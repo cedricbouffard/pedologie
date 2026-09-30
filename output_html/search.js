@@ -35,6 +35,45 @@
       .toLowerCase();
   }
 
+  function levenshtein(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    if (Math.abs(a.length - b.length) > 2) return 99;
+    const row = [];
+    for (let i = 0; i <= b.length; i++) row[i] = i;
+    for (let i = 1; i <= a.length; i++) {
+      let prev = i;
+      for (let j = 1; j <= b.length; j++) {
+        let val;
+        if (a[i - 1] === b[j - 1]) {
+          val = row[j - 1];
+        } else {
+          val = Math.min(row[j - 1] + 1, prev + 1, row[j] + 1);
+        }
+        row[j - 1] = prev;
+        prev = val;
+      }
+      row[b.length] = prev;
+    }
+    return row[b.length];
+  }
+
+  function fuzzyContains(target, query, maxDist = 1) {
+    if (!target || !query) return false;
+    if (target.includes(query)) return true;
+    if (query.length >= 4) {
+      const words = target.split(/[\s,()\-–/.]+/).filter(w => w.length >= 3);
+      for (let i = 0; i < words.length; i++) {
+        const w = words[i];
+        if (Math.abs(w.length - query.length) <= maxDist) {
+          if (levenshtein(w, query) <= maxDist) return true;
+        }
+      }
+    }
+    return false;
+  }
+
   function highlight(text, query) {
     if (!query || !text) return text || '';
     const normText = normalize(text);
@@ -64,10 +103,11 @@
 
         if (normCode === q) score += 100;
         else if (normCode.includes(q)) score += 50;
+        else if (fuzzyContains(normTitle, q)) score += 30;
 
         let allMatch = true;
         for (const w of words) {
-          if (normTitle.includes(w) || normCode.includes(w) || normYear.includes(w)) {
+          if (normTitle.includes(w) || normCode.includes(w) || normYear.includes(w) || fuzzyContains(normTitle, w)) {
             score += 20;
           } else {
             allMatch = false;
@@ -90,20 +130,26 @@
       for (const s of searchIndex.series) {
         const normName = normalize(s.name);
         const normCode = normalize(s.code);
+        const normKeywords = normalize(s.keywords || '');
         let score = 0;
 
         if (normName.startsWith(q)) score += 80;
         else if (normName.includes(q)) score += 40;
+        else if (fuzzyContains(normName, q)) score += 35;
+
+        if (normKeywords && (normKeywords.includes(q) || fuzzyContains(normKeywords, q))) {
+          score += 45;
+        }
 
         let allMatch = true;
         for (const w of words) {
-          if (normName.includes(w) || normCode.includes(w)) {
+          if (normName.includes(w) || normCode.includes(w) || normKeywords.includes(w) || fuzzyContains(normName, w) || fuzzyContains(normKeywords, w)) {
             score += 15;
           } else {
             allMatch = false;
           }
         }
-        if (allMatch || score >= 40) {
+        if (allMatch || score >= 35) {
           let sUrl = s.url;
           if (basePath && !sUrl.startsWith('http') && !sUrl.startsWith('../')) {
             sUrl = basePath + sUrl;
@@ -111,7 +157,7 @@
           matches.push({
             type: 'series',
             title: s.name,
-            subtitle: `Série de sol • ${s.report} (${s.code.toUpperCase()})`,
+            subtitle: `Série de sol • ${s.report} (${(s.code || '').toUpperCase()})${s.keywords ? ' • Notions : ' + s.keywords : ''}`,
             url: sUrl,
             score: score
           });
@@ -122,17 +168,19 @@
     // 3. Match Glossary Terms
     if ((activeFilter === 'all' || activeFilter === 'glossary') && searchIndex.glossary) {
       for (const g of searchIndex.glossary) {
-        const normTerm = normalize(g.term);
+        const term = g.term || g.name || '';
+        const normTerm = normalize(term);
         const normDef = normalize(g.definition);
         let score = 0;
 
         if (normTerm === q) score += 120;
         else if (normTerm.startsWith(q)) score += 90;
         else if (normTerm.includes(q)) score += 50;
+        else if (fuzzyContains(normTerm, q)) score += 75;
 
         let allMatch = true;
         for (const w of words) {
-          if (normTerm.includes(w) || normDef.includes(w)) {
+          if (normTerm.includes(w) || normDef.includes(w) || fuzzyContains(normTerm, w)) {
             score += 15;
           } else {
             allMatch = false;
@@ -141,7 +189,7 @@
         if (allMatch || score >= 40) {
           matches.push({
             type: 'glossary',
-            title: g.term,
+            title: term,
             subtitle: `${g.category} • ${g.definition.slice(0, 110)}...`,
             url: basePath + g.url,
             score: score
