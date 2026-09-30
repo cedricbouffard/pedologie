@@ -1,0 +1,25 @@
+<div>
+  <p><strong>BH_PEDO_</strong> désigne le Numéro de polygone généré à l'interne par le logiciel ARC/INFO.</p>
+  
+  <p>Numéro de polygone attribué par le système, ce champ n'a aucune signification pour la plupart des utilisateurs. Il figure dans le fichier de données produit par ARC/INFO.</p>
+  
+  <p><strong>BH_PEDO_ID</strong> désigne le Numéro attribué à chaque polygone.</p>
+  
+  <p>Ce champ unique attribué par le pédologue identifie chaque polygone de la carte pédologique numérique.</p>
+  
+  <p><strong>POLYGON_HA</strong> désigne la Superficie du polygone en hectare.</p>
+  
+  <p>Il s'agit de la superficie totale en hectares de chaque polygone de la carte pédologique numérique. Cette superficie en hectare est obtenue en divisant par 10 000 (1 ha = 10 000 m<sup>2</sup> = 100 m x 100 m) la valeur du champ <strong>AREA</strong> dans le fichier BH_PEDO.dbf.</p>
+  
+  <p><strong>MAPUNITNOM</strong> désigne le symbole de l'unité cartographique.</p>
+  
+  <p>Annotation de l'unité de cartographie attachée à chaque polygone de la carte pédologique numérique. Ce champ est utilisé pour faire le lien avec le fichier des unités cartographiques (SMUF) de la carte pédologique du bassin versant du Bras d'Henri (BH_SMUF.dbf).</p>
+  
+  <p><strong>DATE_</strong> désigne la Date de la dernière édition de la table des attributs des polygones.</p>
+  
+  <p>Date de la dernière édition de la carte pédologique numérique (BH_PEDO.shp) et de sa table des attributs des polygones (BH_PEDO.dbf).</p>
+  
+  <h3>a) Le fichier des unités de cartographie de la carte pédologique du bassin versant du Bras d'Henri (Québec) (BH_SMUF.dbf)</h3>
+  
+  <p>Le fichier des unités cartographiques (SMUF) compile les enregistrements uniques (c'est-à-dire la somme de tous les polygones possédant la même annotation cartographique) des unités cartographiques de la carte pédologique du bassin versant du Bras d'Henri (BH_SMUF.dbf). Ce fichier peut être joint ou fusionné au fichier des attributs des polygones (BH_PEDO.dbf) de la carte pédologique en format numérique par l'intermédiaire du champ désignant l'unité cartographique <strong>(MAPUNITNOM)</strong>. Le fichier SMUF contient les codes de sol unique <strong>(SOIL_CODE)</strong> attribué par le correlateur provincial dans le Système d'information des sols au Canada (SISCan). À chaque code de sol est associé un modificateur <strong>(MODIFIER)</strong> qui sert à exprimer des phases ou une variante du sol. Ce fichier contient des descripteurs liés au site du sol qui exprime, par exemple, le pourcentage moyen de la pente du sol, la présence ou non de classes de pierrosité, roccosité, d'érosion hydrique ou éolienne. Ces caractéristiques sont généralement exprimées dans le symbole de l'unité cartographique des polygones pédologiques.</p>
+</div>

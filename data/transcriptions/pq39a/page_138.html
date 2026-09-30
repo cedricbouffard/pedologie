@@ -1,0 +1,48 @@
+<table>
+    <thead>
+        <tr>
+            <th>Champ</th>
+            <th>Nom du champ</th>
+            <th>Type</th>
+            <th>Dimension</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>24</td>
+            <td><strong>ROOTRESTRI</strong></td>
+            <td>C</td>
+            <td>1</td>
+            <td>Numéro dans le BH_SLF.dbf de la couche bloquant le passage aux racines</td>
+        </tr>
+        <tr>
+            <td>25</td>
+            <td><strong>DATE</strong></td>
+            <td>D</td>
+            <td>8</td>
+            <td>Année-mois-jour de la dernière édition du fichier SNF</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong><em>Mises en relation</em></strong></p>
+
+<p>Le fichier des noms du sol (SNF) peut être fusionné au fichier des couches de sol (SLF) par l’intermédiaire des champs uniques <strong>PROVINCE, SOIL_CODE, MODIFIER</strong> et <strong>LU</strong>.</p>
+
+<p><strong>PROVINCE</strong> désigne le code de la province.</p>
+<p>Code à deux caractères indiquant la province de l'étude pédologique, ici le Québec (PQ). Ce champ unique est utilisé pour faciliter le lien avec les fichiers des unités cartographiques (SMUF), des noms de sols (SNF) et des couches de sols (SLF) et rendre ces champs informations uniques à chaque province.</p>
+
+<p><strong>SOILNAME</strong> désigne le nom générique du sol, d’un non-sol ou d’un sol non classé.</p>
+<p>L’expression du nom doit commencer par une lettre majuscule.</p>
+
+<p><strong>SOIL_CODE</strong> désigne le code de sol unique suivant le SISCan.</p>
+<p>Code à trois caractères en majuscules pour indiquer l'abréviation du nom du sol (<strong>SOILNAME</strong>) retenu dans le système SISCan et attribué par le corrélateur provincial. Ce code est unique dans chaque province. Consulter le bulletin technique « Dossier des noms de sols du Québec 1997 » (Lamontagne et Nolin (1997b)) pour avoir un aperçu de la liste complète des <strong>SOIL_CODE</strong> attribués aux séries de sols de la province de Québec.</p>
+
+<p><strong>MODIFIER</strong> désigne le modificateur du SOILNAME.</p>
+<p>Le modificateur est un champ à cinq caractères servant à désigner des phases ou une variante du nom du sol (<strong>SOILNAME</strong>). Pour nos besoins au Québec, le contenu du champ <strong>MODIFIER</strong> indique au niveau du premier caractère du champ la classe texturale de la couche de surface du sol, suivi par son qualificatif textural lié à la présence de fragments grossiers, puis de contenu en matière organique. Les deux derniers caractères du champ peuvent exprimer une variante du nom du sol. Le <strong>MODIFIER</strong> s'applique à la fois au nom du sol (<strong>SOILNAME</strong>) et au code SISCan du sol (<strong>SOIL_CODE</strong>). Cependant ce champ peut être laissé en blanc.</p>
+
+<p><strong>LU</strong> désigne l’indicateur de l'utilisation des terres du SOILNAME.</p>
+<p>Il s'agit de l'indicateur des types d'utilisation des terres du sol, qui peut-être un sol agricole (A) ou naturel (N) ou être présent à la fois comme agricoles et naturel (X).Les fichiers SNF et SLF peuvent décrire les profils de sols naturels (non cultivés) (N) ou de sols perturbés par l'agriculture (A), ou les deux (X). Le champ <strong>LU</strong> sert à établir le lien entre la nature du nom du sol (<strong>SOILNAME</strong>) ou du code de sol (<strong>SOIL_CODE</strong>) décrit dans le SNF et présenté dans un profil dans le fichier des couches de sols (SLF).</p>
+
+<p class="page-number">130</p>

@@ -1,0 +1,43 @@
+<table>
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>NT</strong></td>
+      <td>Territoires du Nord-Ouest</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>MAPUNITNOM</strong> désigne le symbole de l'unité cartographique de la carte pédologique.<br>
+Symbole de l'unité de cartographie identifié sur la carte pédologique en format numérique</p>
+
+<p><strong>SUPER_HA</strong> désigne la superficie en hectare de l'unité cartographique.<br>
+Exprime la superficie en hectare de toutes les unités cartographiques de la carte des sols ayant le même symbole cartographique.</p>
+
+<p><strong>SOIL_CODE</strong> désigne le Code de sol unique suivant le SISCan.</p>
+
+<p><em>Soil_Code1, Soil_Code2, Soil_Code3, Soil_Code4</em></p>
+
+<p>Code à trois caractères en majuscules pour indiquer l'abréviation du nom du sol (<strong>SOILNAME</strong>) retenu dans le système SISCan et attribué par le corrélateur provincial. Ce code est unique dans chaque province. Consulter le bulletin technique « Dossier des noms de sols du Québec 1997 » (Lamontagne et Nolin (1997b) pour avoir un aperçu de la liste complète des <strong>SOIL_CODE</strong> attribués aux séries de sols de la province de Québec.<br>
+<strong>SOIL_CODE2</strong> Laisser en blanc si la valeur de <strong>EXTENT1</strong> est 100.<br>
+<strong>SOIL_CODE3</strong> Laisser en blanc si la valeur de <strong>EXTENT1+EXTENT2</strong> est 100.<br>
+<strong>SOIL_CODE4</strong>.Laisser en blanc si la valeur de <strong>EXTENT1+EXTENT2+EXTENT3</strong> est 100.</p>
+
+<p><strong>MODIFIER</strong> désigne le Modificateur du <strong>SOIL_CODE</strong>.</p>
+
+<p><em>Modifier1, Modifier2, Modifier3, Modifier4</em></p>
+
+<p>Le modificateur est un champ à cinq caractères servant à désigner des phases ou une variante du code de sol (<strong>SOIL_CODE</strong>). Pour nos besoins au Québec, le contenu du champ <strong>MODIFIER</strong> indique au niveau du premier caractère du champ la classe texturale de la couche de surface du sol, suivi par son qualificatif textural lié à la présence de fragments grossiers, puis de contenu en matière organique. Les deux derniers caractères du champ peuvent exprimer une variante du nom du sol. Le <strong>MODIFIER</strong> s'applique à la fois au nom du sol (<strong>SOILNAME</strong>) et au code SISCan du sol (<strong>SOIL_CODE</strong>) dans le fichier des noms de sols (<strong>BH_SNF.dbf</strong>). Cependant ce champ peut être laissé en blanc.</p>
+
+<p><strong>EXTENT</strong> désigne l'Étendue en pourcentage du <strong>SOIL_CODE</strong> dans l'unité cartographique.</p>
+
+<p><em>Extent1, Extent2, Extent3, Extent4</em></p>
+
+<p>Pourcentage de la superficie de l'unité cartographique occupée par un sol, un non-sol ou un sol non classé.</p>
+
+<div style="text-align: right; margin-top: 20px;">125</div>

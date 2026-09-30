@@ -1,0 +1,87 @@
+<table>
+  <thead>
+    <tr>
+      <th>CODE</th>
+      <th>Classe de texture du matériau parental</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>VF</strong></td>
+      <td>Texture très fine (AlO)</td>
+    </tr>
+    <tr>
+      <td><strong>FI</strong></td>
+      <td>Fibrique</td>
+    </tr>
+    <tr>
+      <td><strong>ME</strong></td>
+      <td>Mésique</td>
+    </tr>
+    <tr>
+      <td><strong>HU</strong></td>
+      <td>Humique</td>
+    </tr>
+    <tr>
+      <td><strong>SM</strong></td>
+      <td>Stratifié minéral</td>
+    </tr>
+    <tr>
+      <td><strong>SU</strong></td>
+      <td>Stratifié minéral et organique</td>
+    </tr>
+    <tr>
+      <td><strong>UD</strong></td>
+      <td>Texture non différenciée</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>PMCALC</strong> désigne la classe de réaction du (ou des) matériau parental dans la coupe témoin du <strong>SOILNAME</strong>.</p>
+
+<p><strong>PMCALC1, PMCALC2, PMCALC3</strong></p>
+
+<p>Dans le champ <strong>PMCALC</strong>, on peut inscrire un tiret « - » lorsque <strong>KIND</strong> = N ou U. Autrement, on doit y inscrire un des codes figurant sur la liste de codes autorisés lorsque <strong>KIND</strong> = M ou O.<strong>PMCALC1</strong> peut être « - » si <strong>KIND</strong> = N ou U. <strong>PMCALC2</strong> et <strong>PMCALC3</strong> peuvent aussi « - » s'ils ne sont pas présents.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>CODE</th>
+      <th>Classe de réaction du matériau parental</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>-</strong></td>
+      <td>Ne s'applique pas</td>
+    </tr>
+    <tr>
+      <td><strong>EA</strong></td>
+      <td>Acide ($\text{pH} < 5,5$)</td>
+    </tr>
+    <tr>
+      <td><strong>AN</strong></td>
+      <td>Neutre à alcalin ($\text{pH} \ge 5,5$)</td>
+    </tr>
+    <tr>
+      <td><strong>WC</strong></td>
+      <td>Faiblement calcaire (1 à 6 % $\text{CaCO}_3$)</td>
+    </tr>
+    <tr>
+      <td><strong>VC</strong></td>
+      <td>Modérément à fortement calcaire (> 6 % $\text{CaCO}_3$)</td>
+    </tr>
+    <tr>
+      <td><strong>UD</strong></td>
+      <td>Non différencié</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>CFRAG</strong> désigne la teneur moyenne en fragments grossiers (% en volume) contenue dans une partie de la coupe témoin du <strong>SOILNAME</strong>.</p>
+
+<p><strong>CFRAG1</strong> est la classe de fragments grossiers moyen contenu entre 0 à 50 cm de la coupe témoin (ou à une couche limitée de racines de moins de 50 cm)<br>
+<strong>CFRAG2</strong> est la classe de fragments grossiers moyen contenu entre 50 à 100 cm de la coupe témoin (ou à une couche limitée de racines entre 50 et 100)<br>
+Dans le champ <strong>CFRAG</strong>, on peut inscrire un tiret « - » lorsque <strong>KIND</strong> = N ou U. Autrement, on doit y inscrire un des codes figurant sur la liste de codes autorisés lorsque <strong>KIND</strong> = M ou O.<strong>CFRAG1</strong> peut être « - » si <strong>KIND</strong> = N ou U. <strong>CFRAG2</strong> peut être « - » s'il est absent.</p>
+
+<div style="text-align: right; margin-top: 20px;">142</div>

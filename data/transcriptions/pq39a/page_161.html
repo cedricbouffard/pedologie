@@ -1,0 +1,164 @@
+<h2>a) Le fichier des données morphologiques de la carte des sites d’observation du bassin versant du Bras d’Henri (Québec) (BH_SITES.dbf)</h2>
+
+<p>La carte des sites d’observation du bassin versant du Bras d’Henri (Québec) en format numérique (BH_SITES.shp) inclus une table comprenant tous les enregistrements des descripteurs morphologiques (BH_SITES.dbf) décrits au champ par le pédologue avec les coordonnées géographiques (longitude et latitude) des sites d’observation. Cette table décrit à la fois les caractéristiques du site observé (i.e. pente, classe de pierrosité, roccosité, etc.) et des propriétés morphologiques du profil de sol décrit et classé au champ suivant 3 couches ou horizons principaux, soit la couche de surface (A), le sous-sol (B) et le substratum (C). Ce fichier de données morphologiques permet de faire un lien entre les emplacements géographiques des sites d’observations (BH_SITES.shp) et les polygones de la carte pédologique en format numérique (BH_PEDO.shp) Le contenu et la structure des champs enregistrés dans la table BH_SITES.dbf sont décrits de manière exhaustive dans le document intitulé « Document d’entrée des données sur la fiche transect » (Nolin 1983).</p>
+
+<h3>Contenu du fichier BH_SITES.dbf</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Champ</th>
+      <th>Nom du champ</th>
+      <th>Type</th>
+      <th>Dimension</th>
+      <th>Décimale</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>X_MTM_N83</td>
+      <td>N</td>
+      <td>19</td>
+      <td>3</td>
+      <td>Longitude</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Y_MTM_N83</td>
+      <td>N</td>
+      <td>19</td>
+      <td>3</td>
+      <td>Latitude</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>ALTITUDE</td>
+      <td>N</td>
+      <td>19</td>
+      <td>3</td>
+      <td>Altitude (m)</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>IDEN</td>
+      <td>C</td>
+      <td>10</td>
+      <td>-</td>
+      <td>Code d’identification du site<br>(année-échantillonneur-transect-site)</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>INIT</td>
+      <td>C</td>
+      <td>3</td>
+      <td>-</td>
+      <td>Initiale de l’échantillonneur</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>JOUR</td>
+      <td>C</td>
+      <td>2</td>
+      <td>-</td>
+      <td>Jour de l’échantillonnage</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>MOIS</td>
+      <td>C</td>
+      <td>2</td>
+      <td>-</td>
+      <td>Mois de l’échantillonnage</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>COMTE</td>
+      <td>C</td>
+      <td>10</td>
+      <td>-</td>
+      <td>Nom du comté</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>BH_PEDO_ID</td>
+      <td>N</td>
+      <td>11</td>
+      <td>0</td>
+      <td>Numéro de polygone cartographique attribué</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>MAPUNITNOM</td>
+      <td>C</td>
+      <td>60</td>
+      <td>-</td>
+      <td>Symbole de l’unité cartographique associé au polygone pédologique</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>SERIE</td>
+      <td>C</td>
+      <td>3</td>
+      <td>-</td>
+      <td>Code de la série de sols</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>NOM_DU_SOL</td>
+      <td>C</td>
+      <td>30</td>
+      <td>-</td>
+      <td>Nom du sol</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>SOIL_CODE</td>
+      <td>C</td>
+      <td>3</td>
+      <td>-</td>
+      <td>Code SISCan</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>PENT</td>
+      <td>C</td>
+      <td>1</td>
+      <td>-</td>
+      <td>Classe de pente</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>TYPP</td>
+      <td>C</td>
+      <td>1</td>
+      <td>-</td>
+      <td>Type de pente</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>PIER</td>
+      <td>C</td>
+      <td>1</td>
+      <td>-</td>
+      <td>Classe de pierrosité</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>ROCC</td>
+      <td>C</td>
+      <td>1</td>
+      <td>-</td>
+      <td>Classe de roccosité</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>ERHY</td>
+      <td>C</td>
+      <td>1</td>
+      <td>-</td>
+      <td>Classe d’érosion hydrique</td>
+    </tr>
+  </tbody>
+</table>

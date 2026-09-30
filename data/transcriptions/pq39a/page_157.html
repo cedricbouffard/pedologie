@@ -1,0 +1,101 @@
+<div class="pedological-document">
+    <p>Combinaisons autorisées dans <strong>HZN_SUF</strong> par horizon principal :</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>HORIZON MAJEUR</th>
+                <th>HORIZON SUFFIXE</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>A</strong></td>
+                <td>b c ca e g h j k p s u y z x</td>
+            </tr>
+            <tr>
+                <td><strong>B</strong></td>
+                <td>b c ca f g j k m n s t u x y z</td>
+            </tr>
+            <tr>
+                <td><strong>C</strong></td>
+                <td>c ca g j k s u y z x</td>
+            </tr>
+            <tr>
+                <td><strong>O</strong></td>
+                <td>f h m p k s co z b</td>
+            </tr>
+            <tr>
+                <td><strong>L</strong></td>
+                <td>f h m p k s co z b</td>
+            </tr>
+            <tr>
+                <td><strong>F</strong></td>
+                <td>f h m p k s co z b</td>
+            </tr>
+            <tr>
+                <td><strong>H</strong></td>
+                <td>peut être laissé en blanc ou b</td>
+            </tr>
+            <tr>
+                <td><strong>R</strong></td>
+                <td>peut être laissé en blanc ou b</td>
+            </tr>
+            <tr>
+                <td><strong>W</strong></td>
+                <td>peut être laissé en blanc ou b</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Si <strong>HZN_MAS</strong> est C, AB, BA, BC ou CB, <strong>HZN_SUF</strong> peut être laissé en blanc.</p>
+
+    <p><strong>HZN_MOD</strong> désigne le Modificateur de l'horizon<br>
+    <strong>HZN_MOD</strong> doit être en blanc, 2 ou 3....</p>
+
+    <p><strong>Profondeur de l'horizon</strong><br>
+    <strong>UDEPTH</strong> Profondeur de l'horizon supérieur (cm).<br>
+    <strong>LDEPTH</strong> Profondeur de l'horizon inférieur (cm).</p>
+
+    <p>La valeur de <strong>UDEPTH</strong> doit être inférieure à celle de <strong>LDEPTH</strong>.<br>
+    Si <strong>KIND</strong> = M (sols minéraux) ou O (sols organiques)<br>
+    <strong>UDEPTH</strong> doit varier de 0 à 999.<br>
+    <strong>LDEPTH</strong> doit varier de 1 à 999.</p>
+
+    <p><strong>COFRAG</strong> désigne le pourcentage de fragments grossiers (% en volume)<br>
+    Horizon minéral : 0-100; peut être -9 si <strong>KIND</strong> = U ou N<br>
+    Horizon organique : 0-100; peut être -9 si <strong>KIND</strong> = U ou N<br>
+    Horizon R ou W : -9</p>
+
+    <p><strong>DOMSAND</strong> désigne la fraction de sable dominante<br>
+    Horizon minéral VC C M F ou VF; peut être « - » - si <strong>KIND</strong> = U ou N<br>
+    Horizon organique : « - »<br>
+    Horizon R ou W : « - »</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>CODE</th>
+                <th>CLASSE DE FRACTION SABLEUSE</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>-</strong></td>
+                <td>Ne s'applique pas</td>
+            </tr>
+            <tr>
+                <td><strong>VC</strong></td>
+                <td>Très grossier</td>
+            </tr>
+            <tr>
+                <td><strong>C</strong></td>
+                <td>Grossier</td>
+            </tr>
+            <tr>
+                <td><strong>M</strong></td>
+                <td>Moyen</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

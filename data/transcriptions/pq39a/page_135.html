@@ -1,0 +1,93 @@
+<table>
+    <caption>Définition des classes de pente</caption>
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Pente (%)</th>
+            <th>Pente (°)</th>
+            <th>Terminologie</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>7</strong></td>
+            <td>30 à 45</td>
+            <td>16,5 à 24</td>
+            <td>Pente très forte ou montueuse</td>
+        </tr>
+        <tr>
+            <td><strong>8</strong></td>
+            <td>45 à 70</td>
+            <td>24 à 35</td>
+            <td>Pente extrême ou montueuse</td>
+        </tr>
+        <tr>
+            <td><strong>9</strong></td>
+            <td>70 à 100</td>
+            <td>35 à 45</td>
+            <td>Pente abrupte ou très montueuse</td>
+        </tr>
+        <tr>
+            <td><strong>10</strong></td>
+            <td>&gt; 100</td>
+            <td>&gt; 45</td>
+            <td>Pente très abrupte</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>STONE</strong> désigne la classe de pierrosité associée à chaque <strong>SOIL_CODE</strong>.</p>
+
+<p><em>Stone1, Stone2, Stone3, Stone4</em></p>
+
+<p>Ce champ exprime la classe de pierrosité et décrit l'abondance des fragments de roches (&ge; 25 cm) présents à la surface des sols en termes de pourcentage de la superficie du polygone recouverte par ces fragments. Le code <strong>STONE1</strong> doit avoir l'une des valeurs suivantes : entre 0 et 5 si <strong>SOIL_CODE1</strong> est un sol (<strong>KIND</strong> = M ou O) et &laquo; - &raquo; s'il est un non-sol ou un sol non classé (<strong>KIND</strong> = N ou U). <strong>STONE2</strong>, <strong>STONE3</strong> et <strong>STONE4</strong> doivent être &laquo; - &raquo; ou entre 0 et 5. Une valeur 9 indique la présence d'une classe de pierrosité non déterminée.</p>
+
+<table>
+    <caption>Classes de pierrosité</caption>
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Définition</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>-</strong></td>
+            <td>Ne s'applique pas</td>
+        </tr>
+        <tr>
+            <td><strong>0</strong></td>
+            <td>Non pierreux (&lt; 0,01 % de la superficie)</td>
+        </tr>
+        <tr>
+            <td><strong>1</strong></td>
+            <td>Légèrement pierreux (0,01 à 0,1 % de la superficie)</td>
+        </tr>
+        <tr>
+            <td><strong>2</strong></td>
+            <td>Modérément pierreux (0,1 à 3 % de la superficie)</td>
+        </tr>
+        <tr>
+            <td><strong>3</strong></td>
+            <td>Très pierreux (3 à 15 % de la superficie)</td>
+        </tr>
+        <tr>
+            <td><strong>4</strong></td>
+            <td>Extrêmement pierreux (15 à 50 % de la superficie)</td>
+        </tr>
+        <tr>
+            <td><strong>5</strong></td>
+            <td>Excessivement pierreux (&gt;50 % de la superficie)</td>
+        </tr>
+        <tr>
+            <td><strong>9</strong></td>
+            <td>Non déterminé</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>ROCKINESS</strong> désigne la classe de roccosité associée à chaque <strong>SOIL_CODE</strong>.</p>
+
+<p><em>Rockiness1, Rockiness2, Rockiness3, Rockiness4</em></p>
+
+<p>Ce champ décrit les affleurements rocheux selon le pourcentage de la surface du sol qu'ils occupent et s'exprime en terme de classe de roccosité. Le code <strong>ROCKINESS1</strong> doit avoir l'une des valeurs suivantes : entre 0 et 5 si <strong>SOIL_CODE1</strong> est un sol (<strong>KIND</strong> = M ou O) et &laquo; - &raquo; s'il est un non-sol ou un sol non classé (<strong>KIND</strong> = N ou U). <strong>ROCKINESS2</strong>, <strong>ROCKINESS3</strong> et <strong>ROCKINESS4</strong> doivent être &laquo; - &raquo; ou entre 0 et 5. Une valeur 9 indique la présence d'une classe de roccosité non déterminée.</p>

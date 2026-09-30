@@ -1,0 +1,116 @@
+<table>
+  <thead>
+    <tr>
+      <th>CODE</th>
+      <th>Définitions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>-</strong></td>
+      <td>Ne s'applique pas</td>
+    </tr>
+    <tr>
+      <td><strong>A</strong></td>
+      <td>Profil de sol agricole (cultivé)</td>
+    </tr>
+    <tr>
+      <td><strong>N</strong></td>
+      <td>Profil de sol naturel (non cultivé)</td>
+    </tr>
+    <tr>
+      <td><strong>X</strong></td>
+      <td>Profils de sols agricole et naturel</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong><em>Utilisation</em></strong></p>
+<p>Le lien entre la table SNF et SLF s'établit par l'intermédiaire des champs <strong>PROVINCE</strong>, <strong>SOIL_CODE</strong>, <strong>MODIFIER</strong> et <strong>LU</strong>. Le champ utilisation des terres (<strong>LU</strong>) détermine si le lien doit être fait avec le profil dans le fichier SLF au sol agricole ou naturel ou à la fois agricole et naturel.</p>
+
+<p><strong>KIND désigne le type de sol du SOILNAME.</strong><br>
+On décrit la nature du matériel parental de la coupe témoin.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>CODE</th>
+      <th>Définitions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>M</strong></td>
+      <td>Minéral</td>
+    </tr>
+    <tr>
+      <td><strong>O</strong></td>
+      <td>Organique</td>
+    </tr>
+    <tr>
+      <td><strong>N</strong></td>
+      <td>Non-sol (v.g. affleurements rocheux)</td>
+    </tr>
+    <tr>
+      <td><strong>U</strong></td>
+      <td>Sol non classé (v.g. zone urbaine ou eau (lac, rivière, etc.))</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>ORDER désigne le niveau taxonomique de l'ordre du SOILNAME</strong></p>
+
+<p><strong>Règles de décision :</strong></p>
+
+<p>
+Si <strong>KIND</strong> = M, alors <strong>ORDER</strong> = BR, CH, CY, GL, LU, PZ, RG, SZ ou VE.<br>
+Si <strong>KIND</strong> = O, alors <strong>ORDER</strong> = OR.<br>
+Si <strong>KIND</strong> = N ou U, alors <strong>ORDER</strong> = <strong>« - »</strong>.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>CODE</th>
+      <th>ORDRE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>-</strong></td>
+      <td>Ne s'applique pas</td>
+    </tr>
+    <tr>
+      <td><strong>BR</strong></td>
+      <td>Brunisolique</td>
+    </tr>
+    <tr>
+      <td><strong>CH</strong></td>
+      <td>Chernozémique</td>
+    </tr>
+    <tr>
+      <td><strong>CY</strong></td>
+      <td>Cryosolique</td>
+    </tr>
+    <tr>
+      <td><strong>GL</strong></td>
+      <td>Gleysolique</td>
+    </tr>
+    <tr>
+      <td><strong>LU</strong></td>
+      <td>Luvisolique</td>
+    </tr>
+    <tr>
+      <td><strong>OR</strong></td>
+      <td>Organique</td>
+    </tr>
+    <tr>
+      <td><strong>PZ</strong></td>
+      <td>Podzolique</td>
+    </tr>
+    <tr>
+      <td><strong>RG</strong></td>
+      <td>Régosolique</td>
+    </tr>
+  </tbody>
+</table>

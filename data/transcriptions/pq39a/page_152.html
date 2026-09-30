@@ -1,0 +1,73 @@
+<div>
+  <p><strong>RESTR_TYPE</strong> désigne la nature de la couche restrictive au développement des racines associées au SOILNAME.</p>
+
+  <p>Dans le champ <strong>RESTR_TYPE</strong>, on peut inscrire un tiret « - » si <strong>KIND</strong> = N ou U. Autrement, on doit y inscrire un des codes figurant sur la liste de codes autorisés si <strong>KIND</strong> = M ou O.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>CODE</th>
+        <th>CLASSE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>-</strong></td>
+        <td>Ne s'applique pas</td>
+      </tr>
+      <tr>
+        <td><strong>UN</strong></td>
+        <td>Non différencié</td>
+      </tr>
+      <tr>
+        <td><strong>BN</strong></td>
+        <td>Horizon B solonetzique</td>
+      </tr>
+      <tr>
+        <td><strong>SA</strong></td>
+        <td>Salinité (conductivité &gt; 4 dS/m)</td>
+      </tr>
+      <tr>
+        <td><strong>CT</strong></td>
+        <td>Till de fond compact</td>
+      </tr>
+      <tr>
+        <td><strong>OR</strong></td>
+        <td>Horizon ortstein</td>
+      </tr>
+      <tr>
+        <td><strong>FP</strong></td>
+        <td>Horizon fragique</td>
+      </tr>
+      <tr>
+        <td><strong>LI</strong></td>
+        <td>Couche lithique (roc solide)</td>
+      </tr>
+      <tr>
+        <td><strong>CR</strong></td>
+        <td>Horizon cryique</td>
+      </tr>
+      <tr>
+        <td><strong>DU</strong></td>
+        <td>Horizon durique</td>
+      </tr>
+      <tr>
+        <td><strong>PL</strong></td>
+        <td>Horizon placique</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>ROOTRESTRI</strong> désigne le numéro (<strong>LAYER_NO</strong>) de la couche restrictive au développement des racines associées au SOILNAME.</p>
+
+  <p>Si <strong>KIND</strong> = M ou O, un numéro de 1 à 9 indiquant la couche restrictive du passage des racines avec le champ <strong>LAYER_NO</strong> que l'on retrouve dans le fichier SLF. Dans le champ <strong>ROOTRESTRI</strong>, on peut inscrire un tiret « - » lorsque <strong>KIND</strong> = N ou U.</p>
+
+  <p><strong>DATE</strong> désigne la date de la dernière édition du fichier <strong>BH_SNF.dbf</strong></p>
+
+  <h4>Description</h4>
+  <p>Date (année-mois-jour) de la dernière édition apportée à chaque enregistrement dans le fichier SNF.</p>
+
+  <h3>c) Le fichier des couches de sol de la carte pédologique du bassin versant du Bras d'Henri (Québec) (BH_SLF)</h3>
+
+  <p>Le fichier des noms de sol (SLF) compile les enregistrements décrivant les propriétés spécifiques des horizons physico-chimiques des noms de sols (<strong>SOILNAME</strong>) de la carte pédologique numérique du bassin versant du Bras d'Henri (BH_SNF.dbf). Ce fichier peut être fusionné au SNF par l'intermédiaire des champs communs et uniques <strong>PROVINCE</strong>, <strong>SOIL_CODE</strong>, <strong>MODIFIER</strong> et <strong>LU</strong>. Le fichier SLF contient l'information portant sur les analyses physico-chimiques de profils représentatifs des <strong>SOILNAME</strong>, par exemple la texture, pH, CEC, densité</p>
+</div>

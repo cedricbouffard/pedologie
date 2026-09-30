@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="fr" class="portal-html">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Glossaire Pédologique &amp; Nomenclature Officielle — SCSS Québec</title>
+  <meta name="description" content="Définitions normalisées du Système de classification des sols du Canada (SCSS) et des mémoires d'inventaire pédologique du Québec."/>
+
+  <!-- Typographie d'archive, de cartographie & de bibliothèque savante -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* Cartes du glossaire harmonisées avec le design system */
+    .glossary-card {
+      background: var(--surface-raised, #fbfaf8);
+      border: 1px solid var(--border, #e5e1d8);
+      border-radius: 8px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .glossary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+      border-color: var(--accent-forest, #204838);
+      background: var(--surface, #ffffff);
+    }
+    .glossary-term-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border, #e5e1d8);
+      padding-bottom: 6px;
+      gap: 8px;
+    }
+    .glossary-term-title {
+      margin: 0;
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      color: var(--accent-forest, #204838);
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .glossary-term-def {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--ink-secondary, #4a4640);
+      flex: 1;
+    }
+    .rubric-header {
+      border-bottom: 2px solid var(--border-dark, #b5ad9e);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .rubric-title {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      color: var(--ink, #1f1d1a);
+      margin: 0;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body class="portal-body">
+
+  <!-- Barre de navigation institutionnelle patrimoniale -->
+  <nav class="portal-navbar" aria-label="Navigation principale">
+    <div class="navbar-content">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-titles">
+          <span class="nav-brand-title">Inventaire Pédologique du Québec</span>
+          <span class="nav-brand-sub">Archives agronomiques &amp; cartographiques • 1936–2017</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-search-btn" style="text-decoration:none;margin-right:8px;" title="Retour à l'accueil du portail">
+          <span>Accueil</span>
+        </a>
+        <a href="etudes.html" class="nav-search-btn" style="text-decoration:none;margin-right:8px;" title="Consulter les 79 mémoires d'inventaire pédologique régionaux">
+          <span>Études</span>
+        </a>
+        <a href="series/index.html" class="nav-search-btn" style="text-decoration:none;margin-right:8px;" title="Consulter le répertoire des séries de sols du Québec">
+          <span>Séries de Sols</span>
+        </a>
+        <a href="glossaire.html" class="nav-search-btn active" style="text-decoration:none;margin-right:8px;font-weight:700;" title="Consulter le glossaire pédologique officiel">
+          <span>Glossaire</span>
+        </a>
+        <button type="button" class="nav-search-btn" onclick="PedoSearch.open()" aria-label="Recherche globale plein-texte">
+          <svg fill="none" stroke="currentColor" stroke-width="2" height="15" viewBox="0 0 24 24" width="15">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span class="nav-search-text">Recherche plein-texte</span>
+          <kbd class="nav-kbd">Ctrl+K</kbd>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="portal-container" id="top">
+
+    <nav class="breadcrumb" style="margin-bottom: 12px; margin-top: 10px;">
+      <a href="index.html">Accueil</a> &rsaquo; 
+      <span class="active">Glossaire Pédologique</span>
+    </nav>
+
+    <!-- Cartouche éditorial et frontispice -->
+    <header class="portal-cartouche">
+      <div class="cartouche-frame">
+        <h1 class="cartouche-title">Glossaire Pédologique &amp; Nomenclature</h1>
+        <p style="text-align:center;max-width:720px;margin:0 auto 16px auto;font-size:0.98rem;line-height:1.55;color:var(--ink-secondary);">
+          Définitions normalisées du Système de classification des sols du Canada (SCSS) et des mémoires d'inventaire pédologique québécois.
+        </p>
+
+        <!-- Registre des statistiques patrimoniales -->
+        <div class="cartouche-stats-strip">
+          <div class="stat-cell">
+            <span class="stat-number">143</span>
+            <span class="stat-name">Termes &amp; concepts définis</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-cell">
+            <span class="stat-number">6</span>
+            <span class="stat-name">Sections taxonomiques</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-cell">
+            <span class="stat-number">SCSS</span>
+            <span class="stat-name">Référentiel certifié</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Console de recherche interactive -->
+    <section class="portal-console" aria-label="Recherche et filtres du glossaire" style="margin-bottom: 25px;">
+      
+      <!-- Barre de saisie -->
+      <div class="console-search-bar">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" 
+                 id="glossarySearchInput" 
+                 class="search-input-field" 
+                 placeholder="Filtrer parmi les définitions (ex: Sol brun, Ae, Bnt, Gley, Ortstein, Podzol)..." 
+                 autocomplete="off"
+                 oninput="handleGlossarySearch()"/>
+          <button type="button" id="searchClearBtn" class="search-clear-btn" onclick="clearGlossarySearch()" aria-label="Effacer la recherche" style="display: none;">✕</button>
+        </div>
+        <div class="search-indicator">
+          <span id="resultsCountBadge" class="results-badge">143 termes au glossaire</span>
+        </div>
+      </div>
+
+      <!-- Navigation thématique par catégorie -->
+      <div class="console-controls-bar">
+        <div class="decade-selector" id="categoryNav" role="tablist" aria-label="Accès thématique">
+          <a href="#ordres" class="tab-pill">Ordres</a>
+          <a href="#grands_groupes" class="tab-pill">Grands Groupes</a>
+          <a href="#sous_groupes" class="tab-pill">Sous-Groupes</a>
+          <a href="#horizons_maitres" class="tab-pill">Horizons Maîtres</a>
+          <a href="#horizons_specifiques" class="tab-pill">Horizons Spécifiques</a>
+          <a href="#proprietes" class="tab-pill">Propriétés &amp; Notions</a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Corps du glossaire : Cartes normalisées -->
+    <main class="rubric-body" id="glossaryContainer" style="padding-top: 10px;">
+<section id="ordres" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Ordres Pédologiques (SCSS)</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Les grands ordres du Système de classification des sols du Canada définissant l&#x27;orientation majeure de la pédogenèse.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="brunisol">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Brunisol</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sol brun présentant un horizon d&#x27;altération Bm, typique des climats tempérés frais sur matériaux moyennement filtrants.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="brunisolique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Brunisolique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ordre de sols au stade de développement intermédiaire, caractérisés par un horizon Bm brunâtre sans horizon éluvié marqué ni accumulation podzolique forte.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="chernozémique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Chernozémique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ordre de sols de prairies semi-arides à subhumides, caractérisés par un horizon de surface noir ou très sombre (Ah mélique) très riche en humus stable.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="gleysol">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Gleysol</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sol hydromorphe saturé d&#x27;eau périodiquement ou en permanence, présentant un horizon Bg ou Cg à marbrures contrastées.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="gleysolique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Gleysolique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ordre de sols développés sous l&#x27;action d&#x27;un engorgement en eau prolongé (nappe phréatique), caractérisés par des teintes de réduction grises ou bleuâtres et de fortes mouchetures de gley.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="luvisol">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Luvisol</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sol à horizon d&#x27;accumulation d&#x27;argile Bt bien développé, fréquent sur les tills ou limons enrichis en carbonates des basses-terres.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="luvisolique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Luvisolique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ordre de sols développés sur dépôts fins ou calcaires, caractérisés par la migration mécanique de l&#x27;argile de la surface vers le sous-sol (horizon illuvial Bt).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="organique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Organique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ordre de sols tourbeux composés de plus de 30 % de matière organique sur une épaisseur supérieure à 40-60 cm.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="podzol">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Podzol</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sol acide caractéristique des forêts de conifères, présentant une différenciation nette entre la couche décolorée Ae et le sous-sol enrichi en sesquioxydes Bf.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="podzolique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Podzolique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ordre de sols très acides et lessivés sous végétation boréale ou sur sables quartzeux, caractérisés par un horizon éluvié Ae blanchi et un horizon d&#x27;accumulation Bf ou Bhf enrichi en matière organique, fer et aluminium.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="régosol">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Régosol</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sol sans horizon sous-jacent diagnostique autre qu&#x27;un horizon de surface faiblement développé (Ah ou Ap) reposant directement sur le matériau d&#x27;origine C.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="régosolique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Régosolique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ordre de sols très jeunes ou instables (dépôts récents, alluvions, éboulis), dépourvus d&#x27;horizon B génétique différencié.</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="grands_groupes" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Grands Groupes Pédologiques</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Sous-divisions diagnostiques majeures caractérisant la différenciation des horizons et l&#x27;intensité des processus.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="brunisol dystrique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Brunisol dystrique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Brunisol acide (pH &lt; 5,5) à faible saturation en bases, développé sur des roches mères pauvres en carbonates.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="brunisol eutrique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Brunisol eutrique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Brunisol peu acide ou basique (pH &gt;= 5,5) à forte saturation en bases, enrichi en calcium et magnésium.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="brunisol sombrique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Brunisol sombrique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Brunisol doté d&#x27;un horizon de surface humifère Ah bien développé et sombre.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="gleysol humique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Gleysol humique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Gleysol enrichi en matière organique de surface, doté d&#x27;un horizon Ah d&#x27;au moins 10 cm d&#x27;épaisseur ou d&#x27;un horizon Ap foncé.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="luvisol gris">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Luvisol gris</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Luvisol typique des régions boréales et tempérées froides, montrant un horizon éluvié Ae très net surmontant l&#x27;horizon Bt.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="podzol ferro-humique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Podzol ferro-humique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Podzol très riche en matière organique accumulée (au moins 5 % de carbone organique dans l&#x27;horizon Bhf supérieur).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="podzol humo-ferrique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Podzol humo-ferrique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Podzol dont l&#x27;horizon B podzolique (Bf) contient au moins 0,6 % de fer et d&#x27;aluminium extractibles avec un rapport matière organique équilibré.</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="sous_groupes" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Sous-Groupes Taxonomiques</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Précision taxonomique du profil modal ou de ses transitions vers d&#x27;autres régimes pédologiques.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="dystrique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dystrique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sous-groupe à réaction fortement acide et faible teneur en cations basiques échangeables.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="eutrique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Eutrique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sous-groupe à réserve calcique élevée et faible acidité naturelle.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="fersiallitique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Fersiallitique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sous-groupe caractérisé par une libération et une accumulation importante de fer libre dans le sous-sol.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="gleyifié">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Gleyifié</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sous-groupe présentant des caractéristiques d&#x27;engorgement temporaire par l&#x27;eau (mouchetures rouille, horizon Bgj) sans atteindre la saturation complète du gleysol.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="humique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Humique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sous-groupe enrichi en matière organique bien incorporée dans la couche de surface (horizon Ah ou Ap épais).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="orthique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Orthique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sous-groupe modal représentant la forme typique et centrale du grand groupe pédologique, sans intergradation vers d&#x27;autres ordres.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="typique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Typique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Forme représentative standard du taxon pédologique.</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="horizons_maitres" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Horizons Maîtres &amp; Couvertures Organiques</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Nomenclature universelle des couches minérales (A, B, C, R) et des litières forestières et tourbes (L, F, H, O).</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="a">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">A</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon minéral de surface, zone d&#x27;accumulation de la matière organique (Ah, Ap) ou de lessivage maximal des colloïdes (Ae).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="b">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">B</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon minéral du sous-sol, zone d&#x27;accumulation illuviale (fer, aluminium, argile, humus) ou de structuration in situ (Bm).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="c">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">C</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériau parental géologique d&#x27;origine, non consolidé, situé sous le solum et peu altéré par la pédogenèse.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="f">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">F</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon de fermentation organique sous-jacent à la litière, où les débris végétaux sont partiellement décomposés mais encore reconnaissables.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="h">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">H</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon d&#x27;humus forestier bien décomposé, amorphe et noir, situé au contact de la couche minérale.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="l">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">L</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Litière forestière superficielle composée de débris végétaux non décomposés (feuilles, aiguilles, brindilles intactes).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="l-f-h">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">L-F-H</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ensemble de la couverture organique forestière brute (couche de litière, fermentation et humus).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="of">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Of</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon organique de tourbe fibrique, composé de résidus végétaux très peu décomposés.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="oh">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Oh</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon organique de tourbe humique, fortement décomposée, à fibres végétales quasiment invisibles.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="om">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Om</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon organique de tourbe mésique, à décomposition intermédiaire.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="r">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">R</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Roche-mère consolidée (socle rocheux continu / roc sous-jacent).</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="horizons_specifiques" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Horizons Spécifiques &amp; Suffixes Diagnostiques</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Symboles des horizons diagnostiques combinant le niveau maître et ses lettres de qualification génétique (Ap, Ae, Bf, Bg, etc.).</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="ae">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ae</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon éluvié décoloré (blanchi ou gris clair), appauvri en argile, fer et matière organique par lessivage acide descendant.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ah">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ah</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon de surface enrichi en matière organique humifiée par voie biologique naturelle.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ahe">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ahe</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon de surface humifère montrant des traces partielles de lessivage ou d&#x27;éluviation.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ap">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ap</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Couche de surface labourée et perturbée par les travaux agricoles (couche arable).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bc">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">BC</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon transitionnel entre le sous-sol B et le matériau parental C.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bf">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bf</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon enrichi en fer et aluminium amorphes (sesquioxydes), brun rougeâtre à ocre vif, caractéristique des podzols.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bfcj">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bfcj</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon podzolique faiblement cimenté ou concrétionné.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bfj">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bfj</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon podzolique jeune ou faiblement exprimé (enrichissement modéré en fer/aluminium).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bfjgj">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bfjgj</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon podzolique juvénile présentant également des marbrures d&#x27;engorgement temporaire (gley juvénile).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bg">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bg</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon de sous-sol gleyifié, affecté par la réduction du fer sous l&#x27;eau et marqué par des marbrures grises et rouille.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bh">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bh</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon podzolique noir à brun très foncé enrichi principalement en matière organique illuviale.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bhf">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bhf</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon podzolique foncé très enrichi à la fois en matière organique et en sesquioxydes de fer et d&#x27;aluminium.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bm">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bm</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon sous-jacent altéré et structuré in situ, sans enrichissement podzolique majeur, brunissant caractéristique des brunisols.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bt">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bt</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon d&#x27;illuviation enrichi en argile silicateuse migrée depuis la surface (enrobages argileux visibles).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="cg">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Cg</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériau d&#x27;origine gleyifié par la nappe phréatique (teintes grises, bleuâtres ou verdâtres de réduction).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ck">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ck</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériau parental contenant des carbonates de calcium libres (faisant effervescence à l&#x27;acide chlorhydrique).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ckg">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ckg</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériau parental calcaire soumis à un engorgement par l&#x27;eau (gleyifié).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="iic">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">IIC</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Discontinuité lithologique : rupture nette de dépôt géologique (ex. sable éolien sur argile marine).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="iicg">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">IICg</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Discontinuité géologique sous-jacente montrant des traces nettes d&#x27;engorgement par la nappe phréatique.</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="structures_consistances" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Structures &amp; Consistances des Sols</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Types d&#x27;agrégation structurale et résistance mécanique du sol à l&#x27;état sec ou humide (polyédrique, granulaire, friable, etc.).</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="colonnaire">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Colonnaire</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Structure prismatique dont les sommets sont arrondis, souvent associée à la présence de sodium ou de conditions salines.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ferme">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ferme</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Consistance qui résiste à l’écrasement manuel et requiert une force modérée pour être désagrégée.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="friable">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Friable</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Consistance d’un sol qui s’émiette facilement sous une légère pression entre le pouce et l’index à l’état humide.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="granulaire">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Granulaire</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Structure meuble formée de petits agrégats sphéroïdaux arrondis, poreux et non ajustés, typique des horizons de surface cultivés riches en humus.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="induré">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Induré</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon induré ou rocheux fortement consolidé par un agent cimentant (fer, silice, carbonates), impénétrable à la bêche.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="lamellée">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Lamellée</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Structure organisée en plaquettes ou feuillets horizontaux minces superposés, fréquente dans les dépôts argileux varvés ou sous compaction.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="massive">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Massive</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">État compact cohérent sans plans de rupture définis, formant un bloc continu sous l’effet du compactage ou d’une forte teneur en limon et argile.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="particulaire">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Particulaire</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">État d’un sol sans structure (particules isolées les unes des autres), typique des sables meubles quartzeux.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="plastique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Plastique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Propriété d’un sol humide (généralement argileux) de se déformer sous la pression sans se briser et de conserver la forme imposée.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="polyédrique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Polyédrique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Structure constituée de blocs ou d&#x27;agrégats à faces planes ou subangulaires bien définies, favorisant une bonne pénétration racinaire le long des fentes de retrait.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="polyédrique angulaire">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Polyédrique angulaire</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Agrégats en blocs dont les arêtes sont vives et les sommets pointus, typiques des sols riches en argiles gonflantes.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="polyédrique subangulaire">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Polyédrique subangulaire</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Agrégats en blocs dont les arêtes et les faces sont adoucies et arrondies, très communs dans les horizons B forestiers et cultivés.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="prismatique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Prismatique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Structure en colonnes verticales à sommets plats, commune dans les sous-sols argileux ou denses des basses-terres.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="structure polyédrique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Structure polyédrique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Organisation du sol en mottes ou polyèdres à arêtes vives ou émoussées, caractéristique des horizons B d&#x27;accumulation ou sous compaction modérée.</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="modes_depot" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Modes de Dépôt &amp; Matériaux Parentaux</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Origines géologiques des dépôts quaternaires du Québec (alluvionnaire, marin Champlain, till glaciaire, etc.).</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="alluvion">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Alluvion</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sédiments minéraux déposés par les rivières et ruisseaux, créant des terroirs jeunes et fertiles au fond des vallées.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="alluvion récente">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Alluvion récente</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sédiments minéraux récents (sables, limons, argiles) déposés par les crues périodiques des cours d&#x27;eau dans les plaines d&#x27;inondation actives.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="alluvions">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Alluvions</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériaux transportés et sédimentés par les rivières et ruisseaux, créant des terroirs jeunes et fertiles au fond des vallées.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="argile champlainienne">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Argile champlainienne</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sédiments argileux très fins et denses déposés au fond de la Mer de Champlain lors de l&#x27;invasion postglaciaire de la vallée du Saint-Laurent.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="dépôts alluvionnaires">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dépôts alluvionnaires</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sédiments minéraux (sables, limons, argiles) déposés récemment par les crues et les débordements des cours d’eau dans les plaines d’inondation.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="dépôts fluviatiles">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dépôts fluviatiles</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Alluvions transportées et triées par les cours d’eau actuels ou anciens, formant des terrasses étagées et des bancs alluviaux sablo-limoneux.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="dépôts fluvio-glaciaires">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dépôts fluvio-glaciaires</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sables et graviers stratifiés déposés par les torrents d’eaux de fonte sous-glaciaires ou marginaux (eskers, kames, deltas de contact).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="dépôts glacio-lacustres">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dépôts glacio-lacustres</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sédiments fins (limons, argiles souvent varvées) déposés dans les lacs calmes proglaciaires formés lors du retrait de la calotte glaciaire laurentidienne.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="dépôts glacio-marins">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dépôts glacio-marins</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Argiles lourdes et limons massifs sédimentés dans les eaux saumâtres des mers postglaciaires d’invasion (Mer de Champlain, Mer de Goldthwait, Mer de Laflamme).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="dépôts organiques">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dépôts organiques</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Accumulations de matière végétale saturée d’eau peu ou pas décomposée (tourbières, fagnes, marécages tourbeux) atteignant plus de 40 cm d’épaisseur.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="dépôts résiduels">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dépôts résiduels</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Manteau d’altération superficiel issu de la décomposition in situ du socle rocheux sous-jacent, sans transport glaciaire ou hydrique.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="dépôts éoliens">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Dépôts éoliens</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sables fins ou limons transportés et façonnés par le vent après la déglaciation, formant des dunes continentales ou des placages de loess.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="estuarien">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Estuarien</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Dépôts meubles (sables, limons, argiles) sédimentés dans la zone de transition fluvio-marine d&#x27;un estuaire, sous l&#x27;influence alternée des marées et des courants fluviaux.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="mer de champlain">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Mer de Champlain</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Mer d&#x27;invasion postglaciaire ayant submergé les basses-terres du Saint-Laurent entre 13 000 et 10 000 ans avant aujourd&#x27;hui, déposant d&#x27;épaisses couches d&#x27;argiles marines.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="morainique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Morainique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériau parental déposé directement par la glace glaciaire (till), caractérisé par un mélange hétérogène et non trié de cailloux, graviers, sables, limons et argiles.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="placage">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Placage</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Mince couverture sédimentaire meuble (généralement 30 à 100 cm) déposée en discontinuité sur un substratum lithologique ou textural contrastant.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="till glaciaire">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Till glaciaire</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériau parental hétérogène et non trié déposé directement par la glace glaciaire, mélangeant argile, sable, cailloux et gros blocs erratiques (moraine).</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="familles_pedologiques" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Familles &amp; Caractéristiques Pédologiques</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Critères granulométriques, minéralogiques et chimiques déterminant le comportement agronomique.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="acide">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Acide</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sol ou horizon dont la valeur de pH est inférieure à 6,0, caractérisé par une saturation partielle ou faible en bases échangeables.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="acidique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Acidique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Famille de sols à réaction nettement acide (pH généralement inférieur à 5,5), pauvres en bases échangeables.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="argileuse">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Argileuse</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Famille granulométrique dominée par la fraction fine (&lt; 0,002 mm), caractérisée par une forte capacité d’échange, une plasticité marquée et une perméabilité lente.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="argileuse-fine">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Argileuse-fine</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Famille de sols très riches en argile (&gt; 60 % de particules fines), très compacts et à perméabilité très lente, requérant un égouttement maîtrisé.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="calcaire">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Calcaire</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériau ou horizon contenant des teneurs significatives en carbonate de calcium, produisant une effervescence nette au contact de HCl dilué.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="carbonatée">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Carbonatée</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sols riches en carbonates de calcium ou de magnésium libres dans le solum ou le matériau d’origine, maintenant un pH basique ou neutre.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="douce">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Douce</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Qualifie une famille pédologique sous un régime thermique modérément doux et favorable à une période de croissance prolongée sans gelée hâtive.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="limoneuse">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Limoneuse</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Famille de sols riches en particules de limon (0,002 à 0,05 mm), très fertiles mais sensibles à la battance et à l’érosion hydrique.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="loameuse">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Loameuse</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Famille granulométrique de texture équilibrée, associant sable, limon et argile dans des proportions favorables à la rétention d&#x27;eau et au développement racinaire.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="minérale">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Minérale</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Famille de sols constitués principalement de particules minérales (silicates, quartz, argiles) avec moins de 17-30 % de carbone organique.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="neutre">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Neutre</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Famille de sols dont le pH oscille entre 6,5 et 7,5, offrant une saturation en bases élevée et une disponibilité optimale des éléments fertilisants.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="non calcaire">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Non calcaire</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Sols développés sur roches ou matériaux dépourvus de carbonates libres, généralement acides ou désaturés.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="sableuse">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Sableuse</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Famille granulométrique où la fraction sableuse (0,05 à 2 mm) domine très largement, conférant une faible rétention d’eau et une forte aération.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="subaquique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Subaquique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Caractéristique d’un sol situé sous une tranche d’eau permanente peu profonde (moins de 2,5 m), subissant une pédogenèse en milieu aquatique submergé.</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="regimes_hydriques_thermiques" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Régimes Hydriques &amp; Thermiques</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Conditions de température et d&#x27;humidité régissant les cycles biologiques et la dynamique de l&#x27;eau.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="aquique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Aquique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime d’humidité caractérisé par une saturation quasi continue par l’eau et l’absence totale ou prolongée d’oxygène dissous (milieu réducteur).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="cryique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Cryique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime thermique très froid de haute altitude ou de zones nordiques boréales, sans pergélisol permanent mais avec des sols restant très froids toute l’année.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="doux">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Doux</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime thermique clément des basses-terres du sud du Québec (vallée du Saint-Laurent, Montérégie), permettant les cultures les plus exigeantes en unités thermiques.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="frais">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Frais</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime thermique boréal frais où la saison végétative est raccourcie, typique des plateaux appalachiens et des hautes Laurentides.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="frigide">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Frigide</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime thermique froid où la température moyenne annuelle du sol est comprise entre 0 °C et 8 °C, avec des hivers longs et des étés courts.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="humide">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Humide</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime d&#x27;humidité régulier où les apports d&#x27;eau météoriques couvrent la demande évapotranspiratoire sans période de sécheresse prolongée.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="mésique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Mésique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime thermique tempéré frais à moyen typique du sud du Québec (température moyenne annuelle du sol entre 8 °C et 15 °C) ou degré d’humidité intermédiaire.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="peraquique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Peraquique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime de saturation en eau permanent où la nappe phréatique affleure ou submerge continuellement la surface du sol.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="perhumide">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Perhumide</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime où les précipitations annuelles dépassent très largement l’évapotranspiration potentielle, maintenant le sol à l’état très humide.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="subhumide">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Subhumide</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Régime climatique où les précipitations équilibrent ou excèdent légèrement les pertes en eau par évaporation sur la saison végétative.</p>
+    </div>
+    
+      </div>
+    </section>
+    
+    <section id="proprietes" class="rubric-section" style="margin-bottom:35px;">
+      <div class="rubric-header" style="border-bottom:2px solid var(--accent-forest);padding-bottom:8px;margin-bottom:15px;">
+        <h2 class="rubric-title" style="font-size:1.3rem;color:var(--accent-forest);margin:0;">Propriétés Physico-Chimiques &amp; Notions de Terrain</h2>
+      </div>
+      <p style="color:var(--ink-muted);font-size:0.92rem;margin-bottom:15px;">Paramètres agronomiques, descripteurs morphologiques et mesures de laboratoire essentiels.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:15px;">
+        
+    <div class="glossary-card" data-term="battance">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Battance</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Désagrégation des mottes et agrégats superficiels sous l&#x27;action mécanique des pluies, formant une croûte superficielle dense qui réduit l&#x27;infiltration de l&#x27;eau et gêne la levée des cultures.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="bleicherde">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Bleicherde</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Terme classique désignant l&#x27;horizon éluvié blanchi ou gris cendré d&#x27;un podzol (horizon Ae), décoloré par le lessivage intense du fer et composé presque exclusivement de grains de quartz résiduels.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="c.e.c.">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">C.E.C.</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Capacité d&#x27;échange cationique : réserve totale du sol en éléments nutritifs fixés sur les colloïdes d&#x27;argile et d&#x27;humus (exprimée en meq/100g ou cmol(+)/kg).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="caténa">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Caténa</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Chaîne ou toposéquence de sols issus d&#x27;un matériau originel identique, différant de l&#x27;amont vers l&#x27;aval par la pente et le drainage naturel.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="discontinuité lithologique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Discontinuité lithologique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Changement abrupt de la nature géologique, du mode de dépôt ou de la composition granulométrique entre deux couches superposées dans un même profil de sol.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="duripan">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Duripan</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon de sous-sol induré cimenté de façon irréversible par la silice colloïdale.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="faciès ophiolitique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Faciès ophiolitique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ensemble lithologique de roches ignées et métamorphiques ultramafiques (serpentine, gabbro), riches en magnésium et métaux lourds, caractéristiques de la chaîne appalachienne.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="fragipan">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Fragipan</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon de sous-sol très dense et cassant à l&#x27;état sec, compact et peu perméable, restreignant l&#x27;enracinement et la percolation de l&#x27;eau.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="gley">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Gley</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon ou sol formé en milieu réducteur sans oxygène sous l&#x27;action d&#x27;une nappe phréatique prolongée.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="illuviation">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Illuviation</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Accumulation et dépôt de particules minérales ou de colloïdes lessivés dans un horizon sous-jacent (horizon B).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="mva">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">MVA</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Masse volumique apparente : masse de sol sec par unité de volume total (g/cm³), indicateur clé de la porosité et du compactage.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="marbrures">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Marbrures</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Grandes traînées hétérogènes de couleurs grises et rouille alternées témoignant d&#x27;un drainage imparfait à mauvais.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="moder">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Moder</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Forme d&#x27;humus forestier intermédiaire entre le mor et le mull, où la litière est décomposée et triturée par la faune du sol sans formation d&#x27;agrégats argilo-humiques stables.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="mor">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Mor</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Forme d&#x27;humus brut très acide des forêts de conifères ou landes, à décomposition biologique lente, reposant directement sur le sol minéral avec un contact tranché.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="moucheture">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Moucheture</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Tache de couleur contrastée (rouille, brune ou grise) due à des phénomènes locaux d&#x27;oxydoréduction du fer et du manganèse en milieu temporairement saturé en eau.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="mouchetures">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Mouchetures</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Taches de teintes contrastées réparties dans la matrice du sol, témoignant de processus actifs ou passés d&#x27;oxydoréduction causés par des fluctuations de nappe.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="mull">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Mull</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Humus doux bien aéré de sols biologiquement actifs et tempérés, où la matière organique est intimement liée aux argiles par les vers de terre pour former une excellente structure grumeleuse.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="munsell">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Munsell</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Système international de notation des couleurs de sol selon la teinte (Hue), la luminosité (Value) et la saturation (Chroma), ex. 10YR 4/3.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="nappe phréatique perchée">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Nappe phréatique perchée</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Nappe d&#x27;eau temporaire retenue en altitude au-dessus d&#x27;une couche sous-jacente imperméable (argile lourde, fragipan ou till compact), indépendamment de la nappe phréatique régionale.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ortstein">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ortstein</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Horizon B illuvial podzolique fortement cimenté par des oxydes de fer, d&#x27;aluminium et de la matière organique, formant un banc rocheux ou gréseux induré très résistant à la pénétration racinaire.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="oxydoréduction">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Oxydoréduction</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Processus biogéochimiques couplés de réduction (en conditions réductrices saturées d&#x27;eau) et d&#x27;oxydation (lors du ressuyage) régissant la mobilité du fer et du manganèse dans le profil.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="p mehlich-3">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">P Mehlich-3</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Dosage du phosphore assimilable disponible pour les racines des plantes cultivées selon la méthode officielle québécoise Mehlich-3.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="redoxmorphique">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Redoxmorphique</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Qualifie les traits morphologiques (marbrures, concrétions fer-manganèse, zones décolorées) engendrés par les réactions d&#x27;oxydoréduction en conditions d&#x27;engorgement en eau.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ressuyage">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Ressuyage</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Évacuation gravitaire de l&#x27;eau excédentaire d&#x27;un sol saturé, permettant au sol de retrouver sa capacité de rétention et un niveau d&#x27;aération propice au travail agricole.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="roche-mère">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Roche-mère</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Matériau géologique initial (minéral ou organique) sur lequel s&#x27;exercent les processus d&#x27;altération et de différenciation pédologique.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="solum">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Solum</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Ensemble des horizons génétiques supérieurs (A et B) façonnés par les processus de pédogenèse, excluant le matériau parental inaltéré sous-jacent (horizon C).</p>
+    </div>
+    
+    <div class="glossary-card" data-term="substratum">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Substratum</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Formation géologique ou dépôt sédimentaire sous-jacent au solum pédologique (horizon D ou IIC), non transformé par la pédogenèse superficielle.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="toposéquence">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Toposéquence</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Succession ordonnée de sols le long d&#x27;une pente topographique, partageant le même climat et matériau parental mais différant par leur drainage et leur érosion.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="traits redoxmorphiques">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Traits redoxmorphiques</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Morphoses pédologiques visibles (taches rouille, décolorations grisâtres) provoquées par l&#x27;alternance de réduction et d&#x27;oxydation du fer sous l&#x27;action d&#x27;une saturation hydrique périodique.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="ph">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">pH</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Mesure de l&#x27;acidité ou de la basicité du sol. Un pH &lt; 5,5 indique un sol fortement acide ; un pH &gt; 7,0 indique un sol alcalin calcaire.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="égouttement">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Égouttement</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Vitesse et facilité avec laquelle un sol évacue les eaux excédentaires, soit par ruissellement superficiel, soit par percolation interne vers la nappe.</p>
+    </div>
+    
+    <div class="glossary-card" data-term="éluviation">
+      <div class="glossary-term-header">
+        <h3 class="glossary-term-title">Éluviation</h3>
+        <span class="badge" style="background:var(--surface-tint);font-family:var(--font-mono);font-size:0.75rem;">SCSS</span>
+      </div>
+      <p class="glossary-term-def">Exportation et lessivage de matière minérale ou organique vers le bas sous l&#x27;action des eaux d&#x27;infiltration (donnant naissance à un horizon Ae).</p>
+    </div>
+    
+      </div>
+    </section>
+    </main>
+
+    <!-- État vide -->
+    <div id="glossaryEmptyState" class="filter-empty-state" style="display: none; padding: 45px 20px; text-align: center;">
+      <p style="font-size: 1.1rem; font-family: var(--font-serif); margin-bottom: 8px;">Aucun terme du glossaire ne correspond à cette recherche.</p>
+      <p style="font-size: 0.88rem; color: var(--ink-muted); margin-bottom: 18px;">Vérifiez l'orthographe du concept ou du symbole recherché.</p>
+      <button type="button" class="tab-pill" onclick="clearGlossarySearch()">Réinitialiser la recherche</button>
+    </div>
+
+    <!-- Pied de page officiel du portail -->
+    <footer class="portal-footer" style="margin-top: 50px; padding: 30px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.86rem; color: var(--ink-muted);">
+      <p style="margin: 0 0 8px 0;">
+        <a href="index.html" style="color: var(--accent-forest); text-decoration: none;">Accueil</a> • 
+        <a href="etudes.html" style="color: var(--accent-forest); text-decoration: none;">Études Pédologiques</a> • 
+        <a href="series/index.html" style="color: var(--accent-forest); text-decoration: none;">Séries de Sols</a> • 
+        <a href="glossaire.html" style="color: var(--accent-forest); text-decoration: none; font-weight: 600;">Glossaire Pédologique</a> • 
+        <a href="javascript:void(0)" onclick="PedoSearch.open()" style="color: var(--accent-forest); text-decoration: none;">Recherche Plein-Texte (Ctrl+K)</a>
+      </p>
+      <p style="margin: 0;">
+        Répertoire Pédologique Québécois • Données certifiées Agriculture Canada, MAPAQ &amp; IRDA.
+      </p>
+    </footer>
+
+  </main>
+
+  <script>
+    function normalizeText(str) {
+      return (str || '')
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .toLowerCase();
+    }
+
+    function handleGlossarySearch() {
+      const input = document.getElementById('glossarySearchInput');
+      const query = normalizeText(input.value).trim();
+      const clearBtn = document.getElementById('searchClearBtn');
+      clearBtn.style.display = query ? 'flex' : 'none';
+
+      const terms = query.split(/\s+/).filter(t => t.length > 0);
+      const cards = document.querySelectorAll('.glossary-card');
+      const sections = document.querySelectorAll('.rubric-section');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const text = normalizeText(card.textContent);
+        let match = true;
+        for (const t of terms) {
+          if (!text.includes(t)) {
+            match = false;
+            break;
+          }
+        }
+
+        if (match) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Masquer les sections dont toutes les cartes sont masquées
+      sections.forEach(sec => {
+        const visibleCards = sec.querySelectorAll('.glossary-card:not([style*="display: none"])');
+        sec.style.display = visibleCards.length > 0 ? '' : 'none';
+      });
+
+      const badge = document.getElementById('resultsCountBadge');
+      if (query) {
+        badge.textContent = visibleCount + (visibleCount > 1 ? ' termes trouvés' : ' terme trouvé');
+      } else {
+        badge.textContent = '143 termes au glossaire';
+      }
+
+      const emptyState = document.getElementById('glossaryEmptyState');
+      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    function clearGlossarySearch() {
+      const input = document.getElementById('glossarySearchInput');
+      input.value = '';
+      document.getElementById('searchClearBtn').style.display = 'none';
+      handleGlossarySearch();
+      input.focus();
+    }
+  </script>
+  <script src="search.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<h3>b) Le fichier des noms de sol de la carte pédologique du bassin versant du Bras d’Henri (Québec) (BH_SNF.dbf)</h3>
+
+<p>Le fichier des noms de sol (SNF) compile les enregistrements décrivant la nature des noms de sols reconnus dans la carte pédologique numérique du bassin versant du Bras d’Henri (BH_SNF.dbf). Ce fichier peut être fusionné au fichier SMUF par l’intermédiaire des champs communs et uniques <strong>PROVINCE</strong>, <strong>SOIL_CODE</strong> et <strong>MODIFIER</strong>. Le fichier SMUF contient l’information qui s’applique à chaque nom de sol minéral ou organique unique (<strong>SOILNAME</strong>). Ce nom de sol peut être aussi un non-sol ou un sol non classé (<strong>KIND = N</strong> ou U). Le fichier compile les descripteurs liés à la classification taxonomique, au mode de déposition, à la granulométrie, à la réaction et au régime hydrique du sol, etc.</p>
+
+<p><em>Contenu du fichier BH_SNF.dbf</em></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Champ</th>
+      <th>Nom du champ</th>
+      <th>Type</th>
+      <th>Dimension</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><strong>PROVINCE</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Code la province</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>SOILNAME</strong></td>
+      <td>C</td>
+      <td>24</td>
+      <td>Nom du sol, du non-sol ou du sol non classé</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>SOIL_CODE</strong></td>
+      <td>C</td>
+      <td>3</td>
+      <td>Code SISCan du <strong>SOILNAME</strong></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>MODIFIER</strong></td>
+      <td>C</td>
+      <td>5</td>
+      <td>Modificateur du <strong>SOIL_CODE</strong> et du <strong>SOILNAME</strong></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>LU</strong></td>
+      <td>C</td>
+      <td>1</td>
+      <td>Indicateur de l’utilisation des terres</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><strong>KIND</strong></td>
+      <td>C</td>
+      <td>1</td>
+      <td>Type de sol</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><strong>ORDER3</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Ordre de sols (3<sup>e</sup> édition du SCCS)</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><strong>G_GROUP3</strong></td>
+      <td>C</td>
+      <td>3</td>
+      <td>Grand groupe de sols (3<sup>e</sup> édition du SCCS)</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><strong>S_GROUP3</strong></td>
+      <td>C</td>
+      <td>5</td>
+      <td>Sous-groupe de sols (3<sup>e</sup> édition du SCCS)</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><strong>MDEP1</strong></td>
+      <td>C</td>
+      <td>4</td>
+      <td>Mode de déposition du 1<sup>er</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td><strong>MDEP2</strong></td>
+      <td>C</td>
+      <td>4</td>
+      <td>Mode de déposition du 2<sup>ième</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td><strong>MDEP3</strong></td>
+      <td>C</td>
+      <td>4</td>
+      <td>Mode de déposition du 3<sup>ième</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td><strong>PMTEX1</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Granulométrie du 1<sup>er</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td><strong>PMTEX2</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Granulométrie du 2<sup>ième</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td><strong>PMTEX3</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Granulométrie du 3<sup>ième</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td><strong>PMCALC1</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Classe de réaction 1<sup>er</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td><strong>PMCALC2</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Classe de réaction 2<sup>ième</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td><strong>PMCALC3</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Classe de réaction 3<sup>ième</sup> matériau parental</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td><strong>CFRAG1</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Contenu en fragments grossiers entre 0 et 50 cm</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td><strong>CFRAG2</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Contenu en fragments grossiers entre 50 et 100 cm</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td><strong>DRAINAGE</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Classe de drainage du sol</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td><strong>WATERTBL</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Caractéristiques du régime de la nappe phréatique</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td><strong>RESTR_TYPE</strong></td>
+      <td>C</td>
+      <td>2</td>
+      <td>Nature de la couche bloquant le passage aux racines</td>
+    </tr>
+  </tbody>
+</table>

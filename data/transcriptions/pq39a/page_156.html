@@ -1,0 +1,46 @@
+<p>indique au niveau du premier caractère du champ la classe texturale de la couche de surface du sol, suivi par son qualificatif textural lié à la présence de fragments grossiers, puis de contenu en matière organique. Les deux derniers caractères du champ peuvent exprimer une variante du nom du sol. Le <b>MODIFIER</b> s'applique à la fois au nom du sol (<b>SOILNAME</b>) et au code SISCan du sol (<b>SOIL_CODE</b>). Cependant ce champ peut être laissé en blanc.</p>
+
+<p><b>LU</b> désigne l'indicateur de l'utilisation des terres du SOILNAME.</p>
+
+<p>Il s'agit de l'indicateur des types d'utilisation des terres du sol, qui peut-être un sol agricole (A) ou naturel (N) ou être présent à la fois comme agricoles et naturel (X).Les fichiers SNF et SLF peuvent décrire les profils de sols naturels (non cultivés) (N) ou de sols perturbés par l'agriculture (A), ou les deux (X). Le champ <b>LU</b> sert à établir le lien entre la nature du nom du sol (<b>SOILNAME</b>) ou du code de sol (<b>SOIL_CODE</b>) décrit dans le SNF et présenté dans un profil dans le fichier des couches de sols (SLF).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>CODE</th>
+      <th>Définitions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">A</td>
+      <td>Profil de sol agricole (cultivé)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">N</td>
+      <td>Profil de sol naturel (non cultivé)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">X</td>
+      <td>Profils de sols agricole et naturel</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Utilisation</h3>
+
+<p>Le lien entre la table SNF et SLF s'établit par l'intermédiaire des champs <b>PROVINCE</b>, <b>SOIL_CODE</b>, <b>MODIFIER</b> et <b>LU</b>. Le champ utilisation des terres (<b>LU</b>) détermine si le lien qui est fait avec le profil dans le fichier SLF au sol agricole (A) ou naturel (N) ou à la fois agricole et naturel (X).</p>
+
+<p><b>LAYER_NO</b> désigne le numéro de l'horizon</p>
+<p><b>LAYER_NO:</b>1-9 Numéro de l'horizon.</p>
+
+<p><b>HZN_LIT</b> désigne une discontinuité lithologique</p>
+<p><b>HZN_LIT</b> doit être en blanc ou 2 ou 3...</p>
+<p>La valeur de ce champ est présumée être 1 si ce dernier est laissé en blanc. Un sol minéral recouvert d'une couche organique est considéré comme matériau 1. Les horizons R ne sont pas considérés comme des discontinuités lithologiques.</p>
+
+<p><b>HZN_MAS</b> désigne l'horizon principal</p>
+<p><b>HZN_MAS :</b> Horizon principal (majuscules).</p>
+<p><b>HZN_MAS</b> doit être A B C R O L F H AB BA BC CB LF LH FH LFH W.</p>
+
+<p><b>HZN_SUF</b> désigne le suffixe de l'horizon</p>
+<p><b>HZN_SUF :</b> Suffixe de l'horizon (minuscule).</p>

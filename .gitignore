@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+.venv/
+env/
+ENV/
+
+# Large source files and PDFs
+data/pdf/
+data/cache_images/
+data/raw/
+*.pdf
+*.gpkg
+*.gpkg-journal
+*.gdb
+couverture_pedologique_2026_01.gpkg
+
+# Temporary test images and scripts
+test_*.png
+test_*.jpg
+sample_*.png
+sample_*.html
+tableau_5_2_*.png
+page15_full.jpg
+pq57b_*.png
+
+# Antigravity & IDE
+.gemini/
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

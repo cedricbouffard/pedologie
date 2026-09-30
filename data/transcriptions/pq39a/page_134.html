@@ -1,0 +1,99 @@
+<table>
+    <thead>
+        <tr>
+            <th>Nom du champ</th>
+            <th>Étendue de la valeur autorisée</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>EXTENT1</strong></td>
+            <td>40 à 100 %</td>
+        </tr>
+        <tr>
+            <td><strong>EXTENT2</strong></td>
+            <td>0 à 40 %</td>
+        </tr>
+        <tr>
+            <td><strong>EXTENT3</strong></td>
+            <td>0 à 20 %</td>
+        </tr>
+        <tr>
+            <td><strong>EXTENT4</strong></td>
+            <td>0 à 10 %</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>HA_SOL</strong> désigne la superficie en hectare de la composante dans l'unité cartographique de la carte pédologique.</p>
+
+<p><strong><em>Ha_Sol1, Ha_Sol2, Ha_Sol3, Ha_Sol4</em></strong><br>
+Ce champ exprime la superficie en hectare de la composante de sol.</p>
+
+<p><strong>SLOPE</strong> désigne la Pente moyenne en pourcentage du <strong>SOIL_CODE</strong>.</p>
+
+<p><strong><em>Slope1, Slope2, Slope3, Slope4</em></strong></p>
+
+<p>Le pourcentage de pente doit avoir une des valeurs suivantes: <strong>SLOPE1</strong>: Sa valeur doit se situer entre 0 et 150 % si <strong>SOIL_CODE1</strong> est un sol minéral (<strong>KIND</strong> = M) et moins de 10 % s'il est un sol organique (<strong>KIND</strong> = O). Elle peut être -9 si <strong>SOIL_CODE1</strong> est un non-sol ou un sol non classé (<strong>KIND</strong> = N ou U) ou si aucune valeur ne s'applique. Les mêmes conditions s'appliquent à <strong>SLOPE2, SLOPE3</strong> et <strong>SLOPE4</strong>, c'est-à-dire <strong>que</strong> la valeur doit se situer entre 0 et 150 % ou -9.</p>
+
+<p><strong>PENMINMAX</strong> désigne l'étendue de la variation minimum et maximum de classes de pente du <strong>SOIL_CODE</strong>.</p>
+
+<p><strong><em>Penminmax1, Penminmax2, Penminmax3, Penminmax3</em></strong></p>
+
+<p>Ce champ donne l'étendue des classes de pente attribuée au <strong>SOIL_CODE</strong>. Il permet d'avoir un aperçu des valeurs minimum et maximum de la variation de la pente de chaque composante de l'unité cartographique. Par exemple, une <strong>PENMINMAX</strong> de 3-4, indique que la composante se présente sur le terrain sur des pentes allant de 2 à 10 %.</p>
+
+<table>
+    <caption>Définition des classes de pente</caption>
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Pente (%)</th>
+            <th>Pente (°)</th>
+            <th>Terminologie</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>-</strong></td>
+            <td><strong>-</strong></td>
+            <td>-</td>
+            <td>Ne s'applique pas</td>
+        </tr>
+        <tr>
+            <td><strong>1</strong></td>
+            <td><strong>0 à 0,5</strong></td>
+            <td>0</td>
+            <td>Horizontal, plat, uni ou dépression</td>
+        </tr>
+        <tr>
+            <td><strong>2</strong></td>
+            <td><strong>0,5 à 2</strong></td>
+            <td>0,3 à 1,1</td>
+            <td>Presque horizontal ou légèrement ondulé</td>
+        </tr>
+        <tr>
+            <td><strong>3</strong></td>
+            <td><strong>2 à 5</strong></td>
+            <td>1,1 à 3</td>
+            <td>Pente très faible ou ondulée</td>
+        </tr>
+        <tr>
+            <td><strong>4</strong></td>
+            <td><strong>5 à 10</strong></td>
+            <td>3 à 5</td>
+            <td>Pente faible ou faiblement vallonnée</td>
+        </tr>
+        <tr>
+            <td><strong>5</strong></td>
+            <td><strong>10 à 15</strong></td>
+            <td>5 à 8,5</td>
+            <td>Pente modérée ou modérément vallonnée</td>
+        </tr>
+        <tr>
+            <td><strong>6</strong></td>
+            <td><strong>15 à 30</strong></td>
+            <td>8,5 à 16,5</td>
+            <td>Pente forte ou fortement vallonnée</td>
+        </tr>
+    </tbody>
+</table>

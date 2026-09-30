@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr" class="portal-html">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Inventaire Pédologique du Québec — Portail Officiel</title>
+  <meta name="description" content="Portail souverain des études pédologiques régionales, du répertoire des séries de sols et du glossaire officiel du SCSS (1936–2017)."/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="portal-body">
+
+  <!-- Barre de navigation institutionnelle patrimoniale -->
+  <nav class="portal-navbar" aria-label="Navigation principale">
+    <div class="navbar-content">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-titles">
+          <span class="nav-brand-title">Inventaire Pédologique du Québec</span>
+          <span class="nav-brand-sub">Archives agronomiques &amp; cartographiques • 1936–2017</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-search-btn active" style="text-decoration:none;margin-right:8px;font-weight:700;" title="Accueil du portail">
+          <span>Accueil</span>
+        </a>
+        <a href="etudes.html" class="nav-search-btn" style="text-decoration:none;margin-right:8px;" title="Consulter les 79 mémoires d'inventaire pédologique régionaux">
+          <span>Études</span>
+        </a>
+        <a href="series/index.html" class="nav-search-btn" style="text-decoration:none;margin-right:8px;" title="Consulter le répertoire des séries de sols du Québec">
+          <span>Séries de Sols</span>
+        </a>
+        <a href="glossaire.html" class="nav-search-btn" style="text-decoration:none;margin-right:8px;" title="Consulter le glossaire pédologique officiel">
+          <span>Glossaire</span>
+        </a>
+        <button type="button" class="nav-search-btn" onclick="PedoSearch.open()" aria-label="Recherche globale plein-texte">
+          <svg fill="none" stroke="currentColor" stroke-width="2" height="15" viewBox="0 0 24 24" width="15">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span class="nav-search-text">Recherche plein-texte</span>
+          <kbd class="nav-kbd">Ctrl+K</kbd>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="portal-container" id="top">
+
+    <!-- Cartouche éditorial et frontispice -->
+    <header class="portal-cartouche">
+      <div class="cartouche-frame">
+        <h1 class="cartouche-title">Inventaire Pédologique du Québec</h1>
+        <p style="text-align:center;max-width:720px;margin:0 auto 20px auto;font-size:1.05rem;line-height:1.6;color:var(--ink-secondary);">
+          Portail de référence des inventaires régionaux de sols, des monographies provinciales de séries et du référentiel taxonomique officiel du Système de classification des sols du Canada.
+        </p>
+
+        <!-- Registre des statistiques patrimoniales -->
+        <div class="cartouche-stats-strip">
+          <div class="stat-cell">
+            <span class="stat-number">79</span>
+            <span class="stat-name">Monographies régionales</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-cell">
+            <span class="stat-number">699</span>
+            <span class="stat-name">Séries de sols répertoriées</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-cell">
+            <span class="stat-number">149</span>
+            <span class="stat-name">Notions &amp; définitions SCSS</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Console de recherche interactive unifiée -->
+    <section class="portal-console" aria-label="Recherche transversale du portail" style="margin-bottom: 30px;">
+      
+      <!-- Choix de cible de recherche : Études, Séries ou Glossaire -->
+      <div class="search-target-tabs" role="tablist" aria-label="Cible de la recherche">
+        <button type="button" class="search-target-tab active" data-target="studies" onclick="setSearchTarget('studies')" role="tab" aria-selected="true">
+          Chercher une étude
+        </button>
+        <button type="button" class="search-target-tab" data-target="series" onclick="setSearchTarget('series')" role="tab" aria-selected="false">
+          Chercher une série
+        </button>
+        <button type="button" class="search-target-tab" data-target="glossary" onclick="setSearchTarget('glossary')" role="tab" aria-selected="false">
+          Chercher dans le glossaire
+        </button>
+      </div>
+
+      <!-- Barre de saisie -->
+      <div class="console-search-bar">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" 
+                 id="unifiedSearchInput" 
+                 class="search-input-field" 
+                 placeholder="Rechercher une étude par comté, région, auteur, année ou cote (ex: Bellechasse, Arthabaska, 1961)..." 
+                 autocomplete="off"
+                 oninput="handleSearchInput()"/>
+          <button type="button" id="searchClearBtn" class="search-clear-btn" onclick="clearSearch()" aria-label="Effacer la recherche" style="display: none;">✕</button>
+        </div>
+        <div class="search-indicator">
+          <span id="resultsCountBadge" class="results-badge">79 études au registre</span>
+        </div>
+      </div>
+
+      <!-- Panneau de résultats dynamiques -->
+      <div id="searchModeResults" class="search-mode-results-panel" style="display: none;"></div>
+    </section>
+
+    <!-- Section tripartite : Les Trois Piliers de l'Inventaire -->
+    <section class="portal-triptych-section" aria-label="Les trois piliers du portail pédologique">
+      <div class="portal-triptych-header">
+        <h2 class="portal-triptych-title">Les Trois Piliers de l'Inventaire</h2>
+        <p class="portal-triptych-subtitle">
+          Accédez directement aux mémoires régionaux historiques, aux monographies des séries de sols ou au glossaire taxonomique officiel.
+        </p>
+      </div>
+
+      <div class="portal-triptych-grid">
+        
+        <!-- Pilier 1 : Études Pédologiques -->
+        <article class="portal-pillar-card">
+          <div class="pillar-eyebrow">Archives &amp; Inventaires Régionaux</div>
+          <h3 class="pillar-title">Études Pédologiques</h3>
+          <p class="pillar-desc">
+            Le corpus exhaustif des 79 mémoires d'inventaire pédologique des comtés et régions du Québec (1936–2017). Transcriptions textuelles exhaustives, cartes et fac-similés PDF officiels numérisés par Agriculture Canada et le MAPAQ.
+          </p>
+          <ul class="pillar-features">
+            <li>79 mémoires de comtés et municipalités</li>
+            <li>Plus de 13 000 pages et rapports intégraux</li>
+            <li>Fac-similés PDF originaux téléchargeables</li>
+          </ul>
+          <a href="etudes.html" class="portal-pillar-btn">
+            <span>Consulter les études</span>
+            <span class="btn-arrow">&rarr;</span>
+          </a>
+        </article>
+
+        <!-- Pilier 2 : Séries de Sols -->
+        <article class="portal-pillar-card">
+          <div class="pillar-eyebrow">Taxonomie &amp; Morphologie</div>
+          <h3 class="pillar-title">Séries de Sols</h3>
+          <p class="pillar-desc">
+            Monographies provinciales individuelles pour chacune des 699 séries de sols identifiées au Québec. Système de classification des sols du Canada (SCSS), drainage, textures types, matériaux parentaux et horizons diagnostiques.
+          </p>
+          <ul class="pillar-features">
+            <li>699 séries de sols répertoriées</li>
+            <li>Ordres, grands groupes et sous-groupes SCSS</li>
+            <li>Symboles officiels, phases et variantes</li>
+          </ul>
+          <a href="series/index.html" class="portal-pillar-btn">
+            <span>Explorer les séries</span>
+            <span class="btn-arrow">&rarr;</span>
+          </a>
+        </article>
+
+        <!-- Pilier 3 : Glossaire Pédologique -->
+        <article class="portal-pillar-card">
+          <div class="pillar-eyebrow">Nomenclature &amp; Référentiel</div>
+          <h3 class="pillar-title">Glossaire SCSS</h3>
+          <p class="pillar-desc">
+            Référentiel terminologique officiel du Système de classification des sols du Canada (SCSS). Définitions rigoureuses des ordres, grands groupes, sous-groupes, critères de diagnostic morphologique et nomenclature des horizons maîtres.
+          </p>
+          <ul class="pillar-features">
+            <li>149 définitions normalisées du SCSS</li>
+            <li>Clés de diagnostic des ordres et groupes</li>
+            <li>Nomenclature des horizons minéraux et organiques</li>
+          </ul>
+          <a href="glossaire.html" class="portal-pillar-btn">
+            <span>Consulter le glossaire</span>
+            <span class="btn-arrow">&rarr;</span>
+          </a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Encadré contributif & signalement d'erreurs -->
+    <aside class="portal-contribute-banner" aria-label="Participation et signalement d'erreurs">
+      <div class="contribute-badge">Projet Ouvert &amp; Collaboratif</div>
+      <p class="contribute-text">
+        Ce portail rassemble des données issues de la numérisation et de la transcription intégrale de documents historiques. Malgré les révisions effectuées, <strong>le répertoire contient encore des coquilles et des erreurs</strong>. Les utilisateurs sont chaleureusement invités et libres de soulever les anomalies ou de proposer directement des corrections via le dépôt GitHub du projet.
+      </p>
+      <div class="contribute-actions">
+        <a href="https://github.com/cedricbouffard/pedologie/issues" target="_blank" rel="noopener" class="contribute-btn">
+          <span>Signaler une erreur sur GitHub</span>
+          <span class="btn-arrow">&rarr;</span>
+        </a>
+        <a href="https://github.com/cedricbouffard/pedologie" target="_blank" rel="noopener" class="contribute-btn contribute-btn-outline">
+          <span>Contribuer ou corriger sur GitHub</span>
+          <span class="btn-arrow">&rarr;</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Pied de page officiel du portail -->
+    <footer class="portal-footer" style="margin-top: 50px; padding: 30px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.86rem; color: var(--ink-muted);">
+      <p style="margin: 0 0 8px 0;">
+        <a href="index.html" style="color: var(--accent-forest); text-decoration: none; font-weight: 600;">Accueil</a> • 
+        <a href="etudes.html" style="color: var(--accent-forest); text-decoration: none;">Études Pédologiques</a> • 
+        <a href="series/index.html" style="color: var(--accent-forest); text-decoration: none;">Séries de Sols</a> • 
+        <a href="glossaire.html" style="color: var(--accent-forest); text-decoration: none;">Glossaire Pédologique</a> • 
+        <a href="javascript:void(0)" onclick="PedoSearch.open()" style="color: var(--accent-forest); text-decoration: none;">Recherche Plein-Texte (Ctrl+K)</a>
+      </p>
+      <p style="margin: 0;">
+        Inventaire Pédologique du Québec • Données historiques Agriculture Canada, MAPAQ &amp; IRDA • Diffusion agronomique et patrimoniale sans but lucratif.
+      </p>
+    </footer>
+
+  </main>
+
+  <script>
+    let globalSearchIndex = null;
+    let currentSearchTarget = 'studies';
+
+    async function getIndexData() {
+      if (globalSearchIndex) return globalSearchIndex;
+      try {
+        const res = await fetch('search_index.json');
+        globalSearchIndex = await res.json();
+        return globalSearchIndex;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function normalizeText(str) {
+      return (str || '')
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .toLowerCase();
+    }
+
+    function setSearchTarget(target) {
+      currentSearchTarget = target;
+      document.querySelectorAll('.search-target-tab').forEach(tab => {
+        const isActive = tab.getAttribute('data-target') === target;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      const input = document.getElementById('unifiedSearchInput');
+      const resultsPanel = document.getElementById('searchModeResults');
+
+      if (target === 'studies') {
+        input.placeholder = "Rechercher une étude par comté, région, auteur, année ou cote (ex: Bellechasse, Arthabaska, 1961)...";
+        if (input.value.trim()) {
+          renderStudiesSearchResults(input.value.trim());
+        } else {
+          resultsPanel.style.display = 'none';
+          document.getElementById('resultsCountBadge').textContent = '79 études au registre';
+        }
+      } else if (target === 'series') {
+        input.placeholder = "Rechercher une série par nom ou symbole (ex: Sainte-Rosalie, Kamouraska, Saint-Urbain)...";
+        resultsPanel.style.display = 'block';
+        renderSeriesSearchResults(input.value.trim());
+      } else if (target === 'glossary') {
+        input.placeholder = "Rechercher une notion, un horizon ou un ordre (ex: Gleysol, Podzol, Ae, Bnt, Ortstein)...";
+        resultsPanel.style.display = 'block';
+        renderGlossarySearchResults(input.value.trim());
+      }
+      input.focus();
+    }
+
+    function handleSearchInput() {
+      const query = document.getElementById('unifiedSearchInput').value.trim();
+      const clearBtn = document.getElementById('searchClearBtn');
+      clearBtn.style.display = query ? 'flex' : 'none';
+
+      if (currentSearchTarget === 'studies') {
+        renderStudiesSearchResults(query);
+      } else if (currentSearchTarget === 'series') {
+        renderSeriesSearchResults(query);
+      } else if (currentSearchTarget === 'glossary') {
+        renderGlossarySearchResults(query);
+      }
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('unifiedSearchInput');
+      input.value = '';
+      document.getElementById('searchClearBtn').style.display = 'none';
+      if (currentSearchTarget === 'studies') {
+        document.getElementById('searchModeResults').style.display = 'none';
+        document.getElementById('resultsCountBadge').textContent = '79 études au registre';
+      } else if (currentSearchTarget === 'series') {
+        renderSeriesSearchResults('');
+      } else if (currentSearchTarget === 'glossary') {
+        renderGlossarySearchResults('');
+      }
+      input.focus();
+    }
+
+    async function renderStudiesSearchResults(rawQuery) {
+      const panel = document.getElementById('searchModeResults');
+      const badge = document.getElementById('resultsCountBadge');
+      const q = normalizeText(rawQuery).trim();
+
+      if (!q) {
+        panel.style.display = 'none';
+        badge.textContent = '79 études au registre';
+        return;
+      }
+
+      const index = await getIndexData();
+      if (!index || !index.reports) {
+        panel.innerHTML = '<p class="search-empty-state">Chargement de l'index des études...</p>';
+        panel.style.display = 'block';
+        return;
+      }
+
+      const words = q.split(/\s+/).filter(w => w.length > 0);
+      const matches = [];
+
+      for (let i = 0; i < index.reports.length; i++) {
+        const r = index.reports[i];
+        const normTitle = normalizeText(r.title);
+        const normCode = normalizeText(r.code);
+        const normYear = normalizeText(r.year || '');
+
+        let matchAll = true;
+        for (let j = 0; j < words.length; j++) {
+          const w = words[j];
+          if (!normTitle.includes(w) && !normCode.includes(w) && !normYear.includes(w)) {
+            matchAll = false;
+            break;
+          }
+        }
+
+        if (matchAll) {
+          matches.push(r);
+          if (matches.length >= 30) break;
+        }
+      }
+
+      badge.textContent = matches.length + (matches.length > 1 ? ' études trouvées' : ' étude trouvée');
+      panel.style.display = 'block';
+
+      if (matches.length === 0) {
+        panel.innerHTML = '<div class="search-empty-state"><p>Aucune étude ne correspond à « <strong>' + rawQuery + '</strong> ».</p><p class="search-tips">Vous pouvez aussi parcourir la collection dans le <a href="etudes.html" style="color:var(--accent-forest);text-decoration:underline;">Registre des Études</a>.</p></div>';
+        return;
+      }
+
+      let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
+      html += '<div style="font-weight:600;font-size:0.95rem;color:var(--accent-forest);">Études correspondantes (' + matches.length + ')</div>';
+      html += '<a href="etudes.html" class="reg-consult-btn" style="text-decoration:none;">Accéder au registre complet &rarr;</a>';
+      html += '</div>';
+      html += '<div class="mode-results-grid">';
+      for (let i = 0; i < matches.length; i++) {
+        const r = matches[i];
+        html += '<a href="' + r.url + '" class="mode-result-card">';
+        html += '<div class="mode-result-card-header">';
+        html += '<span class="mode-result-card-title">' + r.title + '</span>';
+        html += '<span class="badge font-mono" style="font-size:0.75rem;">' + r.code.toUpperCase() + '</span>';
+        html += '</div>';
+        html += '<div class="mode-result-card-desc">Publication : ' + (r.year || 'Année n/d') + ' • ' + (r.pages || '?') + ' pages</div>';
+        html += '</a>';
+      }
+      html += '</div>';
+      panel.innerHTML = html;
+    }
+
+    async function renderSeriesSearchResults(rawQuery) {
+      const panel = document.getElementById('searchModeResults');
+      const badge = document.getElementById('resultsCountBadge');
+      const index = await getIndexData();
+      if (!index || !index.series) {
+        panel.innerHTML = '<p class="search-empty-state">Chargement de l'index des séries...</p>';
+        return;
+      }
+
+      const q = normalizeText(rawQuery).trim();
+      if (!q) {
+        badge.textContent = index.series.length + ' séries au répertoire';
+        let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
+        html += '<div style="font-weight:600;font-size:0.95rem;color:var(--accent-forest);">Répertoire des Séries Pédologiques du Québec</div>';
+        html += '<a href="series/index.html" class="reg-consult-btn" style="text-decoration:none;">Consulter le répertoire complet (A-Z) &rarr;</a>';
+        html += '</div>';
+        html += '<p style="color:var(--ink-muted);font-size:0.88rem;margin:0 0 14px 0;">Saisissez le nom d'une série ou un symbole cartographique pour filtrer en direct.</p>';
+        html += '<div class="mode-results-grid">';
+        const samples = index.series.slice(0, 12);
+        for (let i = 0; i < samples.length; i++) {
+          const s = samples[i];
+          const clean = s.name.split('—')[0].replace(/^(?:la\s+)?série\s+(?:de\s+)?/i, '').trim();
+          html += '<a href="' + s.url + '" class="mode-result-card">';
+          html += '<div class="mode-result-card-header">';
+          html += '<span class="mode-result-card-title">' + clean + '</span>';
+          html += '<span class="badge font-mono" style="font-size:0.75rem;">' + (s.code || 'SÉRIE') + '</span>';
+          html += '</div>';
+          html += '<div class="mode-result-card-desc">' + (s.report || 'Monographie pédologique québécoise') + '</div>';
+          html += '</a>';
+        }
+        html += '</div>';
+        panel.innerHTML = html;
+        return;
+      }
+
+      const words = q.split(/\s+/).filter(w => w.length > 0);
+      const matches = [];
+
+      for (let i = 0; i < index.series.length; i++) {
+        const s = index.series[i];
+        const normName = normalizeText(s.name);
+        const normCode = normalizeText(s.code || '');
+        const normReport = normalizeText(s.report || '');
+
+        let matchAll = true;
+        for (let j = 0; j < words.length; j++) {
+          const w = words[j];
+          if (!normName.includes(w) && !normCode.includes(w) && !normReport.includes(w)) {
+            matchAll = false;
+            break;
+          }
+        }
+
+        if (matchAll) {
+          matches.push(s);
+          if (matches.length >= 60) break;
+        }
+      }
+
+      badge.textContent = matches.length + (matches.length > 1 ? ' séries trouvées' : ' série trouvée');
+
+      if (matches.length === 0) {
+        panel.innerHTML = '<div class="search-empty-state"><p>Aucune série ne correspond à « <strong>' + rawQuery + '</strong> ».</p><p class="search-tips">Vous pouvez aussi consulter l'ensemble des séries dans le <a href="series/index.html" style="color:var(--accent-forest);text-decoration:underline;">Répertoire des Séries</a>.</p></div>';
+        return;
+      }
+
+      let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
+      html += '<div style="font-weight:600;font-size:0.95rem;color:var(--accent-forest);">Séries correspondantes (' + matches.length + ')</div>';
+      html += '<a href="series/index.html" class="reg-consult-btn" style="text-decoration:none;">Index complet A-Z &rarr;</a>';
+      html += '</div>';
+      html += '<div class="mode-results-grid">';
+      for (let i = 0; i < matches.length; i++) {
+        const s = matches[i];
+        const clean = s.name.split('—')[0].replace(/^(?:la\s+)?série\s+(?:de\s+)?/i, '').trim();
+        html += '<a href="' + s.url + '" class="mode-result-card">';
+        html += '<div class="mode-result-card-header">';
+        html += '<span class="mode-result-card-title">' + clean + '</span>';
+        html += '<span class="badge font-mono" style="font-size:0.75rem;">' + (s.code || 'SÉRIE') + '</span>';
+        html += '</div>';
+        html += '<div class="mode-result-card-desc">' + (s.report || 'Monographie pédologique québécoise') + '</div>';
+        html += '</a>';
+      }
+      html += '</div>';
+      panel.innerHTML = html;
+    }
+
+    async function renderGlossarySearchResults(rawQuery) {
+      const panel = document.getElementById('searchModeResults');
+      const badge = document.getElementById('resultsCountBadge');
+      const index = await getIndexData();
+      if (!index || !index.glossary) {
+        panel.innerHTML = '<p class="search-empty-state">Chargement du glossaire...</p>';
+        return;
+      }
+
+      const q = normalizeText(rawQuery).trim();
+      if (!q) {
+        badge.textContent = index.glossary.length + ' termes au glossaire';
+        let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
+        html += '<div style="font-weight:600;font-size:0.95rem;color:var(--accent-forest);">Glossaire Pédologique & Nomenclature Officielle</div>';
+        html += '<a href="glossaire.html" class="reg-consult-btn" style="text-decoration:none;">Consulter le glossaire complet &rarr;</a>';
+        html += '</div>';
+        html += '<p style="color:var(--ink-muted);font-size:0.88rem;margin:0 0 14px 0;">Saisissez un concept, un ordre, un grand groupe ou un symbole d'horizon (ex: Sol brun, Ae, Podzol, Ortstein) pour voir sa définition.</p>';
+        html += '<div class="mode-results-grid">';
+        const samples = index.glossary.slice(0, 12);
+        for (let i = 0; i < samples.length; i++) {
+          const g = samples[i];
+          html += '<a href="' + g.url + '" class="mode-result-card">';
+          html += '<div class="mode-result-card-header">';
+          html += '<span class="mode-result-card-title">' + g.name + '</span>';
+          html += '<span class="badge" style="font-size:0.72rem;background:var(--surface-tint);">' + (g.category || 'SCSS') + '</span>';
+          html += '</div>';
+          html += '<div class="mode-result-card-desc">' + (g.definition ? g.definition.slice(0, 110) + '...' : 'Définition officielle SCSS') + '</div>';
+          html += '</a>';
+        }
+        html += '</div>';
+        panel.innerHTML = html;
+        return;
+      }
+
+      const words = q.split(/\s+/).filter(w => w.length > 0);
+      const matches = [];
+
+      for (let i = 0; i < index.glossary.length; i++) {
+        const g = index.glossary[i];
+        const normName = normalizeText(g.name);
+        const normDef = normalizeText(g.definition || '');
+        const normCat = normalizeText(g.category || '');
+
+        let matchAll = true;
+        for (let j = 0; j < words.length; j++) {
+          const w = words[j];
+          if (!normName.includes(w) && !normDef.includes(w) && !normCat.includes(w)) {
+            matchAll = false;
+            break;
+          }
+        }
+
+        if (matchAll) {
+          matches.push(g);
+          if (matches.length >= 40) break;
+        }
+      }
+
+      badge.textContent = matches.length + (matches.length > 1 ? ' termes trouvés' : ' terme trouvé');
+
+      if (matches.length === 0) {
+        panel.innerHTML = '<div class="search-empty-state"><p>Aucun terme du glossaire ne correspond à « <strong>' + rawQuery + '</strong> ».</p><p class="search-tips">Explorez la liste thématique dans le <a href="glossaire.html" style="color:var(--accent-forest);text-decoration:underline;">Glossaire Pédologique</a>.</p></div>';
+        return;
+      }
+
+      let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
+      html += '<div style="font-weight:600;font-size:0.95rem;color:var(--accent-forest);">Termes du glossaire correspondants (' + matches.length + ')</div>';
+      html += '<a href="glossaire.html" class="reg-consult-btn" style="text-decoration:none;">Glossaire complet &rarr;</a>';
+      html += '</div>';
+      html += '<div class="mode-results-grid">';
+      for (let i = 0; i < matches.length; i++) {
+        const g = matches[i];
+        html += '<a href="' + g.url + '" class="mode-result-card">';
+        html += '<div class="mode-result-card-header">';
+        html += '<span class="mode-result-card-title">' + g.name + '</span>';
+        html += '<span class="badge" style="font-size:0.72rem;background:var(--surface-tint);">' + (g.category || 'SCSS') + '</span>';
+        html += '</div>';
+        html += '<div class="mode-result-card-desc">' + (g.definition ? g.definition.slice(0, 110) + '...' : 'Définition officielle SCSS') + '</div>';
+        html += '</a>';
+      }
+      html += '</div>';
+      panel.innerHTML = html;
+    }
+  </script>
+  <script src="search.js" defer></script>
+</body>
+</html>

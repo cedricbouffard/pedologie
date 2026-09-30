@@ -1,0 +1,202 @@
+<p>apparente, etc. des horizons de sols décrits du haut vers le bas dans la coupe témoin. Le fichier SLF présente des données réelles ou estimées et la table des descripteurs est complète pour <strong>SOILNAME</strong>. Il n'a généralement pas d'information dans le fichier SLF pour un non-sol ou un sol non classé (<strong>KIND</strong> = N ou U).</p>
+
+<h3>Contenu du fichier BH_SLF.dbf</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Champ</th>
+            <th>Nom du champ</th>
+            <th>Type</th>
+            <th>Largeur</th>
+            <th>Décimale</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td><strong>PROVINCE</strong></td>
+            <td>C</td>
+            <td>2</td>
+            <td></td>
+            <td>Code de la province</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td><strong>SOIL_CODE</strong></td>
+            <td>C</td>
+            <td>3</td>
+            <td></td>
+            <td>Code SISCan du <strong>SOILNAME</strong></td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td><strong>MODIFIER</strong></td>
+            <td>C</td>
+            <td>5</td>
+            <td></td>
+            <td>Modificateur du <strong>SOIL_CODE</strong> et du <strong>SOILNAME</strong></td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td><strong>LU</strong></td>
+            <td>C</td>
+            <td>1</td>
+            <td></td>
+            <td>Indicateur de l'utilisation des terres</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td><strong>LAYER_NO</strong></td>
+            <td>C</td>
+            <td>1</td>
+            <td></td>
+            <td>Numéro de l'horizon</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td><strong>HZN_LIT</strong></td>
+            <td>C</td>
+            <td>1</td>
+            <td></td>
+            <td>Discontinuité lithologique</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td><strong>HZN_MAS</strong></td>
+            <td>C</td>
+            <td>3</td>
+            <td></td>
+            <td>Horizon principal</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td><strong>HZN_SUF</strong></td>
+            <td>C</td>
+            <td>7</td>
+            <td></td>
+            <td>Suffixe de l'horizon</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td><strong>HZN_MOD</strong></td>
+            <td>C</td>
+            <td>1</td>
+            <td></td>
+            <td>Modificateur de l'horizon</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td><strong>UDEPTH</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Profondeur de l'horizon supérieur (cm)</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td><strong>LDEPTH</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Profondeur de l'horizon inférieur (cm)</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td><strong>COFRAG</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Fragments grossiers (% en volume)</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td><strong>COFRAG_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de COFRAG</td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td><strong>DOMSAND</strong></td>
+            <td>C</td>
+            <td>2</td>
+            <td></td>
+            <td>Fraction de sable dominante</td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td><strong>VFSAND</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Sable très fin (%)</td>
+        </tr>
+        <tr>
+            <td>16</td>
+            <td><strong>VFSAND_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de VFSAND</td>
+        </tr>
+        <tr>
+            <td>17</td>
+            <td><strong>TSAND</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Sable total (%)</td>
+        </tr>
+        <tr>
+            <td>18</td>
+            <td><strong>TSAND_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de TSAND</td>
+        </tr>
+        <tr>
+            <td>19</td>
+            <td><strong>TSILT</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Limon total (%)</td>
+        </tr>
+        <tr>
+            <td>20</td>
+            <td><strong>TSILT_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de TSILT</td>
+        </tr>
+        <tr>
+            <td>21</td>
+            <td><strong>TCLAY</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Argile totale (%)</td>
+        </tr>
+        <tr>
+            <td>22</td>
+            <td><strong>TCLAY_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de TCLAY</td>
+        </tr>
+        <tr>
+            <td>23</td>
+            <td><strong>ORGCARB</strong></td>
+            <td>N</td>
+            <td>5</td>
+            <td>1</td>
+            <td>Carbone organique (% en masse)</td>
+        </tr>
+    </tbody>
+</table>

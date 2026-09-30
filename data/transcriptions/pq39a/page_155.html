@@ -1,0 +1,93 @@
+<table>
+    <thead>
+        <tr>
+            <th>Champ</th>
+            <th>Nom du champ</th>
+            <th>Type</th>
+            <th>Largeur</th>
+            <th>Décimale</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>46</td>
+            <td><strong>EC_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de EC</td>
+        </tr>
+        <tr>
+            <td>47</td>
+            <td><strong>CACO3</strong></td>
+            <td>N</td>
+            <td>2</td>
+            <td>0</td>
+            <td>Équivalent en carbonate de calcium (CaCO<sub>3</sub>) (%)</td>
+        </tr>
+        <tr>
+            <td>48</td>
+            <td><strong>CACO3_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de CACO3</td>
+        </tr>
+        <tr>
+            <td>49</td>
+            <td><strong>VONPOST</strong></td>
+            <td>N</td>
+            <td>2</td>
+            <td>0</td>
+            <td>Estimation du degré de décomposition selon l'échelle von Post</td>
+        </tr>
+        <tr>
+            <td>50</td>
+            <td><strong>VONPOST_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de VONPOST</td>
+        </tr>
+        <tr>
+            <td>51</td>
+            <td><strong>WOOD</strong></td>
+            <td>N</td>
+            <td>2</td>
+            <td>0</td>
+            <td>Matériau ligneux (% en volume)</td>
+        </tr>
+        <tr>
+            <td>52</td>
+            <td><strong>WOOD_N</strong></td>
+            <td>N</td>
+            <td>3</td>
+            <td>0</td>
+            <td>Nombre d'observations utilisées pour déterminer la valeur de WOOD</td>
+        </tr>
+        <tr>
+            <td>53</td>
+            <td><strong>DATE</strong></td>
+            <td>D</td>
+            <td>8</td>
+            <td></td>
+            <td>Année-mois-jour de la dernière édition du fichier SLF</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>La terminaison _N du nom d'un champ indique le nombre d'observations utilisées pour déterminer la valeur. Ces champs sont OPTIONNELS et peuvent rester vides. Un code de zéro (0) indique une valeur estimée. Par exemple, BD_N peut indiquer le nombre d'observations utilisées dans la détermination de la valeur de BD (densité apparente).</p>
+
+<h3>Mises en relation</h3>
+
+<p>Le fichier SLF peut être fusionné à la table SNF par l'entremise des champs <strong>PROVINCE</strong>, <strong>SOIL_CODE</strong>, <strong>MODIFIER</strong> et <strong>LU</strong> qui sont uniques.</p>
+
+<p><strong>PROVINCE</strong> désigne le code de la province.</p>
+<p>Code à deux caractères indiquant la province de l'étude pédologique, soit ici PQ (Québec). Ce champ unique est utilisé pour faciliter le lien avec les fichiers des unités cartographiques (SMUF), des noms de sols (SNF) et des couches de sols (SLF) et rendre ces champs informations uniques à chaque province.</p>
+
+<p><strong>SOIL_CODE</strong> désigne le code de sol unique suivant le SISCan.</p>
+<p>Code à trois caractères en majuscules pour indiquer l'abréviation du nom du sol (<strong>SOILNAME</strong>) retenu dans le système SISCan et attribué par le corrélateur provincial. Ce code est unique dans chaque province. Consulter le bulletin technique « Dossier des noms de sols du Québec 1997 » (Lamontagne et Nolin (1997b) pour avoir un aperçu de la liste complète des <strong>SOIL_CODE</strong> attribués aux séries de sols de la province de Québec.</p>
+
+<p><strong>MODIFIER</strong> désigne le modificateur du SOILNAME.</p>
+<p>Le modificateur est un champ à cinq caractères servant à désigner des phases ou une variante du nom du sol (<strong>SOILNAME</strong>). Pour nos besoins au Québec, le contenu du champ <strong>MODIFIER</strong></p>

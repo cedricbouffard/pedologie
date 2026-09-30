@@ -1,0 +1,110 @@
+<div class="pedo-document">
+  <h3>Classes de roccosité</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Définition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>-</strong></td>
+        <td>Ne s'applique pas</td>
+      </tr>
+      <tr>
+        <td><strong>0</strong></td>
+        <td>Aucun affleurement rocheux (&lt; 2 % de la superficie)</td>
+      </tr>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>Légèrement rocheux (2 à 10 % de la superficie)</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Modérément rocheux (10 à 25 % de la superficie)</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Très rocheux (25 à 50 % de la superficie)</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Extrêmement rocheux (50 à 90 %)</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>Rocheux (&gt; 90 % de la superficie)</td>
+      </tr>
+      <tr>
+        <td><strong>9</strong></td>
+        <td>Non déterminé</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>EROSION</strong> désigne la classe d'érosion hydrique ou éolienne du <strong>SOIL_CODE</strong>.</p>
+
+  <p><em>Erosion1, Erosion2, Erosion3, Erosion4</em></p>
+
+  <p>On note l'érosion hydrique ou éolienne en décrivant l'intensité du problème. Le code <strong>EROSION1</strong> doit avoir l'une des valeurs suivantes : entre 0 et 4 (érosion hydrique) ou entre 6 et 8 (érosion éolienne) si <strong>SOIL_CODE1</strong> est un sol (KIND =t M ou O) et « - » s'il est un non-sol (KIND = N) ou un sol non classé (KIND = U). <strong>EROSION2</strong>, <strong>EROSION3</strong> et <strong>EROSION4</strong> doivent être « - » ou entre 0 et 4 ou entre 6 et 8. Une valeur 5 indique la présence d'une classe d'érosion hydrique non déterminée ou 9 indique la présence d'une classe d'érosion éolienne non déterminée.</p>
+
+  <h3>Description des classes d'érosion hydrique et éolienne du SISCan</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Définition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>-</strong></td>
+        <td>Ne s'applique pas</td>
+      </tr>
+      <tr>
+        <td><strong>0</strong></td>
+        <td>Aucune érosion hydrique ou éolienne</td>
+      </tr>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>Érosion hydrique légère (&lt; 25 % de la surface du sol)</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Érosion hydrique modérée (25 à 75 % de la surface du sol)</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Érosion hydrique forte (&gt; 75 % de la surface du sol)</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Terrain raviné (gravement raviné)</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>Érosion hydrique non déterminée</td>
+      </tr>
+      <tr>
+        <td><strong>6</strong></td>
+        <td>Érosion éolienne légère (25 à 75 % de la surface du sol)</td>
+      </tr>
+      <tr>
+        <td><strong>7</strong></td>
+        <td>Érosion éolienne forte (. 75 5 de la surface du sol)</td>
+      </tr>
+      <tr>
+        <td><strong>8</strong></td>
+        <td>Terrain emporté par le vent (i.e. dune)</td>
+      </tr>
+      <tr>
+        <td><strong>9</strong></td>
+        <td>Érosion éolienne non déterminée</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>DATE</strong> désigne la <strong>Date de la dernière édition du fichier BH_SMUF</strong>.<br>
+  Date de la dernière édition des enregistrements du fichier BH_SMUF.</p>
+</div>

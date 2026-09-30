@@ -1,0 +1,86 @@
+<p>des unités cartographiques (SMUF) de la carte pédologique du bassin versant du Bras d'Henri (Québec) (BH_SMUF.dbf).</p>
+
+<h3>Contenu du fichier BH_PEDO.dbf</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Champ</th>
+      <th>Nom du champ</th>
+      <th>Type</th>
+      <th>Dimension</th>
+      <th>Décimales</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><strong>AREA</strong></td>
+      <td>N</td>
+      <td>13</td>
+      <td>6</td>
+      <td>Superficie du polygone (m²) générée par ARC/INFO</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>PERIMETER</strong></td>
+      <td>N</td>
+      <td>13</td>
+      <td>6</td>
+      <td>Périmètre du polygone (m) généré par ARC/INFO</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>BH_PEDO_</strong></td>
+      <td>N</td>
+      <td>10</td>
+      <td>0</td>
+      <td>Numéro du polygone généré par ARC/INFO</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>BH_PEDO_ID</strong></td>
+      <td>N</td>
+      <td>10</td>
+      <td>0</td>
+      <td>Numéro du polygone généré par le pédologue</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>POLYGON_HA</strong></td>
+      <td>N</td>
+      <td>11</td>
+      <td>1</td>
+      <td>Superficie du polygone en hectare</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><strong>MAPUNITNOM</strong></td>
+      <td>C</td>
+      <td>60</td>
+      <td>-</td>
+      <td>Symbole de l'unité cartographique</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><strong>DATE_</strong></td>
+      <td>D</td>
+      <td>8</td>
+      <td></td>
+      <td>Date (année-mois-jour) de la dernière édition du fichier BH_PEDO.dbf</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Mises en relation</h3>
+
+<p>Chaque enregistrement dans cette table comporte un numéro (<strong>BH_PEDO_ID</strong>) unique, attribué par le pédologue à chaque polygone (délimitation cartographique) de la carte pédologique en format numérique. Ce champ permet de lier la carte pédologique (BH_PEDO.shp) avec la carte des sites d'observation. (BH_SITES.shp). Le champ <strong>MAPUNITNOM</strong> présent dans le fichier BH_PEDO.dbf est utilisé pour faire le lien entre la carte pédologique numérique et le fichier des unités cartographiques (SMUF) du bassin versant du Bras d'Henri (BH_SMUF.dbf).</p>
+
+<p><strong>AREA</strong> désigne la <strong>Superficie du polygone en m²</strong>.</p>
+
+<p>Ce champ contient des superficies de terres significatives uniquement lorsque la couverture est dans une projection qui conserve les superficies, comme en MTM. Dans le cas des couvertures en coordonnées géographiques (latitude, longitude), le champ <strong>AREA</strong> n'a aucune signification.</p>
+
+<p><strong>PERIMETER</strong> désigne le <strong>Périmètre du polygone en mètre</strong></p>
+
+<p>Ce champ contient les longueurs de périmètre à peu près exactes quand la couverture est dans une projection qui conserve autant que possible les distances, comme en MTM. Dans le cas des couvertures en coordonnées géographiques (latitude, longitude), le champ n'a aucune signification.</p>
