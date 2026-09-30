@@ -9,7 +9,7 @@
 
 ## Présentation du portail
 
-Ce projet rassemble et valorise le corpus des inventaires pédologiques publiés entre 1936 et 2017 par les équipes de recherche conjointes fédérales et provinciales, intégrant les données du GeoPackage officiel 2026.
+Ce projet rassemble et valorise le corpus des inventaires pédologiques publiés entre 1936 et 2017 par les équipes de recherche fédérales, provinciales et de l'IRDA.
 
 Le portail est articulé autour de 3 piliers interconnectés :
 1. **Études Pédologiques** : Registre complet des 79 mémoires d'inventaire de comtés et régions, avec recherche plein-texte, métadonnées, transcriptions intégrales et planches photographiques d'origine.
@@ -90,8 +90,3 @@ Le dépôt est configuré pour un déploiement direct sur **GitHub Pages**.
 ```
 
 ---
-
-## Sources et attribution
-
-- **Données sources** : Agriculture et Agroalimentaire Canada (Système d'information sur les sols du Canada — SISCan) et Ministère de l'Agriculture, des Pêcheries et de l'Alimentation du Québec (MAPAQ).
-- Numérisation, structuration sémantique et développement du moteur de recherche pour la préservation et la diffusion du patrimoine agronomique québécois.
