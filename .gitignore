@@ -17,6 +17,7 @@ data/raw/
 *.gpkg
 *.gpkg-journal
 *.gdb
+*.pmtiles
 couverture_pedologique_2026_01.gpkg
 
 # Temporary test images and scripts
