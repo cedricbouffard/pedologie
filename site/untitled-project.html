@@ -7,44 +7,7 @@
   
   <!-- MapLibre GL JS & PMTiles -->
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
-  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js">
-    // Mobile Tools Drawer Toggle
-    const btnToggleTools = document.getElementById("btn-toggle-tools");
-    const btnCloseTools = document.getElementById("btn-close-tools");
-    const panelTools = document.getElementById("panel-tools");
-    const toolsBackdrop = document.getElementById("tools-backdrop");
-
-    function openMobileTools() {
-      if (panelTools) panelTools.classList.add("open");
-      if (toolsBackdrop) toolsBackdrop.classList.add("active");
-      if (btnToggleTools) btnToggleTools.classList.add("active");
-    }
-
-    function closeMobileTools() {
-      if (panelTools) panelTools.classList.remove("open");
-      if (toolsBackdrop) toolsBackdrop.classList.remove("active");
-      if (btnToggleTools) btnToggleTools.classList.remove("active");
-    }
-
-    if (btnToggleTools) {
-      btnToggleTools.addEventListener("click", () => {
-        if (panelTools && panelTools.classList.contains("open")) {
-          closeMobileTools();
-        } else {
-          openMobileTools();
-        }
-      });
-    }
-
-    if (btnCloseTools) {
-      btnCloseTools.addEventListener("click", closeMobileTools);
-    }
-
-    if (toolsBackdrop) {
-      toolsBackdrop.addEventListener("click", closeMobileTools);
-    }
-  
-  </script>
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js"></script>
 
   <style>
@@ -671,16 +634,6 @@
   <!-- Mobile Backdrop Overlay -->
   <div id="tools-backdrop" class="tools-backdrop"></div>
 
-      <div class="tool-group">
-        <div class="tool-label-row">
-          <label class="tool-label" for="pedo-opacity">Opacité des sols</label>
-          <span id="opacity-val" class="opacity-val">80%</span>
-        </div>
-        <input type="range" id="pedo-opacity" min="0" max="100" value="80" class="slider" />
-      </div>
-    </div>
-  </div>
-
   <div id="map"></div>
 
   <!-- Raw GeoLibre project configuration preserved for reference -->
@@ -1044,6 +997,53 @@
         suggestionsBox.style.display = "none";
       }
     });
+  
+    // Mobile Tools Drawer Toggle Logic
+    const btnToggleTools = document.getElementById("btn-toggle-tools");
+    const btnCloseTools = document.getElementById("btn-close-tools");
+    const panelTools = document.getElementById("panel-tools");
+    const toolsBackdrop = document.getElementById("tools-backdrop");
+
+    function openMobileTools() {
+      if (panelTools) panelTools.classList.add("open");
+      if (toolsBackdrop) toolsBackdrop.classList.add("active");
+      if (btnToggleTools) btnToggleTools.classList.add("active");
+    }
+
+    function closeMobileTools() {
+      if (panelTools) panelTools.classList.remove("open");
+      if (toolsBackdrop) toolsBackdrop.classList.remove("active");
+      if (btnToggleTools) btnToggleTools.classList.remove("active");
+    }
+
+    if (btnToggleTools) {
+      btnToggleTools.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (panelTools && panelTools.classList.contains("open")) {
+          closeMobileTools();
+        } else {
+          openMobileTools();
+        }
+      });
+    }
+
+    if (btnCloseTools) {
+      btnCloseTools.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMobileTools();
+      });
+    }
+
+    if (toolsBackdrop) {
+      toolsBackdrop.addEventListener("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMobileTools();
+      });
+    }
+
   </script>
 </body>
 </html>
