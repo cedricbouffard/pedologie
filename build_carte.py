@@ -30,6 +30,7 @@ html_template = """<!DOCTYPE html>
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js"></script>
+  <script src="geolibre-contour.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -1019,13 +1020,13 @@ html_template = """<!DOCTYPE html>
         </div>
 
         <div class="tool-label-row">
-          <span class="tool-sublabel">Intervalle (m)</span>
+          <span class="tool-sublabel">Intervalle</span>
         </div>
         <div class="pills-group">
-          <button class="pill-btn" data-interval="5">5 m</button>
-          <button class="pill-btn" data-interval="10">10 m</button>
-          <button class="pill-btn active" data-interval="20">20 m</button>
-          <button class="pill-btn" data-interval="50">50 m</button>
+          <button class="pill-btn" data-interval="0.1">10 cm</button>
+          <button class="pill-btn" data-interval="0.3">30 cm</button>
+          <button class="pill-btn active" data-interval="1">1 m</button>
+          <button class="pill-btn" data-interval="3">3 m</button>
         </div>
 
         <div class="tool-label-row" style="margin-top: 4px;">
@@ -1039,7 +1040,7 @@ html_template = """<!DOCTYPE html>
         </div>
 
         <div id="contour-status" class="contour-status-badge">
-          Zoom 11+ requis pour le calcul dynamique
+          Zoom 10+ requis pour le calcul dynamique
         </div>
       </div>
 
@@ -1055,8 +1056,8 @@ html_template = """<!DOCTYPE html>
 
   <div id="map"></div>
 
-  <script type="module">
-    import { ContourManager, readCogRegion, fromUrl } from './geolibre-contour.js';
+  <script>
+    const { ContourManager, readCogRegion, fromUrl, proj4 } = window.GeoLibreContour;
 
     // Initialize PMTiles protocol
     const protocol = new pmtiles.Protocol();
@@ -1091,43 +1092,30 @@ html_template = """<!DOCTYPE html>
     // Study titles dictionary
     const STUDY_NAMES = __STUDY_NAMES_PLACEHOLDER__;
 
-    // HRDEM Tiles metadata
-    let hrdemTiles = [];
-    async function loadTilesCatalog() {
-      try {
-        const res = await fetch('data/hrdem_tiles.json');
-        if (res.ok) {
-          hrdemTiles = await res.json();
-        }
-      } catch (e) {
-        console.warn('Could not load hrdem_tiles.json, using fallback tile 9_3', e);
-      }
-    }
-    loadTilesCatalog();
+    // Exact HRDEM Mosaics (56 tiles covering Canada & Quebec)
+    const EPSG_3979_DEF = '+proj=lcc +lat_1=49 +lat_2=77 +lat_0=49 +lon_0=-95 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs';
+    const VALID_HRDEM_TILES = new Set([
+      '1_3','1_4','1_5','1_6','1_7','2_3','2_4','2_5','2_6','2_7','2_8',
+      '3_3','3_4','3_5','3_6','3_7','3_8','4_3','4_4','4_5','4_6',
+      '5_3','5_4','5_6','5_7','5_8','6_2','6_3','6_5','6_6','6_7','6_8',
+      '7_2','7_3','7_4','7_5','7_6','7_7','7_8','8_1','8_2','8_3','8_4',
+      '8_5','8_6','8_7','9_2','9_3','9_4','9_5','10_2','10_3','10_4','10_5',
+      '11_3','11_4'
+    ]);
 
     function findTileForCoords(lng, lat) {
-      if (!hrdemTiles || hrdemTiles.length === 0) {
-        return 'https://canelevation-dem.s3.ca-central-1.amazonaws.com/hrdem-mosaic-1m/9_3-mosaic-1m-dtm.tif';
-      }
-      const match = hrdemTiles.find(t => {
-        const b = t.bounds_wgs84;
-        return lng >= b[0] && lng <= b[2] && lat >= b[1] && lat <= b[3];
-      });
-      if (match) return match.url;
-
-      let closest = hrdemTiles[0];
-      let minDist = Infinity;
-      for (const t of hrdemTiles) {
-        const b = t.bounds_wgs84;
-        const cx = (b[0] + b[2]) / 2;
-        const cy = (b[1] + b[3]) / 2;
-        const d = (lng - cx)**2 + (lat - cy)**2;
-        if (d < minDist) {
-          minDist = d;
-          closest = t;
+      try {
+        const pt = proj4('EPSG:4326', EPSG_3979_DEF, [lng, lat]);
+        const col = Math.floor(pt[0] / 500000) + 6;
+        const row = Math.floor(pt[1] / 500000) + 3;
+        const key = `${col}_${row}`;
+        if (VALID_HRDEM_TILES.has(key)) {
+          return `https://canelevation-dem.s3.ca-central-1.amazonaws.com/hrdem-mosaic-1m/${key}-mosaic-1m-dtm.tif`;
         }
+      } catch (e) {
+        console.warn('findTileForCoords calculation error:', e);
       }
-      return closest ? closest.url : 'https://canelevation-dem.s3.ca-central-1.amazonaws.com/hrdem-mosaic-1m/9_3-mosaic-1m-dtm.tif';
+      return null;
     }
 
     // Viewport Raster Stretch Color Ramp: Mauve (lowest) -> Red (highest)
@@ -1247,6 +1235,11 @@ html_template = """<!DOCTYPE html>
 
         const center = this.map.getCenter();
         const tileUrl = findTileForCoords(center.lng, center.lat);
+        if (!tileUrl) {
+          const badge = document.getElementById('topo-alt-badge');
+          if (badge) badge.textContent = 'Hors de la zone MNE HRDEM';
+          return;
+        }
 
         if (this.abortController) this.abortController.abort();
         this.abortController = new AbortController();
@@ -1459,10 +1452,10 @@ html_template = """<!DOCTYPE html>
       const defaultTile = findTileForCoords(initialCenter[0], initialCenter[1]);
       contourManager.updateConfig({
         cogUrl: defaultTile,
-        interval: 20,
+        interval: 1,
         majorEvery: 5,
         gridSize: 128,
-        minZoom: 11,
+        minZoom: 10,
         lineColor: "#78350f",
         majorWidth: 1.6,
         minorWidth: 0.8,
@@ -1704,8 +1697,13 @@ html_template = """<!DOCTYPE html>
         pillButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         const interval = parseFloat(btn.dataset.interval);
+        let majorEvery = 5;
+        if (interval === 0.1) majorEvery = 10;
+        else if (interval === 0.3) majorEvery = 5;
+        else if (interval === 1) majorEvery = 5;
+        else if (interval === 3) majorEvery = 5;
         if (contourManager) {
-          contourManager.updateConfig({ interval });
+          contourManager.updateConfig({ interval, majorEvery });
           contourManager.generateForView();
         }
       });

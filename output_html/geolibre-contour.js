@@ -1,3 +1,4 @@
+(function(window, globalThis) {
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
@@ -12011,9 +12012,14 @@ class ContourManager {
         "text-allow-overlap": true,
         "text-ignore-placement": true,
         "text-size": this.config.labelSize,
-        "text-field": ["get", "label"]
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Regular"]
       },
-      paint: { "text-halo-color": "white", "text-halo-width": 1 }
+      paint: {
+        "text-color": this.config.lineColor,
+        "text-halo-color": "rgba(255, 255, 255, 0.9)",
+        "text-halo-width": 1.5
+      }
     });
     (_b = (_a = this.app).registerExternalNativeLayer) == null ? void 0 : _b.call(_a, {
       id: HOST_LAYER_ID,
@@ -12124,6 +12130,9 @@ class ContourManager {
     if (!this.map) return;
     this.map.setPaintProperty(MINOR_LAYER_ID, "line-width", this.config.minorWidth);
     this.map.setPaintProperty(MAJOR_LAYER_ID, "line-width", this.config.majorWidth);
+    this.map.setPaintProperty(MINOR_LAYER_ID, "line-color", this.config.lineColor);
+    this.map.setPaintProperty(MAJOR_LAYER_ID, "line-color", this.config.lineColor);
+    this.map.setPaintProperty(LABEL_LAYER_ID, "text-color", this.config.lineColor);
     this.map.setLayoutProperty(LABEL_LAYER_ID, "text-size", this.config.labelSize);
   }
 }
@@ -17990,10 +17999,20 @@ const webimage = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProp
   __proto__: null,
   default: WebImageDecoder
 }, Symbol.toStringTag, { value: "Module" }));
-export {
-  plugin as default,
+const GeoLibreContour = {
   plugin,
   ContourManager,
   readCogRegion,
-  fromUrl
+  fromUrl,
+  proj4
 };
+if (typeof window !== "undefined") {
+  window.GeoLibreContour = GeoLibreContour;
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.GeoLibreContour = GeoLibreContour;
+}
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = GeoLibreContour;
+}
+})(typeof window !== "undefined" ? window : this, typeof globalThis !== "undefined" ? globalThis : this);
