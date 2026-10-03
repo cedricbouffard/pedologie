@@ -1,4 +1,4 @@
-#  [Portail web](https://github.com/cedricbouffard/pedologie)
+#  [Portail web](https://cedricbouffard.github.io/pedologie/)
 
 
 # Inventaire et Portail Pédologique du Québec
