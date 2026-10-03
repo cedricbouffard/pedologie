@@ -12202,13 +12202,19 @@ async function readCogRegion(cog, bbox, targetSize, nodataOverride, fullExtent =
     sourceBBox[3] - pixelY1 / imageHeight * (sourceBBox[3] - sourceBBox[1])
   ];
   const bboxWgs84 = transformBBox(actualSourceBBox, projection.toWgs84);
+  const cornersWgs84 = [
+    projection.toWgs84(actualSourceBBox[0], actualSourceBBox[3]), // Top-Left (NW)
+    projection.toWgs84(actualSourceBBox[2], actualSourceBBox[3]), // Top-Right (NE)
+    projection.toWgs84(actualSourceBBox[2], actualSourceBBox[1]), // Bottom-Right (SE)
+    projection.toWgs84(actualSourceBBox[0], actualSourceBBox[1])  // Bottom-Left (SW)
+  ];
   return {
     data,
     width,
     height,
     sourceBBox: actualSourceBBox,
     bboxWgs84,
-    
+    cornersWgs84,
     projection: projection.definition,
     imageWidth,
     imageHeight,

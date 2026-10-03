@@ -1305,7 +1305,7 @@ html_template = """<!DOCTYPE html>
           const dataUrl = this.canvas.toDataURL();
 
           const actualBbox = region.bboxWgs84 || bbox;
-          const coords = [
+          const coords = region.cornersWgs84 || [
             [actualBbox[0], actualBbox[3]], // Top-Left (NW)
             [actualBbox[2], actualBbox[3]], // Top-Right (NE)
             [actualBbox[2], actualBbox[1]], // Bottom-Right (SE)
