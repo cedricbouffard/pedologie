@@ -7,7 +7,44 @@
   
   <!-- MapLibre GL JS & PMTiles -->
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
-  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js">
+    // Mobile Tools Drawer Toggle
+    const btnToggleTools = document.getElementById("btn-toggle-tools");
+    const btnCloseTools = document.getElementById("btn-close-tools");
+    const panelTools = document.getElementById("panel-tools");
+    const toolsBackdrop = document.getElementById("tools-backdrop");
+
+    function openMobileTools() {
+      if (panelTools) panelTools.classList.add("open");
+      if (toolsBackdrop) toolsBackdrop.classList.add("active");
+      if (btnToggleTools) btnToggleTools.classList.add("active");
+    }
+
+    function closeMobileTools() {
+      if (panelTools) panelTools.classList.remove("open");
+      if (toolsBackdrop) toolsBackdrop.classList.remove("active");
+      if (btnToggleTools) btnToggleTools.classList.remove("active");
+    }
+
+    if (btnToggleTools) {
+      btnToggleTools.addEventListener("click", () => {
+        if (panelTools && panelTools.classList.contains("open")) {
+          closeMobileTools();
+        } else {
+          openMobileTools();
+        }
+      });
+    }
+
+    if (btnCloseTools) {
+      btnCloseTools.addEventListener("click", closeMobileTools);
+    }
+
+    if (toolsBackdrop) {
+      toolsBackdrop.addEventListener("click", closeMobileTools);
+    }
+  
+  </script>
   <script src="https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js"></script>
 
   <style>
@@ -424,6 +461,152 @@
       color: #1d4ed8;
       text-decoration: underline;
     }
+  
+    .search-and-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+    .mobile-tools-toggle {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 11px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e4535;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .mobile-tools-toggle:hover, .mobile-tools-toggle.active {
+      background: #1e4535;
+      color: #ffffff;
+      border-color: #1e4535;
+    }
+
+    .tools-drawer-header {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .tools-drawer-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .tools-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 22px;
+      line-height: 1;
+      color: #64748b;
+      cursor: pointer;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+    .tools-close-btn:hover {
+      color: #0f172a;
+    }
+
+    .tools-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 1050;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    @media (max-width: 640px) {
+      .nav-brand-sub { display: none; }
+      .nav-btn span { font-size: 0.76rem; }
+      .nav-btn { padding: 5px 8px; }
+
+      .map-controls-panel {
+        top: 12px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: none;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        pointer-events: none;
+      }
+      .panel-header {
+        display: none;
+      }
+      .search-and-toggle-row {
+        pointer-events: auto;
+      }
+      .search-input {
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        padding: 9px 30px 9px 32px;
+        font-size: 13px;
+      }
+      .mobile-tools-toggle {
+        display: inline-flex;
+        padding: 9px 12px;
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+      }
+
+      /* Bottom sheet drawer for mobile */
+      .panel-tools {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1100;
+        background: #ffffff;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.22);
+        padding: 16px 20px 28px 20px;
+        border-top: 1px solid #e2e8f0;
+        transform: translateY(105%);
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .panel-tools.open {
+        transform: translateY(0);
+      }
+      .tools-drawer-header {
+        display: flex;
+      }
+
+      .tools-backdrop.active {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -432,24 +615,41 @@
   <div class="map-controls-panel">
     <div class="panel-header">
       <div class="panel-title">Pédologie du Québec</div>
-      <div class="panel-subtitle">Couverture pédologique (étiquettes dès zoom 12)</div>
+      <div class="panel-subtitle">Sols officiels (étiquettes dès zoom 12)</div>
     </div>
 
-    <!-- Address Search Input -->
-    <div class="search-box">
-      <div class="search-input-wrapper">
-        <svg class="search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" id="address-input" class="search-input" placeholder="Rechercher une adresse, ville..." autocomplete="off" />
-        <button id="clear-search" class="clear-btn" style="display:none;" title="Effacer">&times;</button>
+    <!-- Search Box and Mobile Toggle -->
+    <div class="search-and-toggle-row">
+      <div class="search-box">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="address-input" class="search-input" placeholder="Rechercher une adresse, ville..." autocomplete="off" />
+          <button id="clear-search" class="clear-btn" style="display:none;" title="Effacer">&times;</button>
+        </div>
+        <div id="search-suggestions" class="search-suggestions" style="display:none;"></div>
       </div>
-      <div id="search-suggestions" class="search-suggestions" style="display:none;"></div>
+
+      <!-- Mobile Toggle Button (Visible only on mobile) -->
+      <button id="btn-toggle-tools" class="mobile-tools-toggle" type="button" aria-label="Couches et opacité" title="Fonds de carte et opacité">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span class="mobile-toggle-label">Couches</span>
+      </button>
     </div>
 
-    <!-- Tools: Basemap & Opacity -->
-    <div class="panel-tools">
+    <!-- Tools: Basemap & Opacity (Desktop: in card, Mobile: collapsible bottom sheet) -->
+    <div class="panel-tools" id="panel-tools">
+      <div class="tools-drawer-header">
+        <div class="tools-drawer-title">Affichage des sols &amp; fonds</div>
+        <button id="btn-close-tools" class="tools-close-btn" type="button" aria-label="Fermer le panneau">&times;</button>
+      </div>
+
       <div class="tool-group">
         <label class="tool-label">Fond de carte</label>
         <div class="segmented-control">
@@ -457,6 +657,19 @@
           <button id="btn-basemap-sat" class="seg-btn" type="button">Google Hybride</button>
         </div>
       </div>
+
+      <div class="tool-group">
+        <div class="tool-label-row">
+          <label class="tool-label" for="pedo-opacity">Opacité des sols</label>
+          <span id="opacity-val" class="opacity-val">80%</span>
+        </div>
+        <input type="range" id="pedo-opacity" min="0" max="100" value="80" class="slider" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Backdrop Overlay -->
+  <div id="tools-backdrop" class="tools-backdrop"></div>
 
       <div class="tool-group">
         <div class="tool-label-row">
