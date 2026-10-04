@@ -835,6 +835,126 @@ html_template = """<!DOCTYPE html>
     .raster-profile-axis-label { fill: #64748b; font-size: 9.5px; font-weight: 600; font-family: var(--font-mono, monospace); }
     .raster-profile-grid { stroke: #e2e8f0; stroke-width: 0.8; stroke-dasharray: 2 3; }
 
+    /* NDVI Dock and Chart styling */
+    .ndvi-dock {
+      border-top: 3.5px solid #16a34a;
+    }
+    .ndvi-active-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 12px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      margin-top: 2px;
+    }
+    .ndvi-date-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #14532d;
+    }
+    .ndvi-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .ndvi-nav-buttons {
+      display: flex;
+      gap: 4px;
+    }
+    .ndvi-nav-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 3px 9px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ndvi-nav-btn:hover:not(:disabled) {
+      background: #16a34a;
+      color: #ffffff;
+      border-color: #16a34a;
+    }
+    .ndvi-nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .ndvi-opacity-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #334155;
+    }
+    .ndvi-legend-mini {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10.5px;
+      color: #475569;
+    }
+    .ndvi-grad-sample {
+      display: inline-block;
+      width: 48px;
+      height: 8px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #d73027 0%, #ffffbf 50%, #1a9850 100%);
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+    .floating-profile-btn.btn-ndvi-mode.active {
+      background: #16a34a;
+      color: #ffffff;
+      border-color: #15803d;
+    }
+    .floating-profile-btn.btn-ndvi-mode.active svg {
+      stroke: #ffffff;
+    }
+    .ndvi-chart-point {
+      cursor: pointer;
+      transition: r 0.15s, stroke-width 0.15s;
+    }
+    .ndvi-chart-point:hover {
+      r: 6.5;
+    }
+    .ndvi-chart-point.active-point {
+      r: 7.5;
+      stroke: #0f172a;
+      stroke-width: 2.5;
+    }
+    .ndvi-target-marker {
+      pointer-events: none;
+      transform: translate(-12px, -12px);
+    }
+    .btn-popup-ndvi {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      margin-top: 10px;
+      padding: 7px 12px;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #15803d;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-popup-ndvi:hover {
+      background: #16a34a;
+      color: #ffffff;
+      border-color: #15803d;
+    }
+
     @media (max-width: 768px) {
       .elevation-profile-dock {
         left: 10px;
@@ -1388,6 +1508,49 @@ html_template = """<!DOCTYPE html>
     <div id="profile-chart-container" class="profile-chart-container" data-raster-profile-chart></div>
   </div>
 
+  <!-- Floating NDVI Sentinel-2 Bottom Dock -->
+  <div id="ndvi-dock" class="elevation-profile-dock ndvi-dock">
+    <div class="profile-dock-header">
+      <div class="profile-dock-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+        <span id="ndvi-dock-title">Série Temporelle NDVI — Sentinel-2 L2A (12 derniers mois)</span>
+      </div>
+      <div class="profile-dock-header-right">
+        <button id="btn-dock-clear-ndvi" class="profile-dock-btn" type="button" title="Masquer la tuile satellite sur la carte">Masquer tuile</button>
+        <button id="btn-close-ndvi-dock" class="profile-dock-close" type="button" aria-label="Fermer le panneau NDVI">&times;</button>
+      </div>
+    </div>
+    
+    <div id="ndvi-stats-bar" class="profile-stats-bar"></div>
+
+    <div id="ndvi-hover-info" class="profile-hover-info">
+      Cliquez sur une date du graphique ci-dessous pour afficher la tuile satellite NDVI correspondante
+    </div>
+
+    <!-- Active date banner & layer controls -->
+    <div id="ndvi-active-controls" class="ndvi-active-controls" style="display: none;">
+      <div class="ndvi-date-badge" id="ndvi-selected-date-badge">📅 Date sélectionnée : —</div>
+      <div class="ndvi-controls-row">
+        <div class="ndvi-nav-buttons">
+          <button id="btn-ndvi-prev" class="ndvi-nav-btn" type="button" title="Acquisition précédente">&larr; Précédente</button>
+          <button id="btn-ndvi-next" class="ndvi-nav-btn" type="button" title="Acquisition suivante">Suivante &rarr;</button>
+        </div>
+        <div class="ndvi-opacity-wrap">
+          <span>Opacité tuile :</span>
+          <input type="range" id="ndvi-tile-opacity" min="0" max="100" value="85" class="slider" style="width: 80px;" />
+          <span id="ndvi-opacity-val" class="val-badge">85%</span>
+        </div>
+        <div class="ndvi-legend-mini">
+          <span>NDVI :</span>
+          <span class="ndvi-grad-sample"></span>
+          <span>0.0 (sol) &rarr; 0.85+ (végétation)</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="ndvi-chart-container" class="profile-chart-container" style="min-height: 160px;"></div>
+  </div>
+
   <!-- Floating Quick Profile Toolbar on Map -->
   <div id="map-profile-toolbar" class="map-profile-toolbar">
     <button id="btn-quick-profile" class="floating-profile-btn" type="button" title="Tracer une coupe topographique (cliquez sur la carte, double-clic ou clic droit pour calculer)">
@@ -1400,6 +1563,11 @@ html_template = """<!DOCTYPE html>
     </button>
     <button id="btn-quick-clear" class="floating-profile-btn action-clear" type="button" title="Effacer la coupe" style="display: none;">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 1px;"></div>
+    <button id="btn-quick-ndvi" class="floating-profile-btn btn-ndvi-mode" type="button" title="Activer l'analyse NDVI Sentinel-2 (cliquez sur une parcelle ou n'importe où sur la carte)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+      <span id="ndvi-btn-text">NDVI Sentinel-2</span>
     </button>
   </div>
 
@@ -2057,9 +2225,458 @@ html_template = """<!DOCTYPE html>
       }
     }
 
+    // Sentinel-2 L2A NDVI Time Series & Layer Manager via Microsoft Planetary Computer
+    class NdviManager {
+      constructor(mapInstance) {
+        this.map = mapInstance;
+        this.isActiveMode = false;
+        this.currentLocation = null;
+        this.currentParcel = null;
+        this.series = [];
+        this.selectedIndex = -1;
+        this.tileOpacity = 0.85;
+        this.abortController = null;
+        this.marker = null;
+      }
+
+      setMode(active) {
+        this.isActiveMode = active;
+        const btn = document.getElementById("btn-quick-ndvi");
+        if (btn) {
+          btn.classList.toggle("active", active);
+        }
+        if (active) {
+          if (profileManager && profileManager.isDrawing) {
+            profileManager.stopDrawing();
+          }
+          this.map.getCanvas().style.cursor = "crosshair";
+        } else {
+          this.map.getCanvas().style.cursor = "";
+        }
+      }
+
+      toggleMode() {
+        this.setMode(!this.isActiveMode);
+      }
+
+      async analyzeLocation(lngLat, parcelProps = null) {
+        if (this.abortController) {
+          this.abortController.abort();
+        }
+        this.abortController = new AbortController();
+        const signal = this.abortController.signal;
+
+        this.currentLocation = lngLat;
+        this.currentParcel = parcelProps;
+        this.series = [];
+        this.selectedIndex = -1;
+
+        if (this.marker) this.marker.remove();
+        const el = document.createElement("div");
+        el.className = "ndvi-target-marker";
+        el.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" fill="#16a34a" fill-opacity="0.3" stroke="#16a34a" stroke-width="2.5"/><circle cx="12" cy="12" r="3" fill="#ffffff" stroke="#15803d" stroke-width="2"/></svg>`;
+        this.marker = new maplibregl.Marker({ element: el })
+          .setLngLat([lngLat.lng, lngLat.lat])
+          .addTo(this.map);
+
+        const dock = document.getElementById("ndvi-dock");
+        const titleEl = document.getElementById("ndvi-dock-title");
+        const statsBar = document.getElementById("ndvi-stats-bar");
+        const hoverInfo = document.getElementById("ndvi-hover-info");
+        const container = document.getElementById("ndvi-chart-container");
+        const controlsRow = document.getElementById("ndvi-active-controls");
+
+        if (dock) dock.classList.add("open");
+        if (controlsRow) controlsRow.style.display = "none";
+
+        const pid = parcelProps ? (parcelProps.IDPAR || parcelProps.idpar || "") : "";
+        const crop = parcelProps ? (parcelProps.DESCODPR1 || parcelProps.descodpr1 || "") : "";
+
+        if (titleEl) {
+          titleEl.textContent = pid 
+            ? `Série NDVI — Parcelle nº ${pid}${crop ? ` (${crop})` : ''}`
+            : `Série NDVI — Point [${lngLat.lat.toFixed(4)}°N, ${Math.abs(lngLat.lng).toFixed(4)}°O]`;
+        }
+
+        if (statsBar) {
+          statsBar.innerHTML = `<span class="stat-chip">⏳ Recherche des acquisitions Sentinel-2 L2A (12 derniers mois)...</span>`;
+        }
+        if (container) {
+          container.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:160px; color:#64748b; font-size:12px; gap:8px;">
+              <div style="width:24px; height:24px; border:2.5px solid #cbd5e1; border-top-color:#16a34a; border-radius:50%; animation: spin 0.8s linear infinite;"></div>
+              <span>Interrogation du catalogue satellite Sentinel-2 (Planetary Computer)...</span>
+            </div>
+          `;
+        }
+
+        try {
+          const now = new Date();
+          const oneYearAgo = new Date(now.getTime() - 365 * 24 * 3600 * 1000);
+          const dtStr = `${oneYearAgo.toISOString().split("T")[0]}T00:00:00Z/${now.toISOString().split("T")[0]}T23:59:59Z`;
+
+          const stacBody = {
+            collections: ["sentinel-2-l2a"],
+            intersects: {
+              type: "Point",
+              coordinates: [lngLat.lng, lngLat.lat]
+            },
+            datetime: dtStr,
+            query: {
+              "eo:cloud_cover": { lt: 35 }
+            },
+            limit: 75,
+            sortby: [{ field: "datetime", direction: "asc" }]
+          };
+
+          const stacResp = await fetch("https://planetarycomputer.microsoft.com/api/stac/v1/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(stacBody),
+            signal
+          });
+
+          if (!stacResp.ok) throw new Error(`Erreur STAC (${stacResp.status})`);
+          const stacData = await stacResp.json();
+          const items = stacData.features || [];
+
+          if (items.length === 0) {
+            if (statsBar) statsBar.innerHTML = `<span class="stat-chip" style="color:#b91c1c;">Aucune scène Sentinel-2 dégagée trouvée pour cette localisation au cours des 12 derniers mois.</span>`;
+            if (container) container.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b;">Aucune donnée satellite disponible.</div>`;
+            return;
+          }
+
+          const byDate = new Map();
+          for (const item of items) {
+            const dt = item.properties.datetime;
+            const dateKey = dt.split("T")[0];
+            const cloud = item.properties["eo:cloud_cover"] || 0;
+            if (!byDate.has(dateKey) || byDate.get(dateKey).properties["eo:cloud_cover"] > cloud) {
+              byDate.set(dateKey, item);
+            }
+          }
+
+          const uniqueItems = Array.from(byDate.values()).sort((a, b) => 
+            new Date(a.properties.datetime) - new Date(b.properties.datetime)
+          );
+
+          if (statsBar) {
+            statsBar.innerHTML = `<span class="stat-chip">🛰️ ${uniqueItems.length} scènes trouvées • Échantillonnage NDVI en cours (0/${uniqueItems.length})...</span>`;
+          }
+
+          const sampled = [];
+          const batchSize = 5;
+          let completed = 0;
+
+          for (let i = 0; i < uniqueItems.length; i += batchSize) {
+            if (signal.aborted) return;
+            const batch = uniqueItems.slice(i, i + batchSize);
+            const batchPromises = batch.map(async (scene) => {
+              const itemId = scene.id;
+              const pUrl = `https://planetarycomputer.microsoft.com/api/data/v1/item/point/${lngLat.lng.toFixed(5)},${lngLat.lat.toFixed(5)}?collection=sentinel-2-l2a&item=${itemId}&assets=B04&assets=B08&assets=SCL`;
+              try {
+                const pResp = await fetch(pUrl, { signal });
+                if (!pResp.ok) return null;
+                const pData = await pResp.json();
+                const vals = pData.values || [];
+                if (vals.length >= 2) {
+                  const b4 = vals[0];
+                  const b8 = vals[1];
+                  const scl = vals[2] !== undefined ? vals[2] : 4;
+                  if (b8 + b4 > 0) {
+                    const ndvi = (b8 - b4) / (b8 + b4);
+                    if (Number.isFinite(ndvi) && ndvi >= -0.2 && ndvi <= 1.0) {
+                      return {
+                        id: itemId,
+                        datetime: scene.properties.datetime,
+                        dateKey: scene.properties.datetime.split("T")[0],
+                        ndvi,
+                        b4,
+                        b8,
+                        scl,
+                        cloud: scene.properties["eo:cloud_cover"] || 0,
+                        platform: scene.properties["platform"] || "Sentinel-2"
+                      };
+                    }
+                  }
+                }
+              } catch (e) {
+                if (e.name === 'AbortError') throw e;
+              }
+              return null;
+            });
+
+            const batchResults = await Promise.all(batchPromises);
+            for (const r of batchResults) {
+              if (r) sampled.push(r);
+            }
+            completed += batch.length;
+            if (statsBar) {
+              statsBar.innerHTML = `<span class="stat-chip">🛰️ Échantillonnage NDVI en cours (${Math.min(completed, uniqueItems.length)}/${uniqueItems.length})...</span>`;
+            }
+          }
+
+          sampled.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+          this.series = sampled;
+
+          if (this.series.length === 0) {
+            if (statsBar) statsBar.innerHTML = `<span class="stat-chip" style="color:#b91c1c;">Impossible de calculer les valeurs NDVI pour ces dates.</span>`;
+            if (container) container.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b;">Données spectrales indisponibles.</div>`;
+            return;
+          }
+
+          const ndviVals = this.series.map(s => s.ndvi);
+          const maxNdvi = Math.max(...ndviVals);
+          const minNdvi = Math.min(...ndviVals);
+          const latest = this.series[this.series.length - 1];
+          const peakIdx = ndviVals.indexOf(maxNdvi);
+
+          if (statsBar) {
+            statsBar.innerHTML = `
+              <span class="stat-chip">Dernier NDVI : <strong>${latest.ndvi.toFixed(2)}</strong> (${latest.dateKey})</span>
+              <span class="stat-chip" style="background:#dcfce7; border-color:#86efac; color:#14532d;">Pic estival : <strong>${maxNdvi.toFixed(2)}</strong> (${this.series[peakIdx].dateKey})</span>
+              <span class="stat-chip">Minimum : <strong>${minNdvi.toFixed(2)}</strong></span>
+              <span class="stat-chip">Passages analysés : <strong>${this.series.length} dates</strong></span>
+            `;
+          }
+
+          const defaultSelectIdx = peakIdx >= 0 ? peakIdx : this.series.length - 1;
+          this.renderChart(defaultSelectIdx);
+          this.selectDate(defaultSelectIdx);
+
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+          console.error("NDVI analysis error:", err);
+          if (statsBar) statsBar.innerHTML = `<span class="stat-chip" style="color:#b91c1c;">Erreur lors de la récupération des données Sentinel-2 : ${err.message}</span>`;
+        }
+      }
+
+      selectDate(index) {
+        if (index < 0 || index >= this.series.length) return;
+        this.selectedIndex = index;
+        const scene = this.series[index];
+
+        const controlsRow = document.getElementById("ndvi-active-controls");
+        const badge = document.getElementById("ndvi-selected-date-badge");
+        const btnPrev = document.getElementById("btn-ndvi-prev");
+        const btnNext = document.getElementById("btn-ndvi-next");
+
+        if (controlsRow) controlsRow.style.display = "flex";
+        if (badge) {
+          badge.innerHTML = `📅 <strong>${scene.dateKey}</strong> &bull; NDVI : <strong>${scene.ndvi.toFixed(3)}</strong> &bull; Nuages scène : ${scene.cloud.toFixed(1)}% &bull; (${scene.platform})`;
+        }
+        if (btnPrev) btnPrev.disabled = (index <= 0);
+        if (btnNext) btnNext.disabled = (index >= this.series.length - 1);
+
+        const circles = document.querySelectorAll(".ndvi-chart-point");
+        circles.forEach((c, idx) => {
+          c.classList.toggle("active-point", idx === index);
+        });
+
+        this.displayNdviLayer(scene.id, scene.ndvi);
+      }
+
+      displayNdviLayer(sceneId, sampleNdvi) {
+        const minVal = -0.05;
+        const maxVal = 0.85;
+        const rescaleStr = `${minVal.toFixed(2)},${maxVal.toFixed(2)}`;
+        const tileUrl = `https://planetarycomputer.microsoft.com/api/data/v1/item/tiles/WebMercatorQuad/{z}/{x}/{y}@1x?collection=sentinel-2-l2a&item=${sceneId}&assets=B08&assets=B04&asset_as_band=True&expression=%28B08-B04%29%2F%28B08%2BB04%29&rescale=${encodeURIComponent(rescaleStr)}&colormap_name=rdylgn`;
+
+        if (this.map.getLayer("sentinel2-ndvi-layer")) {
+          this.map.removeLayer("sentinel2-ndvi-layer");
+        }
+        if (this.map.getSource("sentinel2-ndvi-source")) {
+          this.map.removeSource("sentinel2-ndvi-source");
+        }
+
+        this.map.addSource("sentinel2-ndvi-source", {
+          type: "raster",
+          tiles: [tileUrl],
+          tileSize: 256,
+          attribution: "Sentinel-2 L2A © ESA / Copernicus • Microsoft Planetary Computer"
+        });
+
+        const beforeLayer = this.map.getLayer("parcelles-line-bg") ? "parcelles-line-bg" : (this.map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined);
+        this.map.addLayer({
+          id: "sentinel2-ndvi-layer",
+          type: "raster",
+          source: "sentinel2-ndvi-source",
+          paint: {
+            "raster-opacity": this.tileOpacity,
+            "raster-resampling": "linear",
+            "raster-fade-duration": 180
+          }
+        }, beforeLayer);
+      }
+
+      setTileOpacity(val) {
+        this.tileOpacity = val;
+        if (this.map.getLayer("sentinel2-ndvi-layer")) {
+          this.map.setPaintProperty("sentinel2-ndvi-layer", "raster-opacity", val);
+        }
+      }
+
+      clearLayer() {
+        if (this.map.getLayer("sentinel2-ndvi-layer")) {
+          this.map.removeLayer("sentinel2-ndvi-layer");
+        }
+        if (this.map.getSource("sentinel2-ndvi-source")) {
+          this.map.removeSource("sentinel2-ndvi-source");
+        }
+        const controlsRow = document.getElementById("ndvi-active-controls");
+        if (controlsRow) controlsRow.style.display = "none";
+      }
+
+      closeDock() {
+        if (this.abortController) this.abortController.abort();
+        const dock = document.getElementById("ndvi-dock");
+        if (dock) dock.classList.remove("open");
+        this.clearLayer();
+        if (this.marker) {
+          this.marker.remove();
+          this.marker = null;
+        }
+        this.setMode(false);
+      }
+
+      renderChart(activeIndex = -1) {
+        const container = document.getElementById("ndvi-chart-container");
+        if (!container || !this.series.length) return;
+
+        const width = Math.max(340, container.clientWidth || 600);
+        const height = 160;
+        const pad = { top: 18, right: 24, bottom: 28, left: 38 };
+        const plotW = width - pad.left - pad.right;
+        const plotH = height - pad.top - pad.bottom;
+
+        const firstDate = new Date(this.series[0].datetime).getTime();
+        const lastDate = new Date(this.series[this.series.length - 1].datetime).getTime();
+        const timeSpan = Math.max(1, lastDate - firstDate);
+
+        const getY = (val) => {
+          const clamped = Math.max(-0.1, Math.min(1.0, val));
+          return pad.top + plotH * (1 - (clamped - (-0.1)) / 1.1);
+        };
+
+        const getX = (dtStr) => {
+          const t = new Date(dtStr).getTime();
+          return pad.left + ((t - firstDate) / timeSpan) * plotW;
+        };
+
+        const y1_0 = getY(1.0);
+        const y0_6 = getY(0.6);
+        const y0_4 = getY(0.4);
+        const y0_2 = getY(0.2);
+        const y0_0 = getY(0.0);
+
+        let bandsHtml = `
+          <rect x="${pad.left}" y="${y1_0}" width="${plotW}" height="${y0_6 - y1_0}" fill="rgba(34, 197, 94, 0.12)" />
+          <rect x="${pad.left}" y="${y0_6}" width="${plotW}" height="${y0_4 - y0_6}" fill="rgba(132, 204, 22, 0.10)" />
+          <rect x="${pad.left}" y="${y0_4}" width="${plotW}" height="${y0_2 - y0_4}" fill="rgba(234, 179, 8, 0.10)" />
+          <rect x="${pad.left}" y="${y0_2}" width="${plotW}" height="${y0_0 - y0_2}" fill="rgba(239, 68, 68, 0.10)" />
+        `;
+
+        const yTicks = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0];
+        let yAxisHtml = "";
+        for (const tick of yTicks) {
+          const ty = getY(tick);
+          yAxisHtml += `
+            <line x1="${pad.left}" y1="${ty.toFixed(1)}" x2="${pad.left + plotW}" y2="${ty.toFixed(1)}" stroke="#e2e8f0" stroke-width="0.8" stroke-dasharray="2 3" />
+            <text x="${pad.left - 6}" y="${(ty + 3).toFixed(1)}" fill="#64748b" font-size="9" text-anchor="end" font-family="var(--font-mono, monospace)">${tick.toFixed(1)}</text>
+          `;
+        }
+
+        let xAxisHtml = "";
+        const monthsSet = new Set();
+        this.series.forEach(s => {
+          const mKey = s.dateKey.substring(0, 7);
+          if (!monthsSet.has(mKey)) {
+            monthsSet.add(mKey);
+            const x = getX(s.datetime);
+            const mParts = s.dateKey.split("-");
+            const mNames = ["janv", "févr", "mars", "avr", "mai", "juin", "juil", "août", "sept", "oct", "nov", "déc"];
+            const label = mNames[parseInt(mParts[1], 10) - 1] + (mParts[1] === "01" ? " " + mParts[0].substring(2) : "");
+            xAxisHtml += `
+              <line x1="${x.toFixed(1)}" y1="${pad.top + plotH}" x2="${x.toFixed(1)}" y2="${pad.top + plotH + 4}" stroke="#cbd5e1" stroke-width="1" />
+              <text x="${x.toFixed(1)}" y="${pad.top + plotH + 16}" fill="#64748b" font-size="9" text-anchor="middle" font-family="sans-serif">${label}</text>
+            `;
+          }
+        });
+
+        const coords = this.series.map(s => [getX(s.datetime), getY(s.ndvi)]);
+        let pathD = `M ${coords[0][0].toFixed(1)} ${coords[0][1].toFixed(1)}`;
+        for (let i = 1; i < coords.length; i++) {
+          pathD += ` L ${coords[i][0].toFixed(1)} ${coords[i][1].toFixed(1)}`;
+        }
+
+        const areaD = `${pathD} L ${coords[coords.length - 1][0].toFixed(1)} ${getY(0.0).toFixed(1)} L ${coords[0][0].toFixed(1)} ${getY(0.0).toFixed(1)} Z`;
+
+        let pointsHtml = "";
+        this.series.forEach((s, idx) => {
+          const cx = coords[idx][0].toFixed(1);
+          const cy = coords[idx][1].toFixed(1);
+          const isAct = (idx === activeIndex);
+          let color = "#16a34a";
+          if (s.ndvi < 0.2) color = "#dc2626";
+          else if (s.ndvi < 0.4) color = "#d97706";
+          else if (s.ndvi < 0.6) color = "#65a30d";
+
+          pointsHtml += `
+            <circle class="ndvi-chart-point ${isAct ? 'active-point' : ''}" 
+                    data-idx="${idx}" 
+                    cx="${cx}" 
+                    cy="${cy}" 
+                    r="${isAct ? 7 : 4.5}" 
+                    fill="${color}" 
+                    stroke="#ffffff" 
+                    stroke-width="1.8" />
+          `;
+        });
+
+        const svgHtml = `
+          <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+            ${bandsHtml}
+            ${yAxisHtml}
+            ${xAxisHtml}
+            <path d="${areaD}" fill="rgba(22, 163, 74, 0.12)" />
+            <path d="${pathD}" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            ${pointsHtml}
+          </svg>
+        `;
+
+        container.innerHTML = svgHtml;
+
+        const circles = container.querySelectorAll(".ndvi-chart-point");
+        const hoverInfo = document.getElementById("ndvi-hover-info");
+
+        circles.forEach(circle => {
+          circle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const idx = parseInt(circle.dataset.idx, 10);
+            this.selectDate(idx);
+          });
+
+          circle.addEventListener("mouseenter", () => {
+            const idx = parseInt(circle.dataset.idx, 10);
+            const item = this.series[idx];
+            if (hoverInfo) {
+              hoverInfo.innerHTML = `🛰️ <strong>${item.dateKey}</strong> &bull; NDVI : <strong>${item.ndvi.toFixed(3)}</strong> &bull; Nuages scène : ${item.cloud.toFixed(1)}% &bull; Cliquez pour afficher la tuile satellite sur la carte`;
+            }
+          });
+
+          circle.addEventListener("mouseleave", () => {
+            if (hoverInfo) {
+              hoverInfo.textContent = "Cliquez sur une date ci-dessus pour afficher la tuile satellite NDVI correspondante sur la carte";
+            }
+          });
+        });
+      }
+    }
+
     let topoManager = null;
     let contourManager = null;
     let profileManager = null;
+    let ndviManager = null;
 
     map.on("load", () => {
       // 1. Google Hybrid Raster Source
@@ -2254,8 +2871,20 @@ html_template = """<!DOCTYPE html>
       // Instantiate Elevation Profile Manager
       profileManager = new ProfileManager(map);
 
-      // Map click handler for transect line drawing
+      // Instantiate Sentinel-2 NDVI Manager
+      ndviManager = new NdviManager(map);
+
+      // Map click handler for transect line drawing & NDVI mode
       map.on("click", (e) => {
+        if (ndviManager && ndviManager.isActiveMode) {
+          let parcelProps = null;
+          const parcelFeatures = map.queryRenderedFeatures(e.point, { layers: ["parcelles-fill"] });
+          if (parcelFeatures && parcelFeatures.length > 0) {
+            parcelProps = parcelFeatures[0].properties;
+          }
+          ndviManager.analyzeLocation(e.lngLat, parcelProps);
+          return;
+        }
         if (profileManager && profileManager.isDrawing) {
           profileManager.addPoint(e.lngLat);
         }
@@ -2297,24 +2926,33 @@ html_template = """<!DOCTYPE html>
       // Cursor pointer on polygon hover
       map.on("mouseenter", "pedologie-fill", () => {
         if (profileManager && profileManager.isDrawing) return;
-        map.getCanvas().style.cursor = "pointer";
+        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "pointer";
       });
       map.on("mouseleave", "pedologie-fill", () => {
         if (profileManager && profileManager.isDrawing) return;
-        map.getCanvas().style.cursor = "";
+        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "";
       });
       map.on("mouseenter", "parcelles-fill", () => {
         if (profileManager && profileManager.isDrawing) return;
-        map.getCanvas().style.cursor = "pointer";
+        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "pointer";
       });
       map.on("mouseleave", "parcelles-fill", () => {
         if (profileManager && profileManager.isDrawing) return;
-        map.getCanvas().style.cursor = "";
+        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "";
       });
 
       // Click to identify with rich popup
       map.on("click", "pedologie-fill", (e) => {
         if (profileManager && profileManager.isDrawing) return;
+        if (ndviManager && ndviManager.isActiveMode) {
+          let parcelProps = null;
+          const parcelFeatures = map.queryRenderedFeatures(e.point, { layers: ["parcelles-fill"] });
+          if (parcelFeatures && parcelFeatures.length > 0) {
+            parcelProps = parcelFeatures[0].properties;
+          }
+          ndviManager.analyzeLocation(e.lngLat, parcelProps);
+          return;
+        }
         if (!e.features || !e.features.length) return;
         const p = e.features[0].properties;
 
@@ -2428,19 +3066,40 @@ html_template = """<!DOCTYPE html>
               ${parcelBadgeHtml}
               ${validSeriesCount > 0 ? '<div class="pedo-series-heading">Séries de sols identifiées</div>' : ''}
               ${cardsHtml}
+              <button id="btn-popup-ndvi" type="button" class="btn-popup-ndvi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+                <span>🌿 Évolution NDVI annuelle (Sentinel-2)</span>
+              </button>
             </div>
           </div>
         `;
 
-        new maplibregl.Popup({ closeButton: true, offset: 8 })
+        const popup = new maplibregl.Popup({ closeButton: true, offset: 8 })
           .setLngLat(e.lngLat)
           .setHTML(popupHtml)
           .addTo(map);
+
+        const popupDom = popup.getElement();
+        const btnNdviInPopup = popupDom ? popupDom.querySelector("#btn-popup-ndvi") : null;
+        if (btnNdviInPopup) {
+          btnNdviInPopup.addEventListener("click", () => {
+            popup.remove();
+            let pProps = null;
+            if (parcelFeatures && parcelFeatures.length > 0) {
+              pProps = parcelFeatures[0].properties;
+            }
+            if (ndviManager) ndviManager.analyzeLocation(e.lngLat, pProps);
+          });
+        }
       });
 
       // Standalone Click on Parcels when clicked outside pedologie
       map.on("click", "parcelles-fill", (e) => {
         if (profileManager && profileManager.isDrawing) return;
+        if (ndviManager && ndviManager.isActiveMode) {
+          if (ndviManager) ndviManager.analyzeLocation(e.lngLat, e.features && e.features.length ? e.features[0].properties : null);
+          return;
+        }
         const pedoFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill"] });
         if (pedoFeatures && pedoFeatures.length > 0) return;
         if (!e.features || !e.features.length) return;
@@ -2468,13 +3127,26 @@ html_template = """<!DOCTYPE html>
                 ${supStr ? `<div>Superficie : <strong>${supStr}</strong></div>` : ''}
                 <div style="margin-top: 8px; color: #64748b; font-size: 0.74rem;">Base de Données des Parcelles Agricoles Déclarées (BDPPAD)</div>
               </div>
+              <button id="btn-parcel-popup-ndvi" type="button" class="btn-popup-ndvi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+                <span>🌿 Évolution NDVI annuelle (Sentinel-2)</span>
+              </button>
             </div>
           </div>
         `;
-        new maplibregl.Popup({ closeButton: true, offset: 8 })
+        const popup = new maplibregl.Popup({ closeButton: true, offset: 8 })
           .setLngLat(e.lngLat)
           .setHTML(popupHtml)
           .addTo(map);
+
+        const popupDom = popup.getElement();
+        const btnNdviInParcelPopup = popupDom ? popupDom.querySelector("#btn-parcel-popup-ndvi") : null;
+        if (btnNdviInParcelPopup) {
+          btnNdviInParcelPopup.addEventListener("click", () => {
+            popup.remove();
+            if (ndviManager) ndviManager.analyzeLocation(e.lngLat, pf);
+          });
+        }
       });
     });
 
@@ -2727,12 +3399,69 @@ html_template = """<!DOCTYPE html>
       });
     }
 
+    // NDVI Controls Event Handlers
+    const btnQuickNdvi = document.getElementById("btn-quick-ndvi");
+    const btnCloseNdviDock = document.getElementById("btn-close-ndvi-dock");
+    const btnDockClearNdvi = document.getElementById("btn-dock-clear-ndvi");
+    const btnNdviPrev = document.getElementById("btn-ndvi-prev");
+    const btnNdviNext = document.getElementById("btn-ndvi-next");
+    const ndviTileOpacity = document.getElementById("ndvi-tile-opacity");
+    const ndviOpacityVal = document.getElementById("ndvi-opacity-val");
+
+    if (btnQuickNdvi) {
+      btnQuickNdvi.addEventListener("click", () => {
+        if (ndviManager) ndviManager.toggleMode();
+      });
+    }
+
+    if (btnCloseNdviDock) {
+      btnCloseNdviDock.addEventListener("click", () => {
+        if (ndviManager) ndviManager.closeDock();
+      });
+    }
+
+    if (btnDockClearNdvi) {
+      btnDockClearNdvi.addEventListener("click", () => {
+        if (ndviManager) ndviManager.clearLayer();
+      });
+    }
+
+    if (btnNdviPrev) {
+      btnNdviPrev.addEventListener("click", () => {
+        if (ndviManager && ndviManager.selectedIndex > 0) {
+          ndviManager.selectDate(ndviManager.selectedIndex - 1);
+        }
+      });
+    }
+
+    if (btnNdviNext) {
+      btnNdviNext.addEventListener("click", () => {
+        if (ndviManager && ndviManager.selectedIndex < ndviManager.series.length - 1) {
+          ndviManager.selectDate(ndviManager.selectedIndex + 1);
+        }
+      });
+    }
+
+    if (ndviTileOpacity) {
+      ndviTileOpacity.addEventListener("input", (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (ndviOpacityVal) ndviOpacityVal.textContent = val + "%";
+        if (ndviManager) ndviManager.setTileOpacity(val / 100);
+      });
+    }
+
     window.addEventListener("resize", () => {
       if (profileManager && profileManager.profile.length >= 2) {
         const dock = document.getElementById("elevation-profile-dock");
         if (dock && dock.classList.contains("open")) {
           const prec = profilePrecision ? profilePrecision.value : "decimal1";
           profileManager.renderChart(prec);
+        }
+      }
+      if (ndviManager && ndviManager.series.length > 0) {
+        const dock = document.getElementById("ndvi-dock");
+        if (dock && dock.classList.contains("open")) {
+          ndviManager.renderChart(ndviManager.selectedIndex);
         }
       }
     });
