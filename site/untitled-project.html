@@ -1500,9 +1500,23 @@
     <div class="profile-dock-header">
       <div class="profile-dock-title">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
-        <span id="ndvi-dock-title">Série Temporelle NDVI — Sentinel-2 L2A (12 derniers mois)</span>
+        <span id="ndvi-dock-title">Série NDVI — Sentinel-2 L2A (Saison de croissance)</span>
       </div>
       <div class="profile-dock-header-right">
+        <label class="profile-precision-label" title="Année de la saison de croissance au Québec (mars à décembre)">
+          <span>Année :</span>
+          <select id="ndvi-year-select" class="tool-select">
+            <option value="2026" selected>2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+            <option value="2019">2019</option>
+            <option value="2018">2018</option>
+          </select>
+        </label>
         <button id="btn-dock-clear-ndvi" class="profile-dock-btn" type="button" title="Masquer la tuile satellite sur la carte">Masquer tuile</button>
         <button id="btn-close-ndvi-dock" class="profile-dock-close" type="button" aria-label="Fermer le panneau NDVI">&times;</button>
       </div>
@@ -2221,9 +2235,40 @@
         this.currentParcel = null;
         this.series = [];
         this.selectedIndex = -1;
+        this.selectedYear = new Date().getFullYear();
         this.tileOpacity = 0.85;
         this.abortController = null;
         this.marker = null;
+      }
+
+      initYearSelect() {
+        const select = document.getElementById("ndvi-year-select");
+        if (!select) return;
+        const currentYear = new Date().getFullYear();
+        select.innerHTML = "";
+        for (let y = currentYear; y >= 2018; y--) {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          if (y === this.selectedYear) opt.selected = true;
+          select.appendChild(opt);
+        }
+      }
+
+      getSclLabel(scl) {
+        switch (Math.round(scl)) {
+          case 4: return "Végétation";
+          case 5: return "Sol nu";
+          case 6: return "Eau";
+          case 2: return "Surface sombre";
+          case 7: return "Non classifié";
+          case 3: return "Ombre de nuage";
+          case 8: return "Nuage (prob. moy.)";
+          case 9: return "Nuage (prob. forte)";
+          case 10: return "Cirrus fin";
+          case 11: return "Neige / Glace";
+          default: return `Classe ${scl}`;
+        }
       }
 
       setMode(active) {
@@ -2246,7 +2291,7 @@
         this.setMode(!this.isActiveMode);
       }
 
-      async analyzeLocation(lngLat, parcelProps = null) {
+      async analyzeLocation(lngLat, parcelProps = null, year = null) {
         if (this.abortController) {
           this.abortController.abort();
         }
@@ -2257,6 +2302,17 @@
         this.currentParcel = parcelProps;
         this.series = [];
         this.selectedIndex = -1;
+
+        if (year !== null) {
+          this.selectedYear = parseInt(year, 10);
+        } else {
+          const yearSelect = document.getElementById("ndvi-year-select");
+          if (yearSelect && yearSelect.value) {
+            this.selectedYear = parseInt(yearSelect.value, 10);
+          }
+        }
+        const yearSelect = document.getElementById("ndvi-year-select");
+        if (yearSelect) yearSelect.value = this.selectedYear;
 
         if (this.marker) this.marker.remove();
         const el = document.createElement("div");
@@ -2269,7 +2325,6 @@
         const dock = document.getElementById("ndvi-dock");
         const titleEl = document.getElementById("ndvi-dock-title");
         const statsBar = document.getElementById("ndvi-stats-bar");
-        const hoverInfo = document.getElementById("ndvi-hover-info");
         const container = document.getElementById("ndvi-chart-container");
         const controlsRow = document.getElementById("ndvi-active-controls");
 
@@ -2281,26 +2336,31 @@
 
         if (titleEl) {
           titleEl.textContent = pid 
-            ? `Série NDVI — Parcelle nº ${pid}${crop ? ` (${crop})` : ''}`
-            : `Série NDVI — Point [${lngLat.lat.toFixed(4)}°N, ${Math.abs(lngLat.lng).toFixed(4)}°O]`;
+            ? `Série NDVI ${this.selectedYear} (mars–déc.) — Parcelle nº ${pid}${crop ? ` (${crop})` : ''}`
+            : `Série NDVI ${this.selectedYear} (mars–déc.) — Point [${lngLat.lat.toFixed(4)}°N, ${Math.abs(lngLat.lng).toFixed(4)}°O]`;
         }
 
         if (statsBar) {
-          statsBar.innerHTML = `<span class="stat-chip">⏳ Recherche des acquisitions Sentinel-2 L2A (12 derniers mois)...</span>`;
+          statsBar.innerHTML = `<span class="stat-chip">⏳ Recherche des scènes Sentinel-2 L2A pour la saison ${this.selectedYear} (mars &rarr; déc.)...</span>`;
         }
         if (container) {
           container.innerHTML = `
             <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:160px; color:#64748b; font-size:12px; gap:8px;">
               <div style="width:24px; height:24px; border:2.5px solid #cbd5e1; border-top-color:#16a34a; border-radius:50%; animation: spin 0.8s linear infinite;"></div>
-              <span>Interrogation du catalogue satellite Sentinel-2 (Planetary Computer)...</span>
+              <span>Interrogation du catalogue Sentinel-2 (Planetary Computer) pour la saison ${this.selectedYear}...</span>
             </div>
           `;
         }
 
         try {
+          const yr = this.selectedYear;
+          const startDt = `${yr}-03-01T00:00:00Z`;
+          const decEnd = new Date(Date.UTC(yr, 11, 1, 23, 59, 59));
           const now = new Date();
-          const oneYearAgo = new Date(now.getTime() - 365 * 24 * 3600 * 1000);
-          const dtStr = `${oneYearAgo.toISOString().split("T")[0]}T00:00:00Z/${now.toISOString().split("T")[0]}T23:59:59Z`;
+          const endDt = (yr === now.getUTCFullYear() && now < decEnd)
+            ? now.toISOString()
+            : `${yr}-12-01T23:59:59Z`;
+          const dtStr = `${startDt}/${endDt}`;
 
           const stacBody = {
             collections: ["sentinel-2-l2a"],
@@ -2310,9 +2370,9 @@
             },
             datetime: dtStr,
             query: {
-              "eo:cloud_cover": { lt: 35 }
+              "eo:cloud_cover": { lt: 65 }
             },
-            limit: 75,
+            limit: 100,
             sortby: [{ field: "datetime", direction: "asc" }]
           };
 
@@ -2328,8 +2388,8 @@
           const items = stacData.features || [];
 
           if (items.length === 0) {
-            if (statsBar) statsBar.innerHTML = `<span class="stat-chip" style="color:#b91c1c;">Aucune scène Sentinel-2 dégagée trouvée pour cette localisation au cours des 12 derniers mois.</span>`;
-            if (container) container.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b;">Aucune donnée satellite disponible.</div>`;
+            if (statsBar) statsBar.innerHTML = `<span class="stat-chip" style="color:#b91c1c;">Aucune scène Sentinel-2 trouvée pour la saison ${yr} (mars à déc.).</span>`;
+            if (container) container.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b;">Aucune donnée satellite disponible pour cette année. Essayez une autre année dans le sélecteur ci-dessus.</div>`;
             return;
           }
 
@@ -2348,11 +2408,12 @@
           );
 
           if (statsBar) {
-            statsBar.innerHTML = `<span class="stat-chip">🛰️ ${uniqueItems.length} scènes trouvées • Échantillonnage NDVI en cours (0/${uniqueItems.length})...</span>`;
+            statsBar.innerHTML = `<span class="stat-chip">🛰️ ${uniqueItems.length} passages candidats (${yr}) • Filtrage nuages SCL en cours (0/${uniqueItems.length})...</span>`;
           }
 
           const sampled = [];
-          const batchSize = 5;
+          let cloudFilteredCount = 0;
+          const batchSize = 6;
           let completed = 0;
 
           for (let i = 0; i < uniqueItems.length; i += batchSize) {
@@ -2366,13 +2427,23 @@
                 if (!pResp.ok) return null;
                 const pData = await pResp.json();
                 const vals = pData.values || [];
-                if (vals.length >= 2) {
+                if (vals.length >= 3) {
                   const b4 = vals[0];
                   const b8 = vals[1];
-                  const scl = vals[2] !== undefined ? vals[2] : 4;
+                  const scl = vals[2];
+                  
+                  // Classification SCL Sentinel-2:
+                  // 0: No Data, 1: Saturated/Defective, 2: Dark, 3: Cloud Shadow
+                  // 4: Vegetation, 5: Not Vegetated (sol nu), 6: Water, 7: Unclassified
+                  // 8: Cloud Med Prob, 9: Cloud High Prob, 10: Cirrus, 11: Snow/Ice
+                  const isCloudOrSnow = [0, 1, 3, 8, 9, 10, 11].includes(Math.round(scl));
+                  if (isCloudOrSnow) {
+                    return { isCloud: true, scl };
+                  }
+
                   if (b8 + b4 > 0) {
                     const ndvi = (b8 - b4) / (b8 + b4);
-                    if (Number.isFinite(ndvi) && ndvi >= -0.2 && ndvi <= 1.0) {
+                    if (Number.isFinite(ndvi) && ndvi >= -0.15 && ndvi <= 1.0) {
                       return {
                         id: itemId,
                         datetime: scene.properties.datetime,
@@ -2395,11 +2466,17 @@
 
             const batchResults = await Promise.all(batchPromises);
             for (const r of batchResults) {
-              if (r) sampled.push(r);
+              if (r) {
+                if (r.isCloud) {
+                  cloudFilteredCount++;
+                } else {
+                  sampled.push(r);
+                }
+              }
             }
             completed += batch.length;
             if (statsBar) {
-              statsBar.innerHTML = `<span class="stat-chip">🛰️ Échantillonnage NDVI en cours (${Math.min(completed, uniqueItems.length)}/${uniqueItems.length})...</span>`;
+              statsBar.innerHTML = `<span class="stat-chip">🛰️ Filtrage des nuages SCL (${Math.min(completed, uniqueItems.length)}/${uniqueItems.length}) • ${sampled.length} retenus, ${cloudFilteredCount} nuageux...</span>`;
             }
           }
 
@@ -2407,8 +2484,8 @@
           this.series = sampled;
 
           if (this.series.length === 0) {
-            if (statsBar) statsBar.innerHTML = `<span class="stat-chip" style="color:#b91c1c;">Impossible de calculer les valeurs NDVI pour ces dates.</span>`;
-            if (container) container.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b;">Données spectrales indisponibles.</div>`;
+            if (statsBar) statsBar.innerHTML = `<span class="stat-chip" style="color:#b91c1c;">Aucune date sans nuage pour la saison ${yr} (${cloudFilteredCount} passages éliminés par le masque SCL).</span>`;
+            if (container) container.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b;">Tous les passages satellites de ${yr} étaient couverts de nuages ou de neige. Sélectionnez une autre année ci-dessus.</div>`;
             return;
           }
 
@@ -2420,10 +2497,11 @@
 
           if (statsBar) {
             statsBar.innerHTML = `
-              <span class="stat-chip">Dernier NDVI : <strong>${latest.ndvi.toFixed(2)}</strong> (${latest.dateKey})</span>
+              <span class="stat-chip">Saison <strong>${yr}</strong> (mars &rarr; déc.)</span>
               <span class="stat-chip" style="background:#dcfce7; border-color:#86efac; color:#14532d;">Pic estival : <strong>${maxNdvi.toFixed(2)}</strong> (${this.series[peakIdx].dateKey})</span>
-              <span class="stat-chip">Minimum : <strong>${minNdvi.toFixed(2)}</strong></span>
-              <span class="stat-chip">Passages analysés : <strong>${this.series.length} dates</strong></span>
+              <span class="stat-chip">Dernier NDVI : <strong>${latest.ndvi.toFixed(2)}</strong> (${latest.dateKey})</span>
+              <span class="stat-chip">Observations claires : <strong>${this.series.length} dates</strong></span>
+              ${cloudFilteredCount > 0 ? `<span class="stat-chip" style="color:#475569;" title="Passages éliminés car le pixel était sous un nuage, une ombre de nuage ou de la neige (SCL)">☁️ ${cloudFilteredCount} passages nuageux éliminés (SCL)</span>` : ''}
             `;
           }
 
@@ -2450,7 +2528,7 @@
 
         if (controlsRow) controlsRow.style.display = "flex";
         if (badge) {
-          badge.innerHTML = `📅 <strong>${scene.dateKey}</strong> &bull; NDVI : <strong>${scene.ndvi.toFixed(3)}</strong> &bull; Nuages scène : ${scene.cloud.toFixed(1)}% &bull; (${scene.platform})`;
+          badge.innerHTML = `📅 <strong>${scene.dateKey}</strong> &bull; NDVI : <strong>${scene.ndvi.toFixed(3)}</strong> &bull; SCL : <span style="background:#dcfce7;color:#14532d;padding:1px 6px;border-radius:4px;font-weight:600;">${this.getSclLabel(scene.scl)}</span> &bull; Nuages scène : ${scene.cloud.toFixed(1)}% &bull; (${scene.platform})`;
         }
         if (btnPrev) btnPrev.disabled = (index <= 0);
         if (btnNext) btnNext.disabled = (index >= this.series.length - 1);
@@ -2536,9 +2614,10 @@
         const plotW = width - pad.left - pad.right;
         const plotH = height - pad.top - pad.bottom;
 
-        const firstDate = new Date(this.series[0].datetime).getTime();
-        const lastDate = new Date(this.series[this.series.length - 1].datetime).getTime();
-        const timeSpan = Math.max(1, lastDate - firstDate);
+        // Ancrage fixe sur la saison de croissance au Québec : 1er mars au 1er décembre
+        const seasonStart = new Date(Date.UTC(this.selectedYear, 2, 1, 0, 0, 0)).getTime();
+        const seasonEnd = new Date(Date.UTC(this.selectedYear, 11, 1, 23, 59, 59)).getTime();
+        const timeSpan = Math.max(1, seasonEnd - seasonStart);
 
         const getY = (val) => {
           const clamped = Math.max(-0.1, Math.min(1.0, val));
@@ -2547,7 +2626,7 @@
 
         const getX = (dtStr) => {
           const t = new Date(dtStr).getTime();
-          return pad.left + ((t - firstDate) / timeSpan) * plotW;
+          return pad.left + Math.max(0, Math.min(plotW, ((t - seasonStart) / timeSpan) * plotW));
         };
 
         const y1_0 = getY(1.0);
@@ -2573,22 +2652,19 @@
           `;
         }
 
+        // Ticks mensuels pour la saison québécoise (mars à décembre)
+        const mNames = ["janv", "févr", "mars", "avr", "mai", "juin", "juil", "août", "sept", "oct", "nov", "déc"];
         let xAxisHtml = "";
-        const monthsSet = new Set();
-        this.series.forEach(s => {
-          const mKey = s.dateKey.substring(0, 7);
-          if (!monthsSet.has(mKey)) {
-            monthsSet.add(mKey);
-            const x = getX(s.datetime);
-            const mParts = s.dateKey.split("-");
-            const mNames = ["janv", "févr", "mars", "avr", "mai", "juin", "juil", "août", "sept", "oct", "nov", "déc"];
-            const label = mNames[parseInt(mParts[1], 10) - 1] + (mParts[1] === "01" ? " " + mParts[0].substring(2) : "");
+        for (let m = 2; m <= 11; m++) {
+          const mDate = new Date(Date.UTC(this.selectedYear, m, 1)).getTime();
+          if (mDate >= seasonStart && mDate <= seasonEnd) {
+            const x = pad.left + ((mDate - seasonStart) / timeSpan) * plotW;
             xAxisHtml += `
               <line x1="${x.toFixed(1)}" y1="${pad.top + plotH}" x2="${x.toFixed(1)}" y2="${pad.top + plotH + 4}" stroke="#cbd5e1" stroke-width="1" />
-              <text x="${x.toFixed(1)}" y="${pad.top + plotH + 16}" fill="#64748b" font-size="9" text-anchor="middle" font-family="sans-serif">${label}</text>
+              <text x="${x.toFixed(1)}" y="${pad.top + plotH + 16}" fill="#64748b" font-size="9" text-anchor="middle" font-family="sans-serif">${mNames[m]}</text>
             `;
           }
-        });
+        }
 
         const coords = this.series.map(s => [getX(s.datetime), getY(s.ndvi)]);
         let pathD = `M ${coords[0][0].toFixed(1)} ${coords[0][1].toFixed(1)}`;
@@ -2647,7 +2723,7 @@
             const idx = parseInt(circle.dataset.idx, 10);
             const item = this.series[idx];
             if (hoverInfo) {
-              hoverInfo.innerHTML = `🛰️ <strong>${item.dateKey}</strong> &bull; NDVI : <strong>${item.ndvi.toFixed(3)}</strong> &bull; Nuages scène : ${item.cloud.toFixed(1)}% &bull; Cliquez pour afficher la tuile satellite sur la carte`;
+              hoverInfo.innerHTML = `🛰️ <strong>${item.dateKey}</strong> &bull; NDVI : <strong>${item.ndvi.toFixed(3)}</strong> &bull; SCL : <strong>${this.getSclLabel(item.scl)}</strong> &bull; Nuages scène : ${item.cloud.toFixed(1)}% &bull; Cliquez pour afficher la tuile satellite sur la carte`;
             }
           });
 
@@ -2860,6 +2936,7 @@
 
       // Instantiate Sentinel-2 NDVI Manager
       ndviManager = new NdviManager(map);
+      ndviManager.initYearSelect();
 
       // Map click handler for transect line drawing & NDVI mode
       map.on("click", (e) => {
@@ -3394,6 +3471,19 @@
     const btnNdviNext = document.getElementById("btn-ndvi-next");
     const ndviTileOpacity = document.getElementById("ndvi-tile-opacity");
     const ndviOpacityVal = document.getElementById("ndvi-opacity-val");
+    const ndviYearSelect = document.getElementById("ndvi-year-select");
+
+    if (ndviYearSelect) {
+      ndviYearSelect.addEventListener("change", (e) => {
+        const yr = parseInt(e.target.value, 10);
+        if (ndviManager) {
+          ndviManager.selectedYear = yr;
+          if (ndviManager.currentLocation) {
+            ndviManager.analyzeLocation(ndviManager.currentLocation, ndviManager.currentParcel, yr);
+          }
+        }
+      });
+    }
 
     if (btnQuickNdvi) {
       btnQuickNdvi.addEventListener("click", () => {
