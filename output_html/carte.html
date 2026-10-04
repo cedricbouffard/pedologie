@@ -555,6 +555,174 @@
       margin-top: 2px;
     }
 
+    /* Elevation Profile Plugin Styles */
+    .raster-profile-buttons {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .raster-profile-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .raster-profile-btn:hover {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+    }
+    .raster-profile-btn.primary {
+      background: #1e4535;
+      color: #ffffff;
+      border-color: #1e4535;
+    }
+    .raster-profile-btn.primary:hover {
+      background: #163529;
+    }
+    .raster-profile-btn.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #1d4ed8;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+    }
+    .tool-select {
+      padding: 3px 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #0f172a;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+    .profile-status-badge {
+      font-size: 10px;
+      color: #64748b;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 4px 8px;
+      line-height: 1.35;
+      margin-top: 4px;
+    }
+
+    /* Floating Elevation Profile Bottom Dock */
+    .elevation-profile-dock {
+      display: none;
+      position: absolute;
+      bottom: 18px;
+      left: 380px;
+      right: 20px;
+      max-height: 290px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 14px;
+      box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      z-index: 120;
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .elevation-profile-dock.open {
+      display: flex;
+    }
+    .profile-dock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .profile-dock-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .profile-dock-close {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      line-height: 1;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 0 4px;
+      transition: color 0.15s;
+    }
+    .profile-dock-close:hover {
+      color: #0f172a;
+    }
+    .profile-stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      padding: 4px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .stat-chip {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 2px 7px;
+      color: #334155;
+      font-weight: 500;
+    }
+    .stat-chip strong {
+      color: #0f172a;
+    }
+    .profile-hover-info {
+      font-size: 11px;
+      color: #2563eb;
+      font-weight: 600;
+      min-height: 16px;
+    }
+    .profile-chart-container {
+      width: 100%;
+      height: 160px;
+      position: relative;
+    }
+    .profile-chart-container svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+    .raster-profile-line { fill: none; stroke: #2563eb; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .raster-profile-trend { fill: none; stroke: #dc2626; stroke-width: 1.5; stroke-dasharray: 5 3; }
+    .raster-profile-area { fill: rgba(37, 99, 235, 0.14); }
+    .raster-profile-hover-line { stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 3 3; pointer-events: none; }
+    .raster-profile-hover-dot { fill: #dc2626; stroke: #ffffff; stroke-width: 2; pointer-events: none; }
+    .raster-profile-axis { stroke: #cbd5e1; stroke-width: 1; }
+    .raster-profile-axis-label { fill: #64748b; font-size: 9.5px; font-weight: 600; font-family: var(--font-mono, monospace); }
+    .raster-profile-grid { stroke: #e2e8f0; stroke-width: 0.8; stroke-dasharray: 2 3; }
+
+    @media (max-width: 768px) {
+      .elevation-profile-dock {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        max-height: 260px;
+        padding: 10px 12px;
+      }
+      .profile-chart-container {
+        height: 130px;
+      }
+    }
+
     /* Backdrop for mobile drawer */
     .tools-backdrop {
       display: none;
@@ -1031,6 +1199,44 @@
         </div>
       </div>
 
+      <!-- 5. Profil altimétrique MNT (geolibre-raster-elevation-profile) -->
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <span>Profil altimétrique MNT</span>
+          </div>
+        </div>
+
+        <div class="tool-label-row">
+          <span class="tool-sublabel">Précision altimétrique</span>
+          <select id="profile-precision" class="tool-select">
+            <option value="unit">0 décimale (1 m)</option>
+            <option value="decimal1" selected>1 décimale (0.1 m)</option>
+            <option value="decimal2">2 décimales (0.01 m)</option>
+          </select>
+        </div>
+
+        <div class="raster-profile-buttons" style="margin-top: 6px;">
+          <button id="btn-profile-draw" class="raster-profile-btn primary" type="button" title="Activer le tracé de la coupe">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <span>Tracer coupe</span>
+          </button>
+          <button id="btn-profile-apply" class="raster-profile-btn" type="button" title="Calculer le profil altimétrique">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Calculer</span>
+          </button>
+          <button id="btn-profile-clear" class="raster-profile-btn" type="button" title="Effacer la coupe">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <span>Effacer</span>
+          </button>
+        </div>
+
+        <div id="profile-status" class="profile-status-badge">
+          Tracez une coupe sur la carte pour générer son profil topographique.
+        </div>
+      </div>
+
       <!-- Source information -->
       <div class="source-info-line">
         <strong>Mosaïque VRT HRDEM Canada 1 m</strong> (56 tuiles) • Sols IRDA 2026
@@ -1040,6 +1246,22 @@
 
   <!-- Mobile Backdrop Overlay -->
   <div id="tools-backdrop" class="tools-backdrop"></div>
+
+  <!-- Floating Elevation Profile Bottom Dock -->
+  <div id="elevation-profile-dock" class="elevation-profile-dock">
+    <div class="profile-dock-header">
+      <div class="profile-dock-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Profil Altimétrique du Relief (HRDEM 1m)</span>
+      </div>
+      <button id="btn-close-profile-dock" class="profile-dock-close" type="button" aria-label="Fermer le profil">&times;</button>
+    </div>
+    <div id="profile-stats-bar" class="profile-stats-bar"></div>
+    <div id="profile-hover-info" class="profile-hover-info">
+      Survolez le graphique pour explorer les altitudes le long de la coupe
+    </div>
+    <div id="profile-chart-container" class="profile-chart-container" data-raster-profile-chart></div>
+  </div>
 
   <div id="map"></div>
 
@@ -1331,8 +1553,369 @@
       }
     }
 
+    // Elevation Profile Manager using HRDEM 1 m raster data
+    class ProfileManager {
+      constructor(mapInstance) {
+        this.map = mapInstance;
+        this.line = [];
+        this.profile = [];
+        this.isDrawing = false;
+        this.abortController = null;
+        this.initLayers();
+      }
+
+      initLayers() {
+        if (!this.map.getSource("raster-profile-line")) {
+          this.map.addSource("raster-profile-line", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] }
+          });
+          this.map.addLayer({
+            id: "raster-profile-line",
+            type: "line",
+            source: "raster-profile-line",
+            layout: { "line-cap": "round", "line-join": "round" },
+            paint: { "line-color": "#2563eb", "line-width": 3.5 }
+          });
+        }
+
+        if (!this.map.getSource("raster-profile-points")) {
+          this.map.addSource("raster-profile-points", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] }
+          });
+          this.map.addLayer({
+            id: "raster-profile-points",
+            type: "circle",
+            source: "raster-profile-points",
+            paint: {
+              "circle-radius": 4.5,
+              "circle-color": "#ffffff",
+              "circle-stroke-color": "#2563eb",
+              "circle-stroke-width": 2.5
+            }
+          });
+        }
+
+        if (!this.map.getSource("raster-profile-hover-point")) {
+          this.map.addSource("raster-profile-hover-point", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] }
+          });
+          this.map.addLayer({
+            id: "raster-profile-hover-point",
+            type: "circle",
+            source: "raster-profile-hover-point",
+            paint: {
+              "circle-radius": 6.5,
+              "circle-color": "#dc2626",
+              "circle-stroke-color": "#ffffff",
+              "circle-stroke-width": 2.5
+            }
+          });
+        }
+      }
+
+      addPoint(lngLat) {
+        this.line.push([lngLat.lng, lngLat.lat]);
+        this.updateMapVisuals();
+      }
+
+      updateMapVisuals() {
+        const lineSource = this.map.getSource("raster-profile-line");
+        if (lineSource) {
+          lineSource.setData({
+            type: "FeatureCollection",
+            features: this.line.length >= 2 ? [{
+              type: "Feature",
+              properties: {},
+              geometry: { type: "LineString", coordinates: this.line }
+            }] : []
+          });
+        }
+
+        const pointsSource = this.map.getSource("raster-profile-points");
+        if (pointsSource) {
+          pointsSource.setData({
+            type: "FeatureCollection",
+            features: this.line.length > 0 ? [{
+              type: "Feature",
+              properties: {},
+              geometry: { type: "MultiPoint", coordinates: this.line }
+            }] : []
+          });
+        }
+      }
+
+      setHoverPoint(coord) {
+        const source = this.map.getSource("raster-profile-hover-point");
+        if (!source) return;
+        source.setData({
+          type: "FeatureCollection",
+          features: coord ? [{
+            type: "Feature",
+            properties: {},
+            geometry: { type: "Point", coordinates: coord }
+          }] : []
+        });
+      }
+
+      clear() {
+        this.line = [];
+        this.profile = [];
+        this.updateMapVisuals();
+        this.setHoverPoint(null);
+        const dock = document.getElementById("elevation-profile-dock");
+        if (dock) dock.classList.remove("open");
+        const container = document.getElementById("profile-chart-container");
+        if (container) container.innerHTML = "";
+        const statsBar = document.getElementById("profile-stats-bar");
+        if (statsBar) statsBar.innerHTML = "";
+        const hoverInfo = document.getElementById("profile-hover-info");
+        if (hoverInfo) hoverInfo.textContent = "Survolez le graphique pour explorer les altitudes le long de la coupe";
+        const statusEl = document.getElementById("profile-status");
+        if (statusEl) statusEl.textContent = "Tracez une coupe sur la carte pour générer son profil topographique.";
+      }
+
+      async calculateProfile(precisionType) {
+        if (this.line.length < 2) {
+          throw new Error("Veuillez cliquer au moins 2 points sur la carte.");
+        }
+
+        const statusEl = document.getElementById("profile-status");
+        if (statusEl) statusEl.textContent = "Extraction du relief HRDEM 1 m en cours...";
+
+        // Calculate bbox with padding
+        let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+        for (const [lng, lat] of this.line) {
+          if (lng < minLng) minLng = lng;
+          if (lat < minLat) minLat = lat;
+          if (lng > maxLng) maxLng = lng;
+          if (lat > maxLat) maxLat = lat;
+        }
+        const padLng = Math.max(0.003, (maxLng - minLng) * 0.15);
+        const padLat = Math.max(0.003, (maxLat - minLat) * 0.15);
+        const bbox = [minLng - padLng, minLat - padLat, maxLng + padLng, maxLat + padLat];
+
+        const midLng = (minLng + maxLng) / 2;
+        const midLat = (minLat + maxLat) / 2;
+        const tileUrl = findTileForCoords(midLng, midLat);
+        if (!tileUrl) {
+          throw new Error("Aucune tuile MNE HRDEM disponible pour ce secteur.");
+        }
+
+        if (this.abortController) this.abortController.abort();
+        this.abortController = new AbortController();
+
+        const cog = await fromUrl(tileUrl);
+        const region = await readCogRegion(
+          cog,
+          bbox,
+          256,
+          -32767,
+          false,
+          this.abortController.signal,
+          'bilinear'
+        );
+
+        if (!region || !region.data || !region.sourceBBox) {
+          throw new Error("Impossible de lire les données altimétriques de la tuile MNE.");
+        }
+
+        const distances = [0];
+        for (let i = 1; i < this.line.length; i++) {
+          const a = this.line[i - 1];
+          const b = this.line[i];
+          const latRad = ((a[1] + b[1]) / 2) * Math.PI / 180;
+          const dx = (b[0] - a[0]) * Math.cos(latRad) * 111320;
+          const dy = (b[1] - a[1]) * 110540;
+          distances.push(distances[i - 1] + Math.hypot(dx, dy));
+        }
+        const totalDist = distances[distances.length - 1];
+        if (totalDist <= 0) {
+          throw new Error("La distance de la coupe est trop faible.");
+        }
+
+        const samplesCount = 128;
+        const profile = [];
+        let segIdx = 1;
+
+        for (let s = 0; s < samplesCount; s++) {
+          const curDist = (totalDist * s) / (samplesCount - 1);
+          while (segIdx < distances.length - 1 && distances[segIdx] < curDist) {
+            segIdx++;
+          }
+          const d0 = distances[segIdx - 1];
+          const d1 = distances[segIdx];
+          const r = d1 === d0 ? 0 : (curDist - d0) / (d1 - d0);
+          const ptLng = this.line[segIdx - 1][0] + (this.line[segIdx][0] - this.line[segIdx - 1][0]) * r;
+          const ptLat = this.line[segIdx - 1][1] + (this.line[segIdx][1] - this.line[segIdx - 1][1]) * r;
+
+          const [projX, projY] = proj4('EPSG:4326', EPSG_3979_DEF, [ptLng, ptLat]);
+          const px = Math.round(((projX - region.sourceBBox[0]) / (region.sourceBBox[2] - region.sourceBBox[0])) * (region.width - 1));
+          const py = Math.round(((region.sourceBBox[3] - projY) / (region.sourceBBox[3] - region.sourceBBox[1])) * (region.height - 1));
+
+          if (px >= 0 && px < region.width && py >= 0 && py < region.height) {
+            const val = region.data[py * region.width + px];
+            if (Number.isFinite(val) && val > -1000 && val < 9000) {
+              profile.push({
+                distance: curDist,
+                elevation: val,
+                coord: [ptLng, ptLat]
+              });
+            }
+          }
+        }
+
+        if (profile.length < 2) {
+          throw new Error("Aucune valeur altimétrique valide n'intersecte la coupe tracée.");
+        }
+
+        this.profile = profile;
+        this.renderChart(precisionType);
+        if (statusEl) {
+          statusEl.textContent = `Profil calculé : ${profile.length} points sur ${totalDist >= 1000 ? (totalDist / 1000).toFixed(2) + ' km' : Math.round(totalDist) + ' m'}.`;
+        }
+      }
+
+      renderChart(precisionType) {
+        const container = document.getElementById("profile-chart-container");
+        const dock = document.getElementById("elevation-profile-dock");
+        const statsBar = document.getElementById("profile-stats-bar");
+        const hoverInfo = document.getElementById("profile-hover-info");
+        if (!container || !dock) return;
+
+        dock.classList.add("open");
+
+        const elevations = this.profile.map(p => p.elevation);
+        const minElev = Math.min(...elevations);
+        const maxElev = Math.max(...elevations);
+        const deltaElev = maxElev - minElev;
+        const totalDist = this.profile[this.profile.length - 1].distance;
+
+        const n = this.profile.length;
+        const meanX = this.profile.reduce((acc, p) => acc + p.distance, 0) / n;
+        const meanY = elevations.reduce((acc, e) => acc + e, 0) / n;
+        let num = 0, den = 0;
+        for (const p of this.profile) {
+          const dx = p.distance - meanX;
+          num += dx * (p.elevation - meanY);
+          den += dx * dx;
+        }
+        const slope = den === 0 ? 0 : num / den;
+        const intercept = meanY - slope * meanX;
+        const slopePct = slope * 100;
+
+        const fmt = (val) => {
+          if (precisionType === "unit") return val.toFixed(0);
+          if (precisionType === "decimal2") return val.toFixed(2);
+          return val.toFixed(1);
+        };
+
+        const distFmt = (d) => {
+          return d >= 1000 ? (d / 1000).toFixed(2) + " km" : d.toFixed(0) + " m";
+        };
+
+        if (statsBar) {
+          statsBar.innerHTML = `
+            <span class="stat-chip">Min : <strong>${fmt(minElev)} m</strong></span>
+            <span class="stat-chip">Max : <strong>${fmt(maxElev)} m</strong></span>
+            <span class="stat-chip">Dénivelé &Delta; : <strong>${fmt(deltaElev)} m</strong></span>
+            <span class="stat-chip">Pente moyenne : <strong>${slopePct >= 0 ? '+' : ''}${slopePct.toFixed(2)}%</strong></span>
+            <span class="stat-chip">Distance totale : <strong>${distFmt(totalDist)}</strong></span>
+          `;
+        }
+
+        const width = Math.max(340, container.clientWidth || 600);
+        const height = Math.max(140, container.clientHeight || 150);
+        const pad = { left: 52, right: 18, top: 14, bottom: 26 };
+        const plotW = width - pad.left - pad.right;
+        const plotH = height - pad.top - pad.bottom;
+        const span = deltaElev || 1;
+
+        const points = this.profile.map(p => [
+          pad.left + (p.distance / totalDist) * plotW,
+          pad.top + (1 - (p.elevation - minElev) / span) * plotH
+        ]);
+
+        const pathD = points.map((pt, i) => `${i === 0 ? 'M' : 'L'}${pt[0].toFixed(1)} ${pt[1].toFixed(1)}`).join(' ');
+        const axisBottom = pad.top + plotH;
+        const axisLeft = pad.left;
+
+        const trendStart = intercept;
+        const trendEnd = intercept + slope * totalDist;
+        const trendY1 = pad.top + (1 - (trendStart - minElev) / span) * plotH;
+        const trendY2 = pad.top + (1 - (trendEnd - minElev) / span) * plotH;
+        const trendD = `M${pad.left.toFixed(1)} ${trendY1.toFixed(1)} L${(pad.left + plotW).toFixed(1)} ${trendY2.toFixed(1)}`;
+
+        let gridHtml = '';
+        for (let i = 0; i <= 4; i++) {
+          const gx = axisLeft + (i / 4) * plotW;
+          const gy = pad.top + (i / 4) * plotH;
+          gridHtml += `<line class="raster-profile-grid" x1="${gx}" y1="${pad.top}" x2="${gx}" y2="${axisBottom}"/>`;
+          gridHtml += `<line class="raster-profile-grid" x1="${axisLeft}" y1="${gy}" x2="${axisLeft + plotW}" y2="${gy}"/>`;
+        }
+
+        const svgHtml = `
+          <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+            ${gridHtml}
+            <path class="raster-profile-area" d="${pathD} L ${axisLeft + plotW} ${axisBottom} L ${axisLeft} ${axisBottom} Z"/>
+            <path class="raster-profile-line" d="${pathD}"/>
+            <path class="raster-profile-trend" d="${trendD}"/>
+            <line class="raster-profile-axis" x1="${axisLeft}" y1="${axisBottom}" x2="${axisLeft + plotW}" y2="${axisBottom}"/>
+            <line class="raster-profile-axis" x1="${axisLeft}" y1="${pad.top}" x2="${axisLeft}" y2="${axisBottom}"/>
+            <text class="raster-profile-axis-label" x="${axisLeft - 6}" y="${pad.top + 4}" text-anchor="end">${fmt(maxElev)} m</text>
+            <text class="raster-profile-axis-label" x="${axisLeft - 6}" y="${axisBottom}" text-anchor="end">${fmt(minElev)} m</text>
+            <text class="raster-profile-axis-label" x="${axisLeft}" y="${height - 6}" text-anchor="start">0 m</text>
+            <text class="raster-profile-axis-label" x="${axisLeft + plotW}" y="${height - 6}" text-anchor="end">${distFmt(totalDist)}</text>
+            <line class="raster-profile-hover-line" data-profile-hover-line x1="0" x2="0" y1="${pad.top}" y2="${axisBottom}" style="display:none;"/>
+            <circle class="raster-profile-hover-dot" data-profile-hover-dot r="4.5" cx="0" cy="0" style="display:none;"/>
+          </svg>
+        `;
+
+        container.innerHTML = svgHtml;
+
+        const svg = container.querySelector("svg");
+        const hoverLine = container.querySelector("[data-profile-hover-line]");
+        const hoverDot = container.querySelector("[data-profile-hover-dot]");
+
+        svg.addEventListener("mousemove", (e) => {
+          const rect = svg.getBoundingClientRect();
+          const clientX = e.clientX - rect.left;
+          const svgX = (clientX / rect.width) * width;
+          const clampedX = Math.max(pad.left, Math.min(pad.left + plotW, svgX));
+          const frac = (clampedX - pad.left) / plotW;
+          const idx = Math.max(0, Math.min(this.profile.length - 1, Math.round(frac * (this.profile.length - 1))));
+          const pt = this.profile[idx];
+          const screenPt = points[idx];
+
+          hoverLine.style.display = "block";
+          hoverDot.style.display = "block";
+          hoverLine.setAttribute("x1", screenPt[0].toFixed(1));
+          hoverLine.setAttribute("x2", screenPt[0].toFixed(1));
+          hoverDot.setAttribute("cx", screenPt[0].toFixed(1));
+          hoverDot.setAttribute("cy", screenPt[1].toFixed(1));
+
+          this.setHoverPoint(pt.coord);
+          if (hoverInfo) {
+            hoverInfo.innerHTML = `Distance : <strong>${distFmt(pt.distance)}</strong> &bull; Altitude : <strong>${fmt(pt.elevation)} m</strong> &bull; Coord : ${pt.coord[1].toFixed(5)}°N, ${Math.abs(pt.coord[0]).toFixed(5)}°O`;
+          }
+        });
+
+        svg.addEventListener("mouseleave", () => {
+          hoverLine.style.display = "none";
+          hoverDot.style.display = "none";
+          this.setHoverPoint(null);
+          if (hoverInfo) {
+            hoverInfo.textContent = "Survolez le graphique pour explorer les altitudes le long de la coupe";
+          }
+        });
+      }
+    }
+
     let topoManager = null;
     let contourManager = null;
+    let profileManager = null;
 
     map.on("load", () => {
       // 1. Google Hybrid Raster Source
@@ -1459,6 +2042,21 @@
 
       contourManager.setup(map);
 
+      // Instantiate Elevation Profile Manager
+      profileManager = new ProfileManager(map);
+
+      // Map click handler for transect line drawing
+      map.on("click", (e) => {
+        if (profileManager && profileManager.isDrawing) {
+          profileManager.addPoint(e.lngLat);
+          const count = profileManager.line.length;
+          const statusEl = document.getElementById("profile-status");
+          if (statusEl) {
+            statusEl.textContent = `${count} point${count > 1 ? 's' : ''} placé${count > 1 ? 's' : ''}. Cliquez encore ou sur 'Calculer'.`;
+          }
+        }
+      });
+
       // Camera move listeners
       map.on('moveend', () => {
         if (topoManager) topoManager.scheduleUpdate();
@@ -1474,14 +2072,17 @@
 
       // Cursor pointer on polygon hover
       map.on("mouseenter", "pedologie-fill", () => {
+        if (profileManager && profileManager.isDrawing) return;
         map.getCanvas().style.cursor = "pointer";
       });
       map.on("mouseleave", "pedologie-fill", () => {
+        if (profileManager && profileManager.isDrawing) return;
         map.getCanvas().style.cursor = "";
       });
 
       // Click to identify with rich popup
       map.on("click", "pedologie-fill", (e) => {
+        if (profileManager && profileManager.isDrawing) return;
         if (!e.features || !e.features.length) return;
         const p = e.features[0].properties;
 
@@ -1706,6 +2307,82 @@
           contourManager.updatePaintProperties();
         }
       });
+    });
+
+    // Elevation Profile Controls
+    const btnProfileDraw = document.getElementById("btn-profile-draw");
+    const btnProfileApply = document.getElementById("btn-profile-apply");
+    const btnProfileClear = document.getElementById("btn-profile-clear");
+    const btnCloseProfileDock = document.getElementById("btn-close-profile-dock");
+    const profilePrecision = document.getElementById("profile-precision");
+    const profileStatusEl = document.getElementById("profile-status");
+
+    btnProfileDraw.addEventListener("click", () => {
+      if (!profileManager) return;
+      profileManager.isDrawing = !profileManager.isDrawing;
+      if (profileManager.isDrawing) {
+        btnProfileDraw.classList.add("active");
+        map.getCanvas().style.cursor = "crosshair";
+        profileStatusEl.textContent = "Mode tracé actif : cliquez sur la carte pour poser les points (2+ requis).";
+      } else {
+        btnProfileDraw.classList.remove("active");
+        map.getCanvas().style.cursor = "";
+        profileStatusEl.textContent = profileManager.line.length >= 2
+          ? "Tracé terminé. Cliquez sur 'Calculer' pour afficher le profil."
+          : "Tracé en pause. Cliquez sur 'Tracer coupe' pour reprendre.";
+      }
+    });
+
+    btnProfileApply.addEventListener("click", async () => {
+      if (!profileManager) return;
+      if (profileManager.isDrawing) {
+        profileManager.isDrawing = false;
+        btnProfileDraw.classList.remove("active");
+        map.getCanvas().style.cursor = "";
+      }
+      if (window.innerWidth <= 768 && typeof closeMobileTools === "function") {
+        closeMobileTools();
+      }
+      try {
+        btnProfileApply.disabled = true;
+        profileStatusEl.textContent = "Calcul du profil altimétrique...";
+        await profileManager.calculateProfile(profilePrecision.value);
+      } catch (err) {
+        profileStatusEl.textContent = "Erreur : " + (err.message || err);
+        console.error("Profile calculation error:", err);
+      } finally {
+        btnProfileApply.disabled = false;
+      }
+    });
+
+    profilePrecision.addEventListener("change", () => {
+      if (profileManager && profileManager.profile.length >= 2) {
+        profileManager.renderChart(profilePrecision.value);
+      }
+    });
+
+    btnProfileClear.addEventListener("click", () => {
+      if (!profileManager) return;
+      profileManager.isDrawing = false;
+      btnProfileDraw.classList.remove("active");
+      map.getCanvas().style.cursor = "";
+      profileManager.clear();
+    });
+
+    if (btnCloseProfileDock) {
+      btnCloseProfileDock.addEventListener("click", () => {
+        const dock = document.getElementById("elevation-profile-dock");
+        if (dock) dock.classList.remove("open");
+      });
+    }
+
+    window.addEventListener("resize", () => {
+      if (profileManager && profileManager.profile.length >= 2) {
+        const dock = document.getElementById("elevation-profile-dock");
+        if (dock && dock.classList.contains("open")) {
+          profileManager.renderChart(profilePrecision.value);
+        }
+      }
     });
 
     // Address Search Logic (Nominatim API)
