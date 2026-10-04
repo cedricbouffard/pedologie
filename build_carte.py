@@ -1206,6 +1206,14 @@ html_template = """<!DOCTYPE html>
       text-decoration: underline;
     }
 
+    /* Mobile Bottom Navigation Bar (hidden on desktop) */
+    .mobile-bottom-bar {
+      display: none;
+    }
+    .mobile-drawing-actions {
+      display: none;
+    }
+
     /* Mobile Responsive Rules */
     @media (max-width: 768px) {
       .nav-brand-sub { display: none; }
@@ -1236,19 +1244,127 @@ html_template = """<!DOCTYPE html>
         border: 1px solid rgba(203, 213, 225, 0.8);
       }
       .mobile-tools-toggle {
-        display: inline-flex;
-        padding: 9px 12px;
-        background: rgba(255, 255, 255, 0.98);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(203, 213, 225, 0.8);
+        display: none !important;
       }
       .map-profile-toolbar {
-        top: 114px;
-        right: 10px;
+        display: none !important;
       }
-      .floating-profile-btn {
-        font-size: 11px;
+
+      .mobile-bottom-bar {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: #ffffff;
+        border-top: 1px solid #cbd5e1;
+        box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08);
+        z-index: 1500;
+        align-items: stretch;
+        justify-content: space-around;
+        padding: 0 4px;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .mobile-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        background: transparent;
+        border: none;
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 2px;
+        transition: all 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-nav-item svg {
+        transition: transform 0.15s ease, stroke 0.15s ease;
+      }
+      .mobile-nav-item:active {
+        transform: scale(0.92);
+      }
+      .mobile-nav-item.active {
+        color: #16a34a;
+      }
+      .mobile-nav-item.active svg {
+        stroke: #16a34a;
+        transform: scale(1.08);
+      }
+      .mobile-nav-item.active-blue {
+        color: #2563eb;
+      }
+      .mobile-nav-item.active-blue svg {
+        stroke: #2563eb;
+        transform: scale(1.08);
+      }
+
+      /* Mobile drawing action pill above bottom bar */
+      .mobile-drawing-actions {
+        display: none;
+        position: fixed;
+        bottom: 64px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1550;
+        background: #0f172a;
+        border-radius: 30px;
+        padding: 5px 8px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        gap: 6px;
+        align-items: center;
+      }
+      .mobile-drawing-actions.visible {
+        display: flex !important;
+      }
+      .mobile-act-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .mobile-act-btn.btn-calc {
+        background: #2563eb;
+        border-color: #3b82f6;
+      }
+      .mobile-act-btn.danger {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #fca5a5;
         padding: 6px 10px;
+      }
+      .mobile-act-btn:active {
+        opacity: 0.8;
+      }
+
+      .elevation-profile-dock,
+      .ndvi-dock {
+        left: 8px !important;
+        right: 8px !important;
+        bottom: 62px !important;
+        max-height: calc(100vh - 140px) !important;
+        border-radius: 14px !important;
+        box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.25) !important;
+        z-index: 1400 !important;
+      }
+
+      .maplibregl-ctrl-bottom-right {
+        bottom: 62px !important;
+      }
+      .maplibregl-ctrl-top-right {
+        top: 62px !important;
       }
       .profile-dock-header-right {
         gap: 6px;
@@ -1637,6 +1753,65 @@ html_template = """<!DOCTYPE html>
       <span id="ndvi-btn-text">NDVI Sentinel-2</span>
     </button>
   </div>
+
+  <!-- Mobile Profile Floating Action Pill -->
+  <div id="mobile-drawing-actions" class="mobile-drawing-actions">
+    <button id="mobile-act-cancel" class="mobile-act-btn" type="button">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <span>Annuler</span>
+    </button>
+    <button id="mobile-act-calc" class="mobile-act-btn btn-calc" type="button" style="display: none;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <span>Calculer (<span id="mobile-pts-count">0</span> pts)</span>
+    </button>
+    <button id="mobile-act-clear" class="mobile-act-btn danger" type="button" style="display: none;" title="Effacer les points">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    </button>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav id="mobile-bottom-bar" class="mobile-bottom-bar" aria-label="Navigation cartographique mobile">
+    <button id="mobile-btn-layers" class="mobile-nav-item" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+      <span>Couches</span>
+    </button>
+    <button id="mobile-btn-ndvi" class="mobile-nav-item" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+      </svg>
+      <span>NDVI</span>
+    </button>
+    <button id="mobile-btn-profile" class="mobile-nav-item" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"></path>
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+      </svg>
+      <span id="mobile-profile-label">Coupe MNT</span>
+    </button>
+    <button id="mobile-btn-basemap" class="mobile-nav-item" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
+      </svg>
+      <span id="mobile-basemap-label">Satellite</span>
+    </button>
+    <button id="mobile-btn-locate" class="mobile-nav-item" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="8"></circle>
+        <line x1="12" y1="2" x2="12" y2="4"></line>
+        <line x1="12" y1="20" x2="12" y2="22"></line>
+        <line x1="2" y1="12" x2="4" y2="12"></line>
+        <line x1="20" y1="12" x2="22" y2="12"></line>
+      </svg>
+      <span>Position</span>
+    </button>
+  </nav>
 
   <div id="map"></div>
 
@@ -2419,6 +2594,10 @@ html_template = """<!DOCTYPE html>
         const btn = document.getElementById("btn-quick-ndvi");
         if (btn) {
           btn.classList.toggle("active", active);
+        }
+        const mobileNdviBtn = document.getElementById("mobile-btn-ndvi");
+        if (mobileNdviBtn) {
+          mobileNdviBtn.classList.toggle("active", active);
         }
         if (active) {
           if (profileManager && profileManager.isDrawing) {
@@ -3534,10 +3713,21 @@ html_template = """<!DOCTYPE html>
 
     function startDrawing() {
       if (!profileManager) return;
+      if (ndviManager && ndviManager.isActiveMode) {
+        ndviManager.setMode(false);
+      }
       profileManager.isDrawing = true;
       map.doubleClickZoom.disable();
       if (btnQuickProfile) btnQuickProfile.classList.add("active");
       if (profileBtnText) profileBtnText.textContent = "Annuler tracé";
+
+      const mobileProfileBtn = document.getElementById("mobile-btn-profile");
+      const mobileProfileLabel = document.getElementById("mobile-profile-label");
+      const mobileDrawingActions = document.getElementById("mobile-drawing-actions");
+      if (mobileProfileBtn) mobileProfileBtn.classList.add("active-blue");
+      if (mobileProfileLabel) mobileProfileLabel.textContent = "Annuler";
+      if (mobileDrawingActions) mobileDrawingActions.classList.add("visible");
+
       map.getCanvas().style.cursor = "crosshair";
       updateToolbarButtons();
     }
@@ -3550,6 +3740,16 @@ html_template = """<!DOCTYPE html>
       if (profileBtnText) {
         profileBtnText.textContent = profileManager.line.length >= 2 ? "Retracer coupe" : "Tracer coupe MNT";
       }
+
+      const mobileProfileBtn = document.getElementById("mobile-btn-profile");
+      const mobileProfileLabel = document.getElementById("mobile-profile-label");
+      const mobileDrawingActions = document.getElementById("mobile-drawing-actions");
+      if (mobileProfileBtn) mobileProfileBtn.classList.remove("active-blue");
+      if (mobileProfileLabel) {
+        mobileProfileLabel.textContent = profileManager.line.length >= 2 ? "Retracer" : "Coupe MNT";
+      }
+      if (mobileDrawingActions) mobileDrawingActions.classList.remove("visible");
+
       map.getCanvas().style.cursor = "";
       updateToolbarButtons();
     }
@@ -3565,8 +3765,18 @@ html_template = """<!DOCTYPE html>
     function updateToolbarButtons() {
       const hasPoints = profileManager && profileManager.line.length > 0;
       const canCalc = profileManager && profileManager.line.length >= 2;
+      const count = profileManager ? profileManager.line.length : 0;
+
       if (btnQuickCalc) btnQuickCalc.style.display = canCalc ? "inline-flex" : "none";
       if (btnQuickClear) btnQuickClear.style.display = hasPoints ? "inline-flex" : "none";
+
+      const mobileActCalc = document.getElementById("mobile-act-calc");
+      const mobileActClear = document.getElementById("mobile-act-clear");
+      const mobilePtsCount = document.getElementById("mobile-pts-count");
+
+      if (mobileActCalc) mobileActCalc.style.display = canCalc ? "inline-flex" : "none";
+      if (mobileActClear) mobileActClear.style.display = hasPoints ? "inline-flex" : "none";
+      if (mobilePtsCount) mobilePtsCount.textContent = count;
     }
 
     async function triggerProfileCalculation() {
@@ -3833,12 +4043,16 @@ html_template = """<!DOCTYPE html>
       if (panelTools) panelTools.classList.add("open");
       if (toolsBackdrop) toolsBackdrop.classList.add("active");
       if (btnToggleTools) btnToggleTools.classList.add("active");
+      const mobileBtnLayers = document.getElementById("mobile-btn-layers");
+      if (mobileBtnLayers) mobileBtnLayers.classList.add("active");
     }
 
     function closeMobileTools() {
       if (panelTools) panelTools.classList.remove("open");
       if (toolsBackdrop) toolsBackdrop.classList.remove("active");
       if (btnToggleTools) btnToggleTools.classList.remove("active");
+      const mobileBtnLayers = document.getElementById("mobile-btn-layers");
+      if (mobileBtnLayers) mobileBtnLayers.classList.remove("active");
     }
 
     if (btnToggleTools) {
@@ -3866,6 +4080,123 @@ html_template = """<!DOCTYPE html>
         e.preventDefault();
         e.stopPropagation();
         closeMobileTools();
+      });
+    }
+
+    // Mobile Bottom Navigation Bar & Action Listeners
+    const mobileBtnLayers = document.getElementById("mobile-btn-layers");
+    const mobileBtnNdvi = document.getElementById("mobile-btn-ndvi");
+    const mobileBtnProfile = document.getElementById("mobile-btn-profile");
+    const mobileBtnBasemap = document.getElementById("mobile-btn-basemap");
+    const mobileBasemapLabel = document.getElementById("mobile-basemap-label");
+    const mobileBtnLocate = document.getElementById("mobile-btn-locate");
+
+    const mobileActCancel = document.getElementById("mobile-act-cancel");
+    const mobileActCalc = document.getElementById("mobile-act-calc");
+    const mobileActClear = document.getElementById("mobile-act-clear");
+
+    if (mobileBtnLayers) {
+      mobileBtnLayers.addEventListener("click", () => {
+        if (panelTools && panelTools.classList.contains("open")) {
+          closeMobileTools();
+        } else {
+          openMobileTools();
+        }
+      });
+    }
+
+    if (mobileBtnNdvi) {
+      mobileBtnNdvi.addEventListener("click", () => {
+        if (ndviManager) ndviManager.toggleMode();
+      });
+    }
+
+    if (mobileBtnProfile) {
+      mobileBtnProfile.addEventListener("click", toggleDrawing);
+    }
+
+    if (mobileBtnBasemap) {
+      mobileBtnBasemap.addEventListener("click", () => {
+        const isSatActive = btnSat && btnSat.classList.contains("active");
+        if (isSatActive) {
+          if (btnPlan) btnPlan.click();
+          if (mobileBasemapLabel) mobileBasemapLabel.textContent = "Satellite";
+          mobileBtnBasemap.classList.remove("active");
+        } else {
+          if (btnSat) btnSat.click();
+          if (mobileBasemapLabel) mobileBasemapLabel.textContent = "Plan";
+          mobileBtnBasemap.classList.add("active");
+        }
+      });
+    }
+
+    // Keep mobile basemap button in sync when toggled elsewhere
+    if (btnPlan && btnSat) {
+      btnPlan.addEventListener("click", () => {
+        if (mobileBasemapLabel) mobileBasemapLabel.textContent = "Satellite";
+        if (mobileBtnBasemap) mobileBtnBasemap.classList.remove("active");
+      });
+      btnSat.addEventListener("click", () => {
+        if (mobileBasemapLabel) mobileBasemapLabel.textContent = "Plan";
+        if (mobileBtnBasemap) mobileBtnBasemap.classList.add("active");
+      });
+    }
+
+    // Mobile GPS Locate button
+    let mobileUserMarker = null;
+    if (mobileBtnLocate) {
+      mobileBtnLocate.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          alert("La géolocalisation n'est pas supportée par votre navigateur.");
+          return;
+        }
+        mobileBtnLocate.classList.add("active");
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lng = pos.coords.longitude;
+            const lat = pos.coords.latitude;
+            if (mobileUserMarker) mobileUserMarker.remove();
+            
+            const el = document.createElement("div");
+            el.className = "mobile-user-marker";
+            el.innerHTML = '<div style="width:16px;height:16px;border-radius:50%;background:#2563eb;border:2.5px solid #ffffff;box-shadow:0 0 10px rgba(37,99,235,0.6);"></div>';
+            
+            mobileUserMarker = new maplibregl.Marker({ element: el })
+              .setLngLat([lng, lat])
+              .addTo(map);
+
+            map.flyTo({ center: [lng, lat], zoom: 15, duration: 1200 });
+            setTimeout(() => {
+              if (mobileBtnLocate) mobileBtnLocate.classList.remove("active");
+            }, 1500);
+          },
+          (err) => {
+            console.warn("Geolocation error:", err);
+            mobileBtnLocate.classList.remove("active");
+            alert("Impossible d'obtenir votre position GPS.");
+          },
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      });
+    }
+
+    if (mobileActCancel) {
+      mobileActCancel.addEventListener("click", () => {
+        stopDrawing();
+      });
+    }
+
+    if (mobileActCalc) {
+      mobileActCalc.addEventListener("click", () => {
+        triggerProfileCalculation();
+      });
+    }
+
+    if (mobileActClear) {
+      mobileActClear.addEventListener("click", () => {
+        if (profileManager) {
+          profileManager.clear();
+        }
       });
     }
   </script>
