@@ -1394,13 +1394,13 @@ html_template = """<!DOCTYPE html>
             <span>Sols pédologiques</span>
           </div>
           <label class="switch-label" title="Afficher/Masquer les sols">
-            <input type="checkbox" id="toggle-pedo" checked />
+            <input type="checkbox" id="toggle-pedo" />
             <span class="switch-slider"></span>
           </label>
         </div>
         <div class="tool-label-row">
           <span class="tool-sublabel">Opacité des sols</span>
-          <span id="opacity-val" class="val-badge">80%</span>
+          <span id="opacity-val" class="val-badge">Masqué</span>
         </div>
         <input type="range" id="pedo-opacity" min="0" max="100" value="80" class="slider" />
       </div>
@@ -1413,7 +1413,7 @@ html_template = """<!DOCTYPE html>
             <span>Parcelles agricoles (BDPPAD)</span>
           </div>
           <label class="switch-label" title="Afficher/Masquer les contours des parcelles">
-            <input type="checkbox" id="toggle-parcelles" checked />
+            <input type="checkbox" id="toggle-parcelles" />
             <span class="switch-slider"></span>
           </label>
         </div>
@@ -1436,7 +1436,7 @@ html_template = """<!DOCTYPE html>
             <span>Topographie (MNE HRDEM)</span>
           </div>
           <label class="switch-label" title="Afficher/Masquer le relief">
-            <input type="checkbox" id="toggle-topo" checked />
+            <input type="checkbox" id="toggle-topo" />
             <span class="switch-slider"></span>
           </label>
         </div>
@@ -1448,7 +1448,7 @@ html_template = """<!DOCTYPE html>
         </div>
 
         <div id="topo-alt-badge" class="topo-alt-badge">
-          Altitude : initialisation...
+          Désactivé
         </div>
 
         <div class="tool-label-row">
@@ -1474,7 +1474,7 @@ html_template = """<!DOCTYPE html>
             <span>Courbes de niveau</span>
           </div>
           <label class="switch-label" title="Afficher/Masquer les courbes de niveau (dès zoom 11)">
-            <input type="checkbox" id="toggle-contours" checked />
+            <input type="checkbox" id="toggle-contours" />
             <span class="switch-slider"></span>
           </label>
         </div>
@@ -1490,7 +1490,7 @@ html_template = """<!DOCTYPE html>
         </div>
 
         <div id="contour-status" class="contour-status-badge">
-          Zoom 11+ requis pour le calcul dynamique
+          Désactivé
         </div>
       </div>
 
@@ -1647,9 +1647,9 @@ html_template = """<!DOCTYPE html>
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
 
-    // Initial map view: Quebec agricultural heartland
-    const initialCenter = [-71.2944, 46.3833];
-    const initialZoom = 10.5;
+    // Initial map view: Southern Quebec in its entirety
+    const initialCenter = [-72.4, 46.5];
+    const initialZoom = 6.8;
 
     const map = new maplibregl.Map({
       container: "map",
@@ -1761,7 +1761,7 @@ html_template = """<!DOCTYPE html>
     class TopoManager {
       constructor(mapInstance) {
         this.map = mapInstance;
-        this.enabled = true;
+        this.enabled = false;
         this.opacity = 0.70;
         this.stretchMethod = 'percentile'; // 'percentile' or 'minmax'
         this.activeCogUrl = '';
@@ -2931,6 +2931,7 @@ html_template = """<!DOCTYPE html>
         source: "pedologie",
         "source-layer": "pedologie_quebec",
         filter: ["==", ["geometry-type"], "Polygon"],
+        layout: { visibility: "none" },
         paint: {
           "fill-color": ["coalesce", ["get", "color"], "#b23434"],
           "fill-opacity": 0.8
@@ -2943,6 +2944,7 @@ html_template = """<!DOCTYPE html>
         type: "line",
         source: "pedologie",
         "source-layer": "pedologie_quebec",
+        layout: { visibility: "none" },
         paint: {
           "line-color": "#1e293b",
           "line-width": [
@@ -2964,6 +2966,7 @@ html_template = """<!DOCTYPE html>
         minzoom: 12,
         maxzoom: 24,
         layout: {
+          "visibility": "none",
           "text-field": ["to-string", ["coalesce", ["get", "Appellation_cartographique"], ""]],
           "text-font": ["Noto Sans Regular"],
           "text-size": [
@@ -2998,6 +3001,7 @@ html_template = """<!DOCTYPE html>
         type: "fill",
         source: "parcelles-source",
         "source-layer": "BDPPAD_2026",
+        layout: { visibility: "none" },
         paint: {
           "fill-color": "#000000",
           "fill-opacity": 0
@@ -3010,6 +3014,7 @@ html_template = """<!DOCTYPE html>
         type: "line",
         source: "parcelles-source",
         "source-layer": "BDPPAD_2026",
+        layout: { visibility: "none" },
         paint: {
           "line-color": "#ffffff",
           "line-width": [
@@ -3028,6 +3033,7 @@ html_template = """<!DOCTYPE html>
         type: "line",
         source: "parcelles-source",
         "source-layer": "BDPPAD_2026",
+        layout: { visibility: "none" },
         paint: {
           "line-color": "#000000",
           "line-width": [
@@ -3041,9 +3047,8 @@ html_template = """<!DOCTYPE html>
         }
       });
 
-      // Instantiate Topography Manager
+      // Instantiate Topography Manager (starts disabled by default)
       topoManager = new TopoManager(map);
-      topoManager.scheduleUpdate();
 
       // Instantiate ContourManager from geolibre-plugin
       const mockApp = {
@@ -3075,6 +3080,11 @@ html_template = """<!DOCTYPE html>
       });
 
       contourManager.setup(map);
+      for (const layerId of ["gc-contour-minor", "gc-contour-major", "gc-contour-labels"]) {
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(layerId, "visibility", "none");
+        }
+      }
 
       // Function to ensure parcels always stay on top of all layers
       function bringParcellesToFront() {
@@ -3132,9 +3142,10 @@ html_template = """<!DOCTYPE html>
 
       // Camera move listeners
       map.on('moveend', () => {
-        if (topoManager) topoManager.scheduleUpdate();
+        if (topoManager && topoManager.enabled) topoManager.scheduleUpdate();
         
-        if (contourManager) {
+        const toggleContoursEl = document.getElementById("toggle-contours");
+        if (contourManager && toggleContoursEl && toggleContoursEl.checked) {
           const center = map.getCenter();
           const currentTile = findTileForCoords(center.lng, center.lat);
           if (contourManager.config.cogUrl !== currentTile) {
