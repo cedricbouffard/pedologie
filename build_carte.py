@@ -862,6 +862,29 @@ html_template = """<!DOCTYPE html>
       gap: 12px;
       flex-wrap: wrap;
     }
+    .ndvi-stretch-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ndvi-sliders-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      color: #334155;
+    }
+    @media (max-width: 900px) {
+      .ndvi-controls-row {
+        flex-direction: column;
+        align-items: stretch !important;
+      }
+      .ndvi-controls-row > div:last-child {
+        margin-left: 0 !important;
+        justify-content: space-between;
+      }
+    }
     .ndvi-nav-buttons {
       display: flex;
       gap: 4px;
@@ -1543,21 +1566,51 @@ html_template = """<!DOCTYPE html>
 
     <!-- Active date banner & layer controls -->
     <div id="ndvi-active-controls" class="ndvi-active-controls" style="display: none;">
-      <div class="ndvi-date-badge" id="ndvi-selected-date-badge">📅 Date sélectionnée : —</div>
-      <div class="ndvi-controls-row">
+      <div class="ndvi-header-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
+        <div class="ndvi-date-badge" id="ndvi-selected-date-badge">📅 Date sélectionnée : —</div>
         <div class="ndvi-nav-buttons">
           <button id="btn-ndvi-prev" class="ndvi-nav-btn" type="button" title="Acquisition précédente">&larr; Précédente</button>
           <button id="btn-ndvi-next" class="ndvi-nav-btn" type="button" title="Acquisition suivante">Suivante &rarr;</button>
         </div>
-        <div class="ndvi-opacity-wrap">
-          <span>Opacité tuile :</span>
-          <input type="range" id="ndvi-tile-opacity" min="0" max="100" value="85" class="slider" style="width: 80px;" />
-          <span id="ndvi-opacity-val" class="val-badge">85%</span>
+      </div>
+
+      <div class="ndvi-controls-row" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding-top: 5px; border-top: 1px dashed rgba(22, 163, 74, 0.25);">
+        <!-- Stretch Controls -->
+        <div class="ndvi-stretch-group" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-size: 11px; font-weight: 600; color: #166534;">Étirement couleurs (Stretch) :</span>
+          <select id="ndvi-stretch-preset" class="tool-select" style="font-size: 11px; padding: 2px 6px;">
+            <option value="standard" selected>Standard (-0.05 à 0.85)</option>
+            <option value="contrast">Fort contraste (0.25 à 0.85)</option>
+            <option value="dense">Canopée dense (0.50 à 0.90)</option>
+            <option value="emergence">Émergence / Sol (0.00 à 0.45)</option>
+            <option value="auto">Auto (centré parcelle)</option>
+            <option value="custom">Personnalisé</option>
+          </select>
+
+          <div class="ndvi-sliders-inline" style="display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; color: #334155;">
+            <span>Min :</span>
+            <input type="range" id="ndvi-stretch-min" min="-20" max="70" step="5" value="-5" class="slider" style="width: 60px;" title="Borne minimale (rouge)" />
+            <span id="ndvi-stretch-min-val" class="val-badge">-0.05</span>
+
+            <span>Max :</span>
+            <input type="range" id="ndvi-stretch-max" min="20" max="100" step="5" value="85" class="slider" style="width: 60px;" title="Borne maximale (vert)" />
+            <span id="ndvi-stretch-max-val" class="val-badge">0.85</span>
+
+            <button id="btn-ndvi-auto-stretch" class="profile-dock-btn" type="button" title="Ajuster automatiquement les bornes pour révéler les variations intra-parcelle" style="padding: 2px 8px; color: #166534; font-weight: 700; background: #dcfce7; border-color: #86efac; cursor: pointer;">⚡ Auto</button>
+          </div>
         </div>
-        <div class="ndvi-legend-mini">
-          <span>NDVI :</span>
-          <span class="ndvi-grad-sample"></span>
-          <span>0.0 (sol) &rarr; 0.85+ (végétation)</span>
+
+        <!-- Opacity & Legend -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
+          <div class="ndvi-opacity-wrap">
+            <span>Opacité :</span>
+            <input type="range" id="ndvi-tile-opacity" min="0" max="100" value="85" class="slider" style="width: 70px;" />
+            <span id="ndvi-opacity-val" class="val-badge">85%</span>
+          </div>
+          <div class="ndvi-legend-mini">
+            <span class="ndvi-grad-sample"></span>
+            <span id="ndvi-legend-stretch-label" style="font-weight: 600;">-0.05 &rarr; 0.85</span>
+          </div>
         </div>
       </div>
     </div>
@@ -2250,6 +2303,10 @@ html_template = """<!DOCTYPE html>
         this.selectedIndex = -1;
         this.selectedYear = new Date().getFullYear();
         this.tileOpacity = 0.85;
+        this.stretchMin = -0.05;
+        this.stretchMax = 0.85;
+        this.stretchPreset = "standard";
+        this.stretchDebounceTimer = null;
         this.abortController = null;
         this.marker = null;
       }
@@ -2266,6 +2323,79 @@ html_template = """<!DOCTYPE html>
           if (y === this.selectedYear) opt.selected = true;
           select.appendChild(opt);
         }
+      }
+
+      setStretchRange(minVal, maxVal, preset = "custom") {
+        this.stretchMin = Math.max(-0.5, Math.min(0.9, minVal));
+        this.stretchMax = Math.max(this.stretchMin + 0.05, Math.min(1.0, maxVal));
+        this.stretchPreset = preset;
+        this.syncStretchUi();
+        this.scheduleTileUpdate();
+      }
+
+      applyStretchPreset(presetName) {
+        this.stretchPreset = presetName;
+        const currentSample = (this.selectedIndex >= 0 && this.series[this.selectedIndex])
+          ? this.series[this.selectedIndex].ndvi
+          : 0.5;
+
+        switch (presetName) {
+          case "standard":
+            this.stretchMin = -0.05;
+            this.stretchMax = 0.85;
+            break;
+          case "contrast":
+            this.stretchMin = 0.25;
+            this.stretchMax = 0.85;
+            break;
+          case "dense":
+            this.stretchMin = 0.50;
+            this.stretchMax = 0.90;
+            break;
+          case "emergence":
+            this.stretchMin = 0.00;
+            this.stretchMax = 0.45;
+            break;
+          case "auto":
+            this.stretchMin = Math.max(-0.1, Math.round((currentSample - 0.18) * 20) / 20);
+            this.stretchMax = Math.min(1.0, Math.round((currentSample + 0.18) * 20) / 20);
+            if (this.stretchMax - this.stretchMin < 0.15) {
+              this.stretchMax = Math.min(1.0, this.stretchMin + 0.20);
+            }
+            break;
+          default:
+            break;
+        }
+        this.syncStretchUi();
+        this.scheduleTileUpdate();
+      }
+
+      syncStretchUi() {
+        const presetSelect = document.getElementById("ndvi-stretch-preset");
+        const sliderMin = document.getElementById("ndvi-stretch-min");
+        const sliderMax = document.getElementById("ndvi-stretch-max");
+        const valMin = document.getElementById("ndvi-stretch-min-val");
+        const valMax = document.getElementById("ndvi-stretch-max-val");
+        const legendLabel = document.getElementById("ndvi-legend-stretch-label");
+
+        if (presetSelect) presetSelect.value = this.stretchPreset;
+        if (sliderMin) sliderMin.value = Math.round(this.stretchMin * 100);
+        if (sliderMax) sliderMax.value = Math.round(this.stretchMax * 100);
+        if (valMin) valMin.textContent = this.stretchMin.toFixed(2);
+        if (valMax) valMax.textContent = this.stretchMax.toFixed(2);
+        if (legendLabel) {
+          legendLabel.textContent = `${this.stretchMin.toFixed(2)} \u2192 ${this.stretchMax.toFixed(2)}`;
+        }
+      }
+
+      scheduleTileUpdate() {
+        if (this.stretchDebounceTimer) clearTimeout(this.stretchDebounceTimer);
+        this.stretchDebounceTimer = setTimeout(() => {
+          if (this.selectedIndex >= 0 && this.series[this.selectedIndex]) {
+            const scene = this.series[this.selectedIndex];
+            this.displayNdviLayer(scene.id, scene.ndvi);
+          }
+        }, 120);
       }
 
       getSclLabel(scl) {
@@ -2551,12 +2681,24 @@ html_template = """<!DOCTYPE html>
           c.classList.toggle("active-point", idx === index);
         });
 
+        if (this.stretchPreset === "auto") {
+          const currentSample = scene.ndvi;
+          this.stretchMin = Math.max(-0.1, Math.round((currentSample - 0.18) * 20) / 20);
+          this.stretchMax = Math.min(1.0, Math.round((currentSample + 0.18) * 20) / 20);
+          if (this.stretchMax - this.stretchMin < 0.15) {
+            this.stretchMax = Math.min(1.0, this.stretchMin + 0.20);
+          }
+          this.syncStretchUi();
+        } else {
+          this.syncStretchUi();
+        }
+
         this.displayNdviLayer(scene.id, scene.ndvi);
       }
 
       displayNdviLayer(sceneId, sampleNdvi) {
-        const minVal = -0.05;
-        const maxVal = 0.85;
+        const minVal = this.stretchMin;
+        const maxVal = this.stretchMax;
         const rescaleStr = `${minVal.toFixed(2)},${maxVal.toFixed(2)}`;
         const tileUrl = `https://planetarycomputer.microsoft.com/api/data/v1/item/tiles/WebMercatorQuad/{z}/{x}/{y}@1x?collection=sentinel-2-l2a&item=${sceneId}&assets=B08&assets=B04&asset_as_band=True&expression=%28B08-B04%29%2F%28B08%2BB04%29&rescale=${encodeURIComponent(rescaleStr)}&colormap_name=rdylgn`;
 
@@ -2950,6 +3092,7 @@ html_template = """<!DOCTYPE html>
       // Instantiate Sentinel-2 NDVI Manager
       ndviManager = new NdviManager(map);
       ndviManager.initYearSelect();
+      ndviManager.syncStretchUi();
 
       // Map click handler for transect line drawing & NDVI mode
       map.on("click", (e) => {
@@ -3537,6 +3680,45 @@ html_template = """<!DOCTYPE html>
         const val = parseInt(e.target.value, 10);
         if (ndviOpacityVal) ndviOpacityVal.textContent = val + "%";
         if (ndviManager) ndviManager.setTileOpacity(val / 100);
+      });
+    }
+
+    const ndviStretchPreset = document.getElementById("ndvi-stretch-preset");
+    const ndviStretchMin = document.getElementById("ndvi-stretch-min");
+    const ndviStretchMax = document.getElementById("ndvi-stretch-max");
+    const btnNdviAutoStretch = document.getElementById("btn-ndvi-auto-stretch");
+
+    if (ndviStretchPreset) {
+      ndviStretchPreset.addEventListener("change", (e) => {
+        if (ndviManager) {
+          ndviManager.applyStretchPreset(e.target.value);
+        }
+      });
+    }
+
+    if (ndviStretchMin) {
+      ndviStretchMin.addEventListener("input", (e) => {
+        const val = parseInt(e.target.value, 10) / 100;
+        if (ndviManager) {
+          ndviManager.setStretchRange(val, ndviManager.stretchMax, "custom");
+        }
+      });
+    }
+
+    if (ndviStretchMax) {
+      ndviStretchMax.addEventListener("input", (e) => {
+        const val = parseInt(e.target.value, 10) / 100;
+        if (ndviManager) {
+          ndviManager.setStretchRange(ndviManager.stretchMin, val, "custom");
+        }
+      });
+    }
+
+    if (btnNdviAutoStretch) {
+      btnNdviAutoStretch.addEventListener("click", () => {
+        if (ndviManager) {
+          ndviManager.applyStretchPreset("auto");
+        }
       });
     }
 
