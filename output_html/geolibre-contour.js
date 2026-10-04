@@ -12062,7 +12062,7 @@ class ContourManager {
       bbox,
       this.config.gridSize,
       this.config.nodata,
-      zoom <= 11,
+      false,
       AbortSignal.timeout(3e4),
       this.config.resampling
     );
@@ -12070,7 +12070,7 @@ class ContourManager {
       requestId,
       zoom,
       viewBbox,
-      fullExtent: zoom <= 11,
+      fullExtent: false,
       region: region ? {
         sourceBBox: region.sourceBBox,
         grid: [region.width, region.height],

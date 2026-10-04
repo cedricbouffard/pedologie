@@ -172,32 +172,17 @@
       color: #64748b;
       margin-top: 2px;
     }
-    .panel-header-jump-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #2563eb;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 6px;
-      padding: 3px 8px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
-    .panel-header-jump-btn:hover {
-      background: #dbeafe;
-      border-color: #93c5fd;
-    }
-
-    /* Floating Profile Action Button on Map */
-    .floating-profile-btn {
+    /* Floating Profile Toolbar on Map */
+    .map-profile-toolbar {
       position: absolute;
       top: 66px;
       right: 58px;
       z-index: 100;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .floating-profile-btn {
       display: inline-flex;
       align-items: center;
       gap: 7px;
@@ -206,13 +191,14 @@
       font-family: inherit;
       font-size: 12px;
       font-weight: 600;
-      padding: 7px 13px;
+      padding: 7px 14px;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.06);
       cursor: pointer;
       transition: all 0.15s ease;
       user-select: none;
+      white-space: nowrap;
     }
     .floating-profile-btn:hover {
       background: #f8fafc;
@@ -226,8 +212,56 @@
       border-color: #1d4ed8;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
     }
+    .floating-profile-btn.action-calc {
+      background: #166534;
+      color: #ffffff;
+      border-color: #15803d;
+      box-shadow: 0 4px 14px rgba(22, 101, 52, 0.25);
+    }
+    .floating-profile-btn.action-calc:hover {
+      background: #14532d;
+    }
+    .floating-profile-btn.action-clear {
+      padding: 7px 10px;
+      color: #64748b;
+    }
+    .floating-profile-btn.action-clear:hover {
+      color: #dc2626;
+      border-color: #f87171;
+      background: #fef2f2;
+    }
     .floating-profile-btn svg {
       flex-shrink: 0;
+    }
+
+    .profile-dock-header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-precision-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #475569;
+      font-weight: 500;
+    }
+    .profile-dock-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .profile-dock-btn:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #dc2626;
     }
 
     /* Search input */
@@ -1052,11 +1086,19 @@
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
         border: 1px solid rgba(203, 213, 225, 0.8);
       }
-      .floating-profile-btn {
+      .map-profile-toolbar {
         top: 114px;
         right: 10px;
+      }
+      .floating-profile-btn {
         font-size: 11px;
-        padding: 6px 11px;
+        padding: 6px 10px;
+      }
+      .profile-dock-header-right {
+        gap: 6px;
+      }
+      .profile-precision-label span {
+        display: none;
       }
 
       .tools-backdrop {
@@ -1140,16 +1182,8 @@
   <!-- Floating Control Panel -->
   <div class="map-controls-panel">
     <div class="panel-header">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-        <div>
-          <div class="panel-title">Couverture Pédologique &amp; Relief</div>
-          <div class="panel-subtitle">Sols du Québec, MNE 1m &amp; profil</div>
-        </div>
-        <button id="btn-header-profile-jump" class="panel-header-jump-btn" type="button" title="Accéder directement au profil altimétrique (coupe)">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-          <span>Profil</span>
-        </button>
-      </div>
+      <div class="panel-title">Couverture Pédologique &amp; Topographie</div>
+      <div class="panel-subtitle">Sols du Québec, relief MNE 1m &amp; courbes de niveau</div>
     </div>
 
     <!-- Search Box and Mobile Toggle -->
@@ -1276,56 +1310,8 @@
           <button class="pill-btn" data-interval="3">3 m</button>
         </div>
 
-        <div class="tool-label-row" style="margin-top: 4px;">
-          <span class="tool-sublabel">Couleur des courbes</span>
-          <div class="color-select-row">
-            <div class="color-circle active" data-color="#78350f" style="background: #78350f;" title="Brun sépia"></div>
-            <div class="color-circle" data-color="#334155" style="background: #334155;" title="Gris ardoise"></div>
-            <div class="color-circle" data-color="#0f172a" style="background: #0f172a;" title="Noir profond"></div>
-            <div class="color-circle" data-color="#1e4535" style="background: #1e4535;" title="Vert forêt"></div>
-          </div>
-        </div>
-
         <div id="contour-status" class="contour-status-badge">
-          Zoom 10+ requis pour le calcul dynamique
-        </div>
-      </div>
-
-      <!-- 5. Profil altimétrique MNT (geolibre-raster-elevation-profile) -->
-      <div class="tool-card" id="card-profile-section">
-        <div class="tool-card-header">
-          <div class="tool-card-title">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-            <span>Profil altimétrique MNT</span>
-          </div>
-        </div>
-
-        <div class="tool-label-row">
-          <span class="tool-sublabel">Précision altimétrique</span>
-          <select id="profile-precision" class="tool-select">
-            <option value="unit">0 décimale (1 m)</option>
-            <option value="decimal1" selected>1 décimale (0.1 m)</option>
-            <option value="decimal2">2 décimales (0.01 m)</option>
-          </select>
-        </div>
-
-        <div class="raster-profile-buttons" style="margin-top: 6px;">
-          <button id="btn-profile-draw" class="raster-profile-btn primary" type="button" title="Activer le tracé de la coupe">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-            <span>Tracer coupe</span>
-          </button>
-          <button id="btn-profile-apply" class="raster-profile-btn" type="button" title="Calculer le profil altimétrique">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>Calculer</span>
-          </button>
-          <button id="btn-profile-clear" class="raster-profile-btn" type="button" title="Effacer la coupe">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            <span>Effacer</span>
-          </button>
-        </div>
-
-        <div id="profile-status" class="profile-status-badge">
-          Tracez une coupe sur la carte pour générer son profil topographique.
+          Zoom 11+ requis pour le calcul dynamique
         </div>
       </div>
 
@@ -1343,10 +1329,21 @@
   <div id="elevation-profile-dock" class="elevation-profile-dock">
     <div class="profile-dock-header">
       <div class="profile-dock-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
         <span>Profil Altimétrique du Relief (HRDEM 1m)</span>
       </div>
-      <button id="btn-close-profile-dock" class="profile-dock-close" type="button" aria-label="Fermer le profil">&times;</button>
+      <div class="profile-dock-header-right">
+        <label class="profile-precision-label">
+          <span>Précision :</span>
+          <select id="profile-precision" class="tool-select">
+            <option value="unit">0 décimale (1 m)</option>
+            <option value="decimal1" selected>1 décimale (0.1 m)</option>
+            <option value="decimal2">2 décimales (0.01 m)</option>
+          </select>
+        </label>
+        <button id="btn-dock-clear" class="profile-dock-btn" type="button" title="Effacer la coupe">Effacer</button>
+        <button id="btn-close-profile-dock" class="profile-dock-close" type="button" aria-label="Fermer le profil">&times;</button>
+      </div>
     </div>
     <div id="profile-stats-bar" class="profile-stats-bar"></div>
     <div id="profile-hover-info" class="profile-hover-info">
@@ -1355,11 +1352,20 @@
     <div id="profile-chart-container" class="profile-chart-container" data-raster-profile-chart></div>
   </div>
 
-  <!-- Floating Quick Profile Action Button on Map -->
-  <button id="btn-quick-profile" class="floating-profile-btn" type="button" title="Tracer un profil altimétrique (coupe topographique)">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-    <span>Tracer coupe MNT</span>
-  </button>
+  <!-- Floating Quick Profile Toolbar on Map -->
+  <div id="map-profile-toolbar" class="map-profile-toolbar">
+    <button id="btn-quick-profile" class="floating-profile-btn" type="button" title="Tracer une coupe topographique (cliquez sur la carte, double-clic ou clic droit pour calculer)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+      <span id="profile-btn-text">Tracer coupe MNT</span>
+    </button>
+    <button id="btn-quick-calc" class="floating-profile-btn action-calc" type="button" title="Calculer le profil altimétrique (ou double-clic sur la carte)" style="display: none;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <span>Calculer</span>
+    </button>
+    <button id="btn-quick-clear" class="floating-profile-btn action-clear" type="button" title="Effacer la coupe" style="display: none;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
 
   <div id="map"></div>
 
@@ -1715,8 +1721,17 @@
       }
 
       addPoint(lngLat) {
+        if (this.line.length > 0) {
+          const last = this.line[this.line.length - 1];
+          if (Math.hypot(last[0] - lngLat.lng, last[1] - lngLat.lat) < 0.00003) {
+            return;
+          }
+        }
         this.line.push([lngLat.lng, lngLat.lat]);
         this.updateMapVisuals();
+        if (typeof updateToolbarButtons === "function") {
+          updateToolbarButtons();
+        }
       }
 
       updateMapVisuals() {
@@ -1771,17 +1786,15 @@
         if (statsBar) statsBar.innerHTML = "";
         const hoverInfo = document.getElementById("profile-hover-info");
         if (hoverInfo) hoverInfo.textContent = "Survolez le graphique pour explorer les altitudes le long de la coupe";
-        const statusEl = document.getElementById("profile-status");
-        if (statusEl) statusEl.textContent = "Tracez une coupe sur la carte pour générer son profil topographique.";
+        if (typeof updateToolbarButtons === "function") {
+          updateToolbarButtons();
+        }
       }
 
       async calculateProfile(precisionType) {
         if (this.line.length < 2) {
           throw new Error("Veuillez cliquer au moins 2 points sur la carte.");
         }
-
-        const statusEl = document.getElementById("profile-status");
-        if (statusEl) statusEl.textContent = "Extraction du relief HRDEM 1 m en cours...";
 
         // Calculate bbox with padding
         let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
@@ -1871,9 +1884,6 @@
 
         this.profile = profile;
         this.renderChart(precisionType);
-        if (statusEl) {
-          statusEl.textContent = `Profil calculé : ${profile.length} points sur ${totalDist >= 1000 ? (totalDist / 1000).toFixed(2) + ' km' : Math.round(totalDist) + ' m'}.`;
-        }
       }
 
       renderChart(precisionType) {
@@ -2123,8 +2133,8 @@
         interval: 1,
         majorEvery: 5,
         gridSize: 128,
-        minZoom: 10,
-        lineColor: "#78350f",
+        minZoom: 11,
+        lineColor: "#000000",
         majorWidth: 1.6,
         minorWidth: 0.8,
         labelSize: 10
@@ -2147,10 +2157,25 @@
       map.on("click", (e) => {
         if (profileManager && profileManager.isDrawing) {
           profileManager.addPoint(e.lngLat);
-          const count = profileManager.line.length;
-          const statusEl = document.getElementById("profile-status");
-          if (statusEl) {
-            statusEl.textContent = `${count} point${count > 1 ? 's' : ''} placé${count > 1 ? 's' : ''}. Cliquez encore ou sur 'Calculer'.`;
+        }
+      });
+
+      // Double-click to complete drawing and calculate profile
+      map.on("dblclick", (e) => {
+        if (profileManager && profileManager.isDrawing) {
+          e.preventDefault();
+          if (profileManager.line.length >= 2) {
+            triggerProfileCalculation();
+          }
+        }
+      });
+
+      // Right-click to complete drawing and calculate profile
+      map.on("contextmenu", (e) => {
+        if (profileManager && profileManager.isDrawing) {
+          e.preventDefault();
+          if (profileManager.line.length >= 2) {
+            triggerProfileCalculation();
           }
         }
       });
@@ -2395,106 +2420,105 @@
       });
     });
 
-    colorCircles.forEach(circle => {
-      circle.addEventListener("click", () => {
-        colorCircles.forEach(c => c.classList.remove("active"));
-        circle.classList.add("active");
-        const color = circle.dataset.color;
-        if (contourManager) {
-          contourManager.updateConfig({ lineColor: color });
-          contourManager.updatePaintProperties();
-        }
-      });
-    });
-
     // Elevation Profile Controls
-    const btnProfileDraw = document.getElementById("btn-profile-draw");
-    const btnProfileApply = document.getElementById("btn-profile-apply");
-    const btnProfileClear = document.getElementById("btn-profile-clear");
+    const btnQuickProfile = document.getElementById("btn-quick-profile");
+    const btnQuickCalc = document.getElementById("btn-quick-calc");
+    const btnQuickClear = document.getElementById("btn-quick-clear");
+    const btnDockClear = document.getElementById("btn-dock-clear");
     const btnCloseProfileDock = document.getElementById("btn-close-profile-dock");
     const profilePrecision = document.getElementById("profile-precision");
-    const profileStatusEl = document.getElementById("profile-status");
-    const btnQuickProfile = document.getElementById("btn-quick-profile");
-    const btnHeaderProfileJump = document.getElementById("btn-header-profile-jump");
-    const cardProfileSection = document.getElementById("card-profile-section");
+    const profileBtnText = document.getElementById("profile-btn-text");
 
-    function toggleDrawingMode() {
+    function startDrawing() {
       if (!profileManager) return;
-      profileManager.isDrawing = !profileManager.isDrawing;
-      if (profileManager.isDrawing) {
-        btnProfileDraw.classList.add("active");
-        if (btnQuickProfile) btnQuickProfile.classList.add("active");
-        map.getCanvas().style.cursor = "crosshair";
-        profileStatusEl.textContent = "Mode tracé actif : cliquez sur la carte pour poser les points (2+ requis).";
-      } else {
-        btnProfileDraw.classList.remove("active");
-        if (btnQuickProfile) btnQuickProfile.classList.remove("active");
-        map.getCanvas().style.cursor = "";
-        profileStatusEl.textContent = profileManager.line.length >= 2
-          ? "Tracé terminé. Cliquez sur 'Calculer' pour afficher le profil."
-          : "Tracé en pause. Cliquez sur 'Tracer coupe' pour reprendre.";
-      }
+      profileManager.isDrawing = true;
+      map.doubleClickZoom.disable();
+      if (btnQuickProfile) btnQuickProfile.classList.add("active");
+      if (profileBtnText) profileBtnText.textContent = "Annuler tracé";
+      map.getCanvas().style.cursor = "crosshair";
+      updateToolbarButtons();
     }
 
-    btnProfileDraw.addEventListener("click", toggleDrawingMode);
-
-    if (btnQuickProfile) {
-      btnQuickProfile.addEventListener("click", () => {
-        toggleDrawingMode();
-        if (cardProfileSection) {
-          cardProfileSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }
-      });
-    }
-
-    if (btnHeaderProfileJump) {
-      btnHeaderProfileJump.addEventListener("click", () => {
-        if (cardProfileSection) {
-          cardProfileSection.scrollIntoView({ behavior: "smooth", block: "center" });
-          cardProfileSection.style.transition = "outline 0.3s";
-          cardProfileSection.style.outline = "2px solid #2563eb";
-          setTimeout(() => { cardProfileSection.style.outline = "none"; }, 1500);
-        }
-      });
-    }
-
-    btnProfileApply.addEventListener("click", async () => {
-      if (!profileManager) return;
-      if (profileManager.isDrawing) {
-        profileManager.isDrawing = false;
-        btnProfileDraw.classList.remove("active");
-        if (btnQuickProfile) btnQuickProfile.classList.remove("active");
-        map.getCanvas().style.cursor = "";
-      }
-      if (window.innerWidth <= 768 && typeof closeMobileTools === "function") {
-        closeMobileTools();
-      }
-      try {
-        btnProfileApply.disabled = true;
-        profileStatusEl.textContent = "Calcul du profil altimétrique...";
-        await profileManager.calculateProfile(profilePrecision.value);
-      } catch (err) {
-        profileStatusEl.textContent = "Erreur : " + (err.message || err);
-        console.error("Profile calculation error:", err);
-      } finally {
-        btnProfileApply.disabled = false;
-      }
-    });
-
-    profilePrecision.addEventListener("change", () => {
-      if (profileManager && profileManager.profile.length >= 2) {
-        profileManager.renderChart(profilePrecision.value);
-      }
-    });
-
-    btnProfileClear.addEventListener("click", () => {
+    function stopDrawing() {
       if (!profileManager) return;
       profileManager.isDrawing = false;
-      btnProfileDraw.classList.remove("active");
+      map.doubleClickZoom.enable();
       if (btnQuickProfile) btnQuickProfile.classList.remove("active");
+      if (profileBtnText) {
+        profileBtnText.textContent = profileManager.line.length >= 2 ? "Retracer coupe" : "Tracer coupe MNT";
+      }
       map.getCanvas().style.cursor = "";
-      profileManager.clear();
-    });
+      updateToolbarButtons();
+    }
+
+    function toggleDrawing() {
+      if (profileManager && profileManager.isDrawing) {
+        stopDrawing();
+      } else {
+        startDrawing();
+      }
+    }
+
+    function updateToolbarButtons() {
+      const hasPoints = profileManager && profileManager.line.length > 0;
+      const canCalc = profileManager && profileManager.line.length >= 2;
+      if (btnQuickCalc) btnQuickCalc.style.display = canCalc ? "inline-flex" : "none";
+      if (btnQuickClear) btnQuickClear.style.display = hasPoints ? "inline-flex" : "none";
+    }
+
+    async function triggerProfileCalculation() {
+      if (!profileManager || profileManager.line.length < 2) return;
+      stopDrawing();
+      try {
+        if (btnQuickCalc) {
+          btnQuickCalc.disabled = true;
+          btnQuickCalc.textContent = "Calcul...";
+        }
+        const prec = profilePrecision ? profilePrecision.value : "decimal1";
+        await profileManager.calculateProfile(prec);
+      } catch (err) {
+        console.error("Profile calculation error:", err);
+      } finally {
+        if (btnQuickCalc) {
+          btnQuickCalc.disabled = false;
+          btnQuickCalc.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Calculer</span>`;
+        }
+      }
+    }
+
+    if (btnQuickProfile) {
+      btnQuickProfile.addEventListener("click", toggleDrawing);
+    }
+
+    if (btnQuickCalc) {
+      btnQuickCalc.addEventListener("click", triggerProfileCalculation);
+    }
+
+    if (btnQuickClear) {
+      btnQuickClear.addEventListener("click", () => {
+        if (profileManager) {
+          stopDrawing();
+          profileManager.clear();
+        }
+      });
+    }
+
+    if (btnDockClear) {
+      btnDockClear.addEventListener("click", () => {
+        if (profileManager) {
+          stopDrawing();
+          profileManager.clear();
+        }
+      });
+    }
+
+    if (profilePrecision) {
+      profilePrecision.addEventListener("change", () => {
+        if (profileManager && profileManager.profile.length >= 2) {
+          profileManager.renderChart(profilePrecision.value);
+        }
+      });
+    }
 
     if (btnCloseProfileDock) {
       btnCloseProfileDock.addEventListener("click", () => {
@@ -2507,7 +2531,8 @@
       if (profileManager && profileManager.profile.length >= 2) {
         const dock = document.getElementById("elevation-profile-dock");
         if (dock && dock.classList.contains("open")) {
-          profileManager.renderChart(profilePrecision.value);
+          const prec = profilePrecision ? profilePrecision.value : "decimal1";
+          profileManager.renderChart(prec);
         }
       }
     });
