@@ -11861,7 +11861,7 @@ class ContourManager {
       lineColor: "#8b4513",
       majorWidth: 1.8,
       minorWidth: 0.8,
-      labelSize: 10
+      labelSize: 13
     });
     __publicField(this, "map", null);
     __publicField(this, "app");
@@ -11972,8 +11972,9 @@ class ContourManager {
   }
   bringContoursToFront() {
     if (!this.map) return;
+    const beforeId = this.map.getLayer("parcelles-fill") ? "parcelles-fill" : (this.map.getLayer("parcelles-line-bg") ? "parcelles-line-bg" : undefined);
     for (const layerId of [MINOR_LAYER_ID, MAJOR_LAYER_ID, LABEL_LAYER_ID]) {
-      if (this.map.getLayer(layerId)) this.map.moveLayer(layerId);
+      if (this.map.getLayer(layerId)) this.map.moveLayer(layerId, beforeId);
     }
   }
   addMapLayers() {
@@ -12017,8 +12018,8 @@ class ContourManager {
       },
       paint: {
         "text-color": this.config.lineColor,
-        "text-halo-color": "rgba(255, 255, 255, 0.9)",
-        "text-halo-width": 1.5
+        "text-halo-color": "rgba(255, 255, 255, 0.95)",
+        "text-halo-width": 2
       }
     });
     (_b = (_a = this.app).registerExternalNativeLayer) == null ? void 0 : _b.call(_a, {

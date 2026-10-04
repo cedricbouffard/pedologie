@@ -1262,6 +1262,29 @@ html_template = """<!DOCTYPE html>
         <input type="range" id="pedo-opacity" min="0" max="100" value="80" class="slider" />
       </div>
 
+      <!-- 2b. Parcelles agricoles BDPPAD -->
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+            <span>Parcelles agricoles (BDPPAD)</span>
+          </div>
+          <label class="switch-label" title="Afficher/Masquer les contours des parcelles">
+            <input type="checkbox" id="toggle-parcelles" checked />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+        <div class="tool-label-row">
+          <span class="tool-sublabel">Style : Limites hachurées N&amp;B</span>
+          <span class="parcel-badge-sample" style="display:inline-block; width:34px; height:7px; background:repeating-linear-gradient(90deg, #000 0, #000 5px, #fff 5px, #fff 10px); border:1px solid #94a3b8; border-radius:2px;" title="Ligne hachurée noir et blanc"></span>
+        </div>
+        <div class="tool-label-row" style="margin-top:6px;">
+          <span class="tool-sublabel">Opacité des limites</span>
+          <span id="parcelles-opacity-val" class="val-badge">95%</span>
+        </div>
+        <input type="range" id="parcelles-opacity" min="0" max="100" value="95" class="slider" />
+      </div>
+
       <!-- 3. Topographie MNE (HRDEM 1m) -->
       <div class="tool-card">
         <div class="tool-card-header">
@@ -1330,7 +1353,7 @@ html_template = """<!DOCTYPE html>
 
       <!-- Source information -->
       <div class="source-info-line">
-        <strong>Mosaïque VRT HRDEM Canada 1 m</strong> (56 tuiles) • Sols IRDA 2026
+        <strong>Mosaïque VRT HRDEM Canada 1 m</strong> (56 tuiles) • Sols IRDA 2026 • Parcelles BDPPAD 2026
       </div>
     </div>
   </div>
@@ -2128,6 +2151,61 @@ html_template = """<!DOCTYPE html>
         }
       });
 
+      // 6. Vector PMTiles Source for Agricultural Parcels (BDPPAD 2026)
+      map.addSource("parcelles-source", {
+        type: "vector",
+        url: "pmtiles://https://storage.googleapis.com/geoqc/BDPPAD/BDPPAD_2026.pmtiles"
+      });
+
+      // 7. Parcelles Fill Layer (transparent background)
+      map.addLayer({
+        id: "parcelles-fill",
+        type: "fill",
+        source: "parcelles-source",
+        "source-layer": "BDPPAD_2026",
+        paint: {
+          "fill-color": "#000000",
+          "fill-opacity": 0
+        }
+      });
+
+      // 8. Parcelles Boundary Background (solid white underlay line for B&W contrast)
+      map.addLayer({
+        id: "parcelles-line-bg",
+        type: "line",
+        source: "parcelles-source",
+        "source-layer": "BDPPAD_2026",
+        paint: {
+          "line-color": "#ffffff",
+          "line-width": [
+            "interpolate", ["linear"], ["zoom"],
+            10, 1.4,
+            13, 2.2,
+            16, 3.2
+          ],
+          "line-opacity": 0.95
+        }
+      });
+
+      // 9. Parcelles Boundary Foreground (dashed black line for alternating zebra/hachure effect)
+      map.addLayer({
+        id: "parcelles-line-fg",
+        type: "line",
+        source: "parcelles-source",
+        "source-layer": "BDPPAD_2026",
+        paint: {
+          "line-color": "#000000",
+          "line-width": [
+            "interpolate", ["linear"], ["zoom"],
+            10, 1.4,
+            13, 2.2,
+            16, 3.2
+          ],
+          "line-dasharray": [4, 4],
+          "line-opacity": 0.95
+        }
+      });
+
       // Instantiate Topography Manager
       topoManager = new TopoManager(map);
       topoManager.scheduleUpdate();
@@ -2150,7 +2228,7 @@ html_template = """<!DOCTYPE html>
         lineColor: "#000000",
         majorWidth: 1.6,
         minorWidth: 0.8,
-        labelSize: 10
+        labelSize: 13
       });
 
       const contourStatusEl = document.getElementById('contour-status');
@@ -2162,6 +2240,16 @@ html_template = """<!DOCTYPE html>
       });
 
       contourManager.setup(map);
+
+      // Function to ensure parcels always stay on top of all layers
+      function bringParcellesToFront() {
+        ["parcelles-fill", "parcelles-line-bg", "parcelles-line-fg"].forEach(id => {
+          if (map.getLayer(id)) {
+            map.moveLayer(id);
+          }
+        });
+      }
+      bringParcellesToFront();
 
       // Instantiate Elevation Profile Manager
       profileManager = new ProfileManager(map);
@@ -2215,6 +2303,14 @@ html_template = """<!DOCTYPE html>
         if (profileManager && profileManager.isDrawing) return;
         map.getCanvas().style.cursor = "";
       });
+      map.on("mouseenter", "parcelles-fill", () => {
+        if (profileManager && profileManager.isDrawing) return;
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "parcelles-fill", () => {
+        if (profileManager && profileManager.isDrawing) return;
+        map.getCanvas().style.cursor = "";
+      });
 
       // Click to identify with rich popup
       map.on("click", "pedologie-fill", (e) => {
@@ -2234,6 +2330,28 @@ html_template = """<!DOCTYPE html>
         const studyTitle = studyInfo ? studyInfo.title : (rawEtude ? "Étude pédologique nº " + rawEtude : "Étude pédologique");
         const studyYear = studyInfo ? studyInfo.year : "";
         const localPqFile = "pq" + cleanEtudeCode.toLowerCase() + ".html";
+
+        // Query parcel features at click point
+        let parcelBadgeHtml = "";
+        const parcelFeatures = map.queryRenderedFeatures(e.point, { layers: ["parcelles-fill"] });
+        if (parcelFeatures && parcelFeatures.length > 0) {
+          const pf = parcelFeatures[0].properties;
+          const pid = pf.IDPAR || pf.idpar || "";
+          const sup = pf.SUPHEC || pf.suphec || "";
+          const crop = pf.DESCODPR1 || pf.descodpr1 || "";
+          const group = pf.DESGROPRO || pf.desgropro || "";
+          const supNum = parseFloat(sup);
+          const supStr = !isNaN(supNum) ? supNum.toFixed(1) + " ha" : (sup ? sup + " ha" : "");
+          parcelBadgeHtml = `
+            <div class="parcel-info-badge" style="margin-bottom: 12px; padding: 7px 10px; background: #f8fafc; border: 1px solid #cbd5e1; border-left: 3.5px solid #0f172a; border-radius: 6px; font-size: 0.78rem;">
+              <div style="font-weight: 600; color: #0f172a; display: flex; justify-content: space-between; align-items: center;">
+                <span>🌾 Parcelle agricole BDPPAD ${pid ? `nº ${pid}` : ''}</span>
+                ${supStr ? `<span style="font-weight: 700; color: #1e293b;">${supStr}</span>` : ''}
+              </div>
+              ${crop ? `<div style="color: #334155; margin-top: 3px;">Culture : <strong>${crop}</strong>${group ? ` <span style="color:#64748b;">(${group})</span>` : ''}</div>` : ''}
+            </div>
+          `;
+        }
 
         let cardsHtml = "";
         let validSeriesCount = 0;
@@ -2307,12 +2425,52 @@ html_template = """<!DOCTYPE html>
               </div>
             </div>
             <div class="pedo-popup-body">
+              ${parcelBadgeHtml}
               ${validSeriesCount > 0 ? '<div class="pedo-series-heading">Séries de sols identifiées</div>' : ''}
               ${cardsHtml}
             </div>
           </div>
         `;
 
+        new maplibregl.Popup({ closeButton: true, offset: 8 })
+          .setLngLat(e.lngLat)
+          .setHTML(popupHtml)
+          .addTo(map);
+      });
+
+      // Standalone Click on Parcels when clicked outside pedologie
+      map.on("click", "parcelles-fill", (e) => {
+        if (profileManager && profileManager.isDrawing) return;
+        const pedoFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill"] });
+        if (pedoFeatures && pedoFeatures.length > 0) return;
+        if (!e.features || !e.features.length) return;
+        const pf = e.features[0].properties;
+        const pid = pf.IDPAR || pf.idpar || "";
+        const sup = pf.SUPHEC || pf.suphec || "";
+        const crop = pf.DESCODPR1 || pf.descodpr1 || "";
+        const group = pf.DESGROPRO || pf.desgropro || "";
+        const supNum = parseFloat(sup);
+        const supStr = !isNaN(supNum) ? supNum.toFixed(1) + " ha" : (sup ? sup + " ha" : "");
+
+        const popupHtml = `
+          <div class="pedo-popup">
+            <div class="pedo-popup-header">
+              <div class="pedo-study-meta">
+                <span class="pedo-study-badge" style="background:#0f172a;color:#fff;">BDPPAD 2026</span>
+              </div>
+              <h3 class="pedo-popup-title">Parcelle agricole nº ${pid || 'Inconnue'}</h3>
+              ${crop ? `<div class="pedo-appellation">${crop}</div>` : ''}
+            </div>
+            <div class="pedo-popup-body">
+              <div style="font-size: 0.8rem; color: #334155; line-height: 1.55;">
+                ${crop ? `<div>Culture principale : <strong>${crop}</strong></div>` : ''}
+                ${group ? `<div>Groupe : <strong>${group}</strong></div>` : ''}
+                ${supStr ? `<div>Superficie : <strong>${supStr}</strong></div>` : ''}
+                <div style="margin-top: 8px; color: #64748b; font-size: 0.74rem;">Base de Données des Parcelles Agricoles Déclarées (BDPPAD)</div>
+              </div>
+            </div>
+          </div>
+        `;
         new maplibregl.Popup({ closeButton: true, offset: 8 })
           .setLngLat(e.lngLat)
           .setHTML(popupHtml)
@@ -2369,6 +2527,35 @@ html_template = """<!DOCTYPE html>
 
     togglePedo.addEventListener("change", updatePedoLayerVisibility);
     opacitySlider.addEventListener("input", updatePedoLayerVisibility);
+
+    // Parcelles agricoles Controls
+    const toggleParcelles = document.getElementById("toggle-parcelles");
+    const parcellesOpacity = document.getElementById("parcelles-opacity");
+    const parcellesOpacityVal = document.getElementById("parcelles-opacity-val");
+
+    if (toggleParcelles) {
+      toggleParcelles.addEventListener("change", (e) => {
+        const vis = e.target.checked ? "visible" : "none";
+        ["parcelles-fill", "parcelles-line-bg", "parcelles-line-fg"].forEach(id => {
+          if (map.getLayer(id)) {
+            map.setLayoutProperty(id, "visibility", vis);
+          }
+        });
+      });
+    }
+
+    if (parcellesOpacity) {
+      parcellesOpacity.addEventListener("input", (e) => {
+        const val = parseInt(e.target.value, 10);
+        const opacity = val / 100;
+        if (parcellesOpacityVal) parcellesOpacityVal.textContent = val + "%";
+        ["parcelles-line-bg", "parcelles-line-fg"].forEach(id => {
+          if (map.getLayer(id)) {
+            map.setPaintProperty(id, "line-opacity", opacity);
+          }
+        });
+      });
+    }
 
     // Topo Layer Toggle, Opacity & Stretch Controls
     const toggleTopo = document.getElementById("toggle-topo");
@@ -2427,7 +2614,7 @@ html_template = """<!DOCTYPE html>
         else if (interval === 1) majorEvery = 5;
         else if (interval === 3) majorEvery = 5;
         if (contourManager) {
-          contourManager.updateConfig({ interval, majorEvery });
+          contourManager.updateConfig({ interval, majorEvery, labelSize: 13 });
           contourManager.generateForView();
         }
       });
@@ -2682,4 +2869,10 @@ with open('output_html/carte.html', 'w', encoding='utf-8') as f:
 with open('site/untitled-project.html', 'w', encoding='utf-8') as f:
     f.write(html_final)
 
-print('Successfully created output_html/carte.html and site/untitled-project.html!')
+with open('site/carte.html', 'w', encoding='utf-8') as f:
+    f.write(html_final)
+
+with open('carte.html', 'w', encoding='utf-8') as f:
+    f.write(html_final)
+
+print('Successfully created output_html/carte.html, site/untitled-project.html, site/carte.html, and carte.html!')
