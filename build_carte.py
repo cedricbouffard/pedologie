@@ -3639,6 +3639,41 @@ html_template = """<!DOCTYPE html>
         return null;
       };
 
+      const isPointInRing = (pt, ring) => {
+        let inside = false;
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+          const xi = ring[i][0], yi = ring[i][1];
+          const xj = ring[j][0], yj = ring[j][1];
+          const intersect = ((yi > pt[1]) !== (yj > pt[1]))
+            && (pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi);
+          if (intersect) inside = !inside;
+        }
+        return inside;
+      };
+
+      const isPointInGeom = (pt, geom) => {
+        if (!geom || !geom.coordinates) return true;
+        if (geom.type === "Polygon") {
+          if (!geom.coordinates.length || !isPointInRing(pt, geom.coordinates[0])) return false;
+          for (let k = 1; k < geom.coordinates.length; k++) {
+            if (isPointInRing(pt, geom.coordinates[k])) return false;
+          }
+          return true;
+        } else if (geom.type === "MultiPolygon") {
+          for (const poly of geom.coordinates) {
+            if (poly.length && isPointInRing(pt, poly[0])) {
+              let inHole = false;
+              for (let k = 1; k < poly.length; k++) {
+                if (isPointInRing(pt, poly[k])) { inHole = true; break; }
+              }
+              if (!inHole) return true;
+            }
+          }
+          return false;
+        }
+        return true;
+      };
+
       const deserialize = getDeserializeFn();
       if (!deserialize) {
         if (badgeEl) badgeEl.textContent = "FlatGeobuf non chargé";
@@ -3647,7 +3682,7 @@ html_template = """<!DOCTYPE html>
       }
 
       const url = "https://storage.googleapis.com/geoqc/BDPPAD/bdppad.fgb";
-      const delta = 0.00003;
+      const delta = 0.0001;
       const bbox = {
         minX: lngLat.lng - delta,
         minY: lngLat.lat - delta,
@@ -3658,19 +3693,26 @@ html_template = """<!DOCTYPE html>
       try {
         const iter = deserialize(url, bbox);
         const cropsByYear = new Map();
+        const pt = [lngLat.lng, lngLat.lat];
 
         for await (const feature of iter) {
           if (!feature || !feature.properties) continue;
+          if (feature.geometry && !isPointInGeom(pt, feature.geometry)) continue;
+
           const props = feature.properties;
-          const yr = props.annee || props.ANNEE || props.year || props.YEAR || props.an || props.AN;
-          const crop = props.DESCODPR1 || props.descodpr1 || props.culture || props.CULTURE || props.crop || props.CROP;
-          if (yr && crop) {
-            const yrInt = parseInt(yr, 10);
-            if (!isNaN(yrInt) && !cropsByYear.has(yrInt)) {
-              cropsByYear.set(yrInt, {
-                year: yrInt,
-                crop: String(crop).trim()
-              });
+          const yr = props.annee ?? props.ANNEE ?? props.year ?? props.YEAR ?? props.an ?? props.AN;
+          const rawCrop = props.DESGROPRO ?? props.desgropro ?? props.DESCODPR1 ?? props.descodpr1 ?? props.culture ?? props.CULTURE ?? props.crop ?? props.CROP ?? "";
+          const crop = String(rawCrop).trim();
+
+          if (yr !== undefined && yr !== null && yr !== "") {
+            const yrInt = Math.round(Number(yr));
+            if (!isNaN(yrInt) && yrInt >= 1990 && yrInt <= 2035) {
+              const displayCrop = crop || "Culture non déclarée";
+              if (!cropsByYear.has(yrInt)) {
+                cropsByYear.set(yrInt, { year: yrInt, crop: displayCrop });
+              } else if (displayCrop !== "Inconnu" && displayCrop !== "Culture non déclarée" && (cropsByYear.get(yrInt).crop === "Inconnu" || cropsByYear.get(yrInt).crop === "Culture non déclarée")) {
+                cropsByYear.set(yrInt, { year: yrInt, crop: displayCrop });
+              }
             }
           }
         }
@@ -3685,17 +3727,19 @@ html_template = """<!DOCTYPE html>
         if (badgeEl) badgeEl.textContent = `${sorted.length} saisons`;
         let rowsHtml = '<div class="crop-history-list">';
         for (const item of sorted) {
-          let badgeColor = "#166534";
-          let badgeBg = "#f0fdf4";
+          let badgeColor = "#0284c7";
+          let badgeBg = "#e0f2fe";
           const cLower = item.crop.toLowerCase();
           if (cLower.includes("maïs") || cLower.includes("mais")) {
             badgeColor = "#854d0e"; badgeBg = "#fefce8";
           } else if (cLower.includes("soya")) {
             badgeColor = "#15803d"; badgeBg = "#dcfce7";
-          } else if (cLower.includes("blé") || cLower.includes("orge") || cLower.includes("avoine") || cLower.includes("céréale")) {
+          } else if (cLower.includes("blé") || cLower.includes("ble") || cLower.includes("orge") || cLower.includes("avoine") || cLower.includes("céréale") || cLower.includes("cereale") || cLower.includes("triticale") || cLower.includes("épeautre") || cLower.includes("canola")) {
             badgeColor = "#b45309"; badgeBg = "#fffbeb";
-          } else if (cLower.includes("foin") || cLower.includes("prairie") || cLower.includes("pâturage")) {
+          } else if (cLower.includes("foin") || cLower.includes("prairie") || cLower.includes("pâturage") || cLower.includes("paturage") || cLower.includes("fourrag")) {
             badgeColor = "#047857"; badgeBg = "#ecfdf5";
+          } else if (cLower.includes("inconnu") || cLower.includes("non déclaré") || cLower.includes("non declare")) {
+            badgeColor = "#64748b"; badgeBg = "#f1f5f9";
           }
           rowsHtml += `
             <div class="crop-history-item">
@@ -3708,11 +3752,11 @@ html_template = """<!DOCTYPE html>
         if (contentEl) contentEl.innerHTML = rowsHtml;
       } catch (err) {
         console.warn("FGB crop history query note:", err);
-        if (badgeEl) badgeEl.textContent = "FGB en cours";
+        if (badgeEl) badgeEl.textContent = "Erreur FGB";
         if (contentEl) {
           contentEl.innerHTML = `
-            <div style="color: #64748b; font-size: 10.5px; line-height: 1.4; padding: 2px 0;">
-              <em>Fichier <code>bdppad.fgb</code> en cours de téléversement sur le stockage Google Cloud. Dès qu'il sera déployé, l'historique 2003–2026 s'affichera ici automatiquement.</em>
+            <div style="color: #ef4444; font-size: 10.5px; line-height: 1.4; padding: 2px 0;">
+              <em>Impossible de lire l'historique FlatGeobuf (${err.message || 'erreur réseau'}).</em>
             </div>
           `;
         }
