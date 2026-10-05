@@ -3927,6 +3927,24 @@ html_template = """<!DOCTYPE html>
       }
 
       gatherContext(lngLat, pedoProps) {
+        let pProps = pedoProps;
+        const ptPoint = this.map.project(lngLat);
+
+        const pedoLayers = [];
+        if (this.map.getLayer("pedologie-hit-layer")) pedoLayers.push("pedologie-hit-layer");
+        if (this.map.getLayer("pedologie-fill")) pedoLayers.push("pedologie-fill");
+
+        if (!pProps && pedoLayers.length > 0) {
+          try {
+            const hits = this.map.queryRenderedFeatures(ptPoint, { layers: pedoLayers });
+            if (hits && hits.length > 0) {
+              pProps = hits[0].properties;
+            }
+          } catch (e) {
+            console.warn("Could not query pedologie at point:", e);
+          }
+        }
+
         const radiusMeters = 50;
         const deltaLat = radiusMeters / 111320;
         const deltaLng = radiusMeters / (111320 * Math.cos(lngLat.lat * Math.PI / 180));
@@ -3940,10 +3958,16 @@ html_template = """<!DOCTYPE html>
         ];
 
         let nearbyPedoFeatures = [];
-        try {
-          nearbyPedoFeatures = this.map.queryRenderedFeatures(bbox, { layers: ["pedologie-fill"] });
-        } catch (e) {
-          nearbyPedoFeatures = [];
+        if (pedoLayers.length > 0) {
+          try {
+            nearbyPedoFeatures = this.map.queryRenderedFeatures(bbox, { layers: pedoLayers });
+          } catch (e) {
+            nearbyPedoFeatures = [];
+          }
+        }
+
+        if (!pProps && nearbyPedoFeatures.length > 0) {
+          pProps = nearbyPedoFeatures[0].properties;
         }
 
         const primarySeries = [];
@@ -3952,20 +3976,20 @@ html_template = """<!DOCTYPE html>
         let appellation = "";
         let region = "";
 
-        if (pedoProps) {
-          const rawEtude = String(pedoProps.No_etude || pedoProps.etude_code || "").trim();
+        if (pProps) {
+          const rawEtude = String(pProps.No_etude || pProps.etude_code || "").trim();
           let cleanEtudeCode = rawEtude.replace(/^0+/, "");
           const studyInfo = (typeof STUDY_NAMES !== "undefined")
             ? (STUDY_NAMES[rawEtude] || STUDY_NAMES[cleanEtudeCode] || STUDY_NAMES[rawEtude.padStart(2, "0")])
             : null;
           studyTitle = studyInfo ? studyInfo.title : (rawEtude ? "Étude nº " + rawEtude : "Étude pédologique");
           studyYear = studyInfo ? studyInfo.year : "";
-          appellation = (pedoProps.Appellation_cartographique || "").trim();
-          region = (pedoProps.Nom_region || pedoProps.nom_region || "").trim();
+          appellation = (pProps.Appellation_cartographique || "").trim();
+          region = (pProps.Nom_region || pProps.nom_region || "").trim();
 
           for (let i = 1; i <= 4; i++) {
-            const desc = (pedoProps["s" + i + "_desc"] || "").trim();
-            const pct = parseFloat(pedoProps["s" + i + "_pct"]);
+            const desc = (pProps["s" + i + "_desc"] || "").trim();
+            const pct = parseFloat(pProps["s" + i + "_pct"]);
             if (desc && !isNaN(pct) && pct > 0) {
               primarySeries.push({ name: desc, pct: Math.round(pct) });
             }
@@ -4062,6 +4086,15 @@ html_template = """<!DOCTYPE html>
           await this.loadSeriesSummaries();
         }
 
+        if (context.primarySeries.length === 0 && context.nearbySeries.length === 0) {
+          if (this.contextStripEl && this.contextTextEl) {
+            this.contextStripEl.style.display = "flex";
+            this.contextTextEl.textContent = "Aucune série cartographiée à cet endroit";
+          }
+          this.renderErrorMessage("⚠️ Aucune série de sol officielle n'est documentée sous ce point dans les études pédologiques (zone non cartographiée ou hors inventaire pédologique). Veuillez cliquer sur un polygone pédologique coloré de la carte.");
+          return;
+        }
+
         if (!this.apiKey && !this.workerUrl) {
           this.renderWelcome();
           if (this.keyPanelEl) this.keyPanelEl.style.display = "block";
@@ -4101,13 +4134,14 @@ OBJECTIF :
 Guider l'observateur pas à pas sur le terrain pour déterminer quelle série de sol exacte se trouve sous ses pieds parmi les candidates (polygone + voisinage 50 m) en exploitant les contrastes pédologiques documentés ci-dessus.
 
 DIRECTIVES TRÈS STRICTES :
-1. Reste concis (140 à 220 mots maximum par intervention).
-2. Pour chaque étape :
-   - Compare les séries candidates en fonction de leurs contrastes réels décrits ci-dessus (ex: texture tactile au toucher, présence de marbrures orangées/gley, pierrosité/gravier, horizon de surface, position dans le relief).
-   - Pose UNE SEULE question concrète et facile à vérifier sur le terrain sans outil complexe (ex: façonner un boudin de terre humide pour tester la cohésion, frotter entre le pouce et l'index pour évaluer le sable/limon/argile, observer la présence de taches de rouille à 20-30 cm à la bêche, chercher des cailloux).
-3. À la TOUTE FIN de ton message, ajoute TOUJOURS une ligne avec 2 à 4 choix de réponses sous le format exact suivant :
+1. INTERDICTION FORMELLE de donner des conseils génériques ou des définitions théoriques de livre (ne récite pas comment analyser un sol en général, ne parle pas de kits de pH en magasin). Tu dois t'appuyer exclusivement sur les séries candidates documentées ci-dessus et citer leurs noms dès ta première phrase.
+2. DÈS TON PREMIER MESSAGE :
+   - Salue l'observateur et cite directement les séries candidates identifiées sur ce site précis (avec leurs textures et drainages respectifs).
+   - Pose immédiatement UNE SEULE question concrète et facile à vérifier sur le terrain sans outil complexe (ex: façonner un boudin de terre pour évaluer l'argile vs le sable/limon, observer des marbrures orangées à 25 cm à la bêche, chercher des cailloux) permettant de trancher entre ces séries précises.
+3. Reste concis (140 à 220 mots maximum par intervention).
+4. À la TOUTE FIN de ton message, ajoute TOUJOURS une ligne avec 2 à 4 choix de réponses sous le format exact suivant :
 OPTIONS: [Choix 1 | Choix 2 | Choix 3]
-4. Dès que les observations de l'utilisateur permettent de trancher, nomme clairement la série de sol identifiée, détaille sa texture, son drainage naturel et son potentiel agronomique au Québec.`;
+5. Dès que les observations de l'utilisateur permettent de trancher, nomme clairement la série de sol identifiée, détaille sa texture, son drainage naturel et son potentiel agronomique au Québec.`;
       }
 
       async callOpenAi() {
@@ -4279,6 +4313,18 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         type: "raster",
         source: "google-hybrid-source",
         layout: { visibility: "none" }
+      });
+
+      // Permanent invisible query layer for pedologie (active even when pedologie-fill is hidden)
+      map.addLayer({
+        id: "pedologie-hit-layer",
+        type: "fill",
+        source: "pedologie",
+        "source-layer": "pedologie_quebec",
+        filter: ["==", ["geometry-type"], "Polygon"],
+        paint: {
+          "fill-opacity": 0
+        }
       });
 
       // 3. Polygon Fill layer
@@ -4787,7 +4833,16 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           btnAiInParcelPopup.addEventListener("click", () => {
             popup.remove();
             if (soilAiAssistant) {
-              soilAiAssistant.openWithContext(e.lngLat, null);
+              let pedoProps = null;
+              try {
+                const hits = map.queryRenderedFeatures(e.point, {
+                  layers: ["pedologie-hit-layer", "pedologie-fill"].filter(l => map.getLayer(l))
+                });
+                if (hits && hits.length > 0) {
+                  pedoProps = hits[0].properties;
+                }
+              } catch (err) {}
+              soilAiAssistant.openWithContext(e.lngLat, pedoProps);
             }
           });
         }
