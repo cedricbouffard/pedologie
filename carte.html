@@ -745,14 +745,13 @@
       margin-top: 4px;
     }
 
-    /* Floating Elevation Profile Bottom Dock */
+    /* Floating Elevation Profile & NDVI Bottom Dock */
     .elevation-profile-dock {
       display: none;
       position: absolute;
-      bottom: 18px;
-      left: 380px;
-      right: 20px;
-      max-height: 290px;
+      bottom: 24px;
+      left: 360px;
+      right: 24px;
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
@@ -766,6 +765,57 @@
     }
     .elevation-profile-dock.open {
       display: flex;
+    }
+    .elevation-profile-dock:not(.ndvi-dock) {
+      max-height: 310px;
+    }
+    .ndvi-dock {
+      max-height: 540px;
+      border-top: 3.5px solid #16a34a;
+      transition: max-height 0.25s ease, padding 0.2s ease;
+      overflow: hidden;
+    }
+    .ndvi-dock.collapsed {
+      max-height: 52px;
+      padding: 10px 16px;
+      overflow: hidden;
+    }
+    .ndvi-dock.collapsed .ndvi-dock-body {
+      display: none !important;
+    }
+    .ndvi-dock.collapsed #ndvi-collapsed-summary {
+      display: inline-flex !important;
+    }
+    .ndvi-dock-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+    }
+    .btn-dock-collapse {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.15s ease;
+    }
+    .btn-dock-collapse:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+    .btn-dock-collapse svg {
+      transition: transform 0.2s ease;
+    }
+    .ndvi-dock.collapsed .btn-dock-collapse svg {
+      transform: rotate(180deg);
     }
     .profile-dock-header {
       display: flex;
@@ -823,6 +873,10 @@
       height: 160px;
       position: relative;
     }
+    .ndvi-dock .profile-chart-container {
+      height: 195px;
+      min-height: 195px;
+    }
     .profile-chart-container svg {
       width: 100%;
       height: 100%;
@@ -837,11 +891,6 @@
     .raster-profile-axis { stroke: #cbd5e1; stroke-width: 1; }
     .raster-profile-axis-label { fill: #64748b; font-size: 9.5px; font-weight: 600; font-family: var(--font-mono, monospace); }
     .raster-profile-grid { stroke: #e2e8f0; stroke-width: 0.8; stroke-dasharray: 2 3; }
-
-    /* NDVI Dock and Chart styling */
-    .ndvi-dock {
-      border-top: 3.5px solid #16a34a;
-    }
     .ndvi-active-controls {
       display: flex;
       flex-wrap: wrap;
@@ -985,12 +1034,15 @@
       .elevation-profile-dock {
         left: 10px;
         right: 10px;
-        bottom: 10px;
-        max-height: 260px;
+        bottom: 72px;
+        max-height: 80vh;
         padding: 10px 12px;
       }
       .profile-chart-container {
-        height: 130px;
+        height: 140px;
+      }
+      .ndvi-dock .profile-chart-container {
+        height: 180px;
       }
     }
 
@@ -2159,9 +2211,10 @@
   <!-- Floating NDVI Sentinel-2 Bottom Dock -->
   <div id="ndvi-dock" class="elevation-profile-dock ndvi-dock">
     <div class="profile-dock-header">
-      <div class="profile-dock-title">
+      <div class="profile-dock-title" id="ndvi-dock-title-wrap" title="Cliquer pour réduire ou agrandir">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
         <span id="ndvi-dock-title">Série NDVI — Sentinel-2 L2A (Saison de croissance)</span>
+        <span id="ndvi-collapsed-summary" class="stat-chip" style="display:none; margin-left: 8px; font-weight:600; color:#14532d; background:#dcfce7; border-color:#86efac;"></span>
       </div>
       <div class="profile-dock-header-right">
         <label class="profile-precision-label" title="Année de la saison de croissance au Québec (mars à décembre)">
@@ -2179,68 +2232,73 @@
           </select>
         </label>
         <button id="btn-dock-clear-ndvi" class="profile-dock-btn" type="button" title="Masquer la tuile satellite sur la carte">Masquer tuile</button>
+        <button id="btn-collapse-ndvi-dock" class="btn-dock-collapse" type="button" title="Réduire / Agrandir le panneau NDVI" aria-label="Réduire ou agrandir">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
         <button id="btn-close-ndvi-dock" class="profile-dock-close" type="button" aria-label="Fermer le panneau NDVI">&times;</button>
       </div>
     </div>
     
-    <div id="ndvi-stats-bar" class="profile-stats-bar"></div>
+    <div class="ndvi-dock-body" id="ndvi-dock-body">
+      <div id="ndvi-stats-bar" class="profile-stats-bar"></div>
 
-    <div id="ndvi-hover-info" class="profile-hover-info">
-      Cliquez sur une date du graphique ci-dessous pour afficher la tuile satellite NDVI correspondante
-    </div>
+      <div id="ndvi-hover-info" class="profile-hover-info">
+        Cliquez sur une date du graphique ci-dessous pour afficher la tuile satellite NDVI correspondante
+      </div>
 
-    <!-- Active date banner & layer controls -->
-    <div id="ndvi-active-controls" class="ndvi-active-controls" style="display: none;">
-      <div class="ndvi-header-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
-        <div class="ndvi-date-badge" id="ndvi-selected-date-badge">Date sélectionnée : —</div>
-        <div class="ndvi-nav-buttons">
-          <button id="btn-ndvi-prev" class="ndvi-nav-btn" type="button" title="Acquisition précédente">&larr; Précédente</button>
-          <button id="btn-ndvi-next" class="ndvi-nav-btn" type="button" title="Acquisition suivante">Suivante &rarr;</button>
+      <!-- Active date banner & layer controls -->
+      <div id="ndvi-active-controls" class="ndvi-active-controls" style="display: none;">
+        <div class="ndvi-header-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
+          <div class="ndvi-date-badge" id="ndvi-selected-date-badge">Date sélectionnée : —</div>
+          <div class="ndvi-nav-buttons">
+            <button id="btn-ndvi-prev" class="ndvi-nav-btn" type="button" title="Acquisition précédente">&larr; Précédente</button>
+            <button id="btn-ndvi-next" class="ndvi-nav-btn" type="button" title="Acquisition suivante">Suivante &rarr;</button>
+          </div>
+        </div>
+
+        <div class="ndvi-controls-row" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding-top: 5px; border-top: 1px dashed rgba(22, 163, 74, 0.25);">
+          <!-- Stretch Controls -->
+          <div class="ndvi-stretch-group" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="font-size: 11px; font-weight: 600; color: #166534;">Étirement couleurs (Stretch) :</span>
+            <select id="ndvi-stretch-preset" class="tool-select" style="font-size: 11px; padding: 2px 6px;">
+              <option value="standard" selected>Standard (-0.05 à 0.85)</option>
+              <option value="contrast">Fort contraste (0.25 à 0.85)</option>
+              <option value="dense">Canopée dense (0.50 à 0.90)</option>
+              <option value="emergence">Émergence / Sol (0.00 à 0.45)</option>
+              <option value="auto">Auto (centré parcelle)</option>
+              <option value="custom">Personnalisé</option>
+            </select>
+
+            <div class="ndvi-sliders-inline" style="display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; color: #334155;">
+              <span>Min :</span>
+              <input type="range" id="ndvi-stretch-min" min="-20" max="70" step="5" value="-5" class="slider" style="width: 60px;" title="Borne minimale (rouge)" />
+              <span id="ndvi-stretch-min-val" class="val-badge">-0.05</span>
+
+              <span>Max :</span>
+              <input type="range" id="ndvi-stretch-max" min="20" max="100" step="5" value="85" class="slider" style="width: 60px;" title="Borne maximale (vert)" />
+              <span id="ndvi-stretch-max-val" class="val-badge">0.85</span>
+
+              <button id="btn-ndvi-auto-stretch" class="profile-dock-btn" type="button" title="Ajuster automatiquement les bornes pour révéler les variations intra-parcelle" style="padding: 2px 8px; color: #166534; font-weight: 700; background: #dcfce7; border-color: #86efac; cursor: pointer;">Auto</button>
+            </div>
+          </div>
+
+          <!-- Opacity & Legend -->
+          <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
+            <div class="ndvi-opacity-wrap">
+              <span>Opacité :</span>
+              <input type="range" id="ndvi-tile-opacity" min="0" max="100" value="85" class="slider" style="width: 70px;" />
+              <span id="ndvi-opacity-val" class="val-badge">85%</span>
+            </div>
+            <div class="ndvi-legend-mini">
+              <span class="ndvi-grad-sample"></span>
+              <span id="ndvi-legend-stretch-label" style="font-weight: 600;">-0.05 &rarr; 0.85</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="ndvi-controls-row" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding-top: 5px; border-top: 1px dashed rgba(22, 163, 74, 0.25);">
-        <!-- Stretch Controls -->
-        <div class="ndvi-stretch-group" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <span style="font-size: 11px; font-weight: 600; color: #166534;">Étirement couleurs (Stretch) :</span>
-          <select id="ndvi-stretch-preset" class="tool-select" style="font-size: 11px; padding: 2px 6px;">
-            <option value="standard" selected>Standard (-0.05 à 0.85)</option>
-            <option value="contrast">Fort contraste (0.25 à 0.85)</option>
-            <option value="dense">Canopée dense (0.50 à 0.90)</option>
-            <option value="emergence">Émergence / Sol (0.00 à 0.45)</option>
-            <option value="auto">Auto (centré parcelle)</option>
-            <option value="custom">Personnalisé</option>
-          </select>
-
-          <div class="ndvi-sliders-inline" style="display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; color: #334155;">
-            <span>Min :</span>
-            <input type="range" id="ndvi-stretch-min" min="-20" max="70" step="5" value="-5" class="slider" style="width: 60px;" title="Borne minimale (rouge)" />
-            <span id="ndvi-stretch-min-val" class="val-badge">-0.05</span>
-
-            <span>Max :</span>
-            <input type="range" id="ndvi-stretch-max" min="20" max="100" step="5" value="85" class="slider" style="width: 60px;" title="Borne maximale (vert)" />
-            <span id="ndvi-stretch-max-val" class="val-badge">0.85</span>
-
-            <button id="btn-ndvi-auto-stretch" class="profile-dock-btn" type="button" title="Ajuster automatiquement les bornes pour révéler les variations intra-parcelle" style="padding: 2px 8px; color: #166534; font-weight: 700; background: #dcfce7; border-color: #86efac; cursor: pointer;">Auto</button>
-          </div>
-        </div>
-
-        <!-- Opacity & Legend -->
-        <div style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
-          <div class="ndvi-opacity-wrap">
-            <span>Opacité :</span>
-            <input type="range" id="ndvi-tile-opacity" min="0" max="100" value="85" class="slider" style="width: 70px;" />
-            <span id="ndvi-opacity-val" class="val-badge">85%</span>
-          </div>
-          <div class="ndvi-legend-mini">
-            <span class="ndvi-grad-sample"></span>
-            <span id="ndvi-legend-stretch-label" style="font-weight: 600;">-0.05 &rarr; 0.85</span>
-          </div>
-        </div>
-      </div>
+      <div id="ndvi-chart-container" class="profile-chart-container" style="min-height: 195px; height: 195px;"></div>
     </div>
-
-    <div id="ndvi-chart-container" class="profile-chart-container" style="min-height: 160px;"></div>
   </div>
 
   <!-- Floating Conversational Soil Identification Dock -->
@@ -3316,7 +3374,11 @@
         const container = document.getElementById("ndvi-chart-container");
         const controlsRow = document.getElementById("ndvi-active-controls");
 
-        if (dock) dock.classList.add("open");
+        if (dock) {
+          dock.classList.add("open");
+          dock.classList.remove("collapsed");
+          this.isCollapsed = false;
+        }
         if (controlsRow) controlsRow.style.display = "none";
 
         const pid = parcelProps ? (parcelProps.IDPAR || parcelProps.idpar || "") : "";
@@ -3504,7 +3566,7 @@
         }
       }
 
-      selectDate(index) {
+      selectDate(index, skipRender = false) {
         if (index < 0 || index >= this.series.length) return;
         this.selectedIndex = index;
         const scene = this.series[index];
@@ -3521,10 +3583,14 @@
         if (btnPrev) btnPrev.disabled = (index <= 0);
         if (btnNext) btnNext.disabled = (index >= this.series.length - 1);
 
-        const circles = document.querySelectorAll(".ndvi-chart-point");
-        circles.forEach((c, idx) => {
-          c.classList.toggle("active-point", idx === index);
-        });
+        const collapsedSummary = document.getElementById("ndvi-collapsed-summary");
+        if (collapsedSummary) {
+          collapsedSummary.textContent = `${scene.dateKey} • NDVI : ${scene.ndvi.toFixed(3)}`;
+        }
+
+        if (!skipRender) {
+          this.renderChart(index, true);
+        }
 
         if (this.stretchPreset === "auto") {
           const currentSample = scene.ndvi;
@@ -3592,10 +3658,26 @@
         if (controlsRow) controlsRow.style.display = "none";
       }
 
+      toggleCollapse() {
+        const dock = document.getElementById("ndvi-dock");
+        if (!dock) return;
+        dock.classList.toggle("collapsed");
+        this.isCollapsed = dock.classList.contains("collapsed");
+        if (!this.isCollapsed && this.series && this.series.length) {
+          setTimeout(() => {
+            this.renderChart(this.selectedIndex);
+          }, 60);
+        }
+      }
+
       closeDock() {
         if (this.abortController) this.abortController.abort();
         const dock = document.getElementById("ndvi-dock");
-        if (dock) dock.classList.remove("open");
+        if (dock) {
+          dock.classList.remove("open");
+          dock.classList.remove("collapsed");
+        }
+        this.isCollapsed = false;
         this.clearLayer();
         if (this.marker) {
           this.marker.remove();
@@ -3604,13 +3686,13 @@
         this.setMode(false);
       }
 
-      renderChart(activeIndex = -1) {
+      renderChart(activeIndex = -1, fromSelectDate = false) {
         const container = document.getElementById("ndvi-chart-container");
         if (!container || !this.series.length) return;
 
         const width = Math.max(340, container.clientWidth || 600);
-        const height = 160;
-        const pad = { top: 18, right: 24, bottom: 28, left: 38 };
+        const height = 195;
+        const pad = { top: 22, right: 30, bottom: 44, left: 44 };
         const plotW = width - pad.left - pad.right;
         const plotH = height - pad.top - pad.bottom;
 
@@ -3648,7 +3730,7 @@
           const ty = getY(tick);
           yAxisHtml += `
             <line x1="${pad.left}" y1="${ty.toFixed(1)}" x2="${pad.left + plotW}" y2="${ty.toFixed(1)}" stroke="#e2e8f0" stroke-width="0.8" stroke-dasharray="2 3" />
-            <text x="${pad.left - 6}" y="${(ty + 3).toFixed(1)}" fill="#64748b" font-size="9" text-anchor="end" font-family="var(--font-mono, monospace)">${tick.toFixed(1)}</text>
+            <text x="${pad.left - 7}" y="${(ty + 3.5).toFixed(1)}" fill="#64748b" font-size="10" font-weight="600" text-anchor="end" font-family="var(--font-mono, monospace)">${tick.toFixed(1)}</text>
           `;
         }
 
@@ -3660,10 +3742,26 @@
           if (mDate >= seasonStart && mDate <= seasonEnd) {
             const x = pad.left + ((mDate - seasonStart) / timeSpan) * plotW;
             xAxisHtml += `
-              <line x1="${x.toFixed(1)}" y1="${pad.top + plotH}" x2="${x.toFixed(1)}" y2="${pad.top + plotH + 4}" stroke="#cbd5e1" stroke-width="1" />
-              <text x="${x.toFixed(1)}" y="${pad.top + plotH + 16}" fill="#64748b" font-size="9" text-anchor="middle" font-family="sans-serif">${mNames[m]}</text>
+              <line x1="${x.toFixed(1)}" y1="${pad.top}" x2="${x.toFixed(1)}" y2="${pad.top + plotH}" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="${x.toFixed(1)}" y1="${pad.top + plotH}" x2="${x.toFixed(1)}" y2="${pad.top + plotH + 5}" stroke="#94a3b8" stroke-width="1.2" />
+              <text x="${x.toFixed(1)}" y="${pad.top + plotH + 18}" fill="#334155" font-size="11" font-weight="600" text-anchor="middle" font-family="sans-serif">${mNames[m]}</text>
             `;
           }
+        }
+
+        // Active selected date marker & label
+        let activeDateMarkerHtml = "";
+        if (activeIndex >= 0 && activeIndex < this.series.length) {
+          const actItem = this.series[activeIndex];
+          const actX = getX(actItem.datetime);
+          const parts = actItem.dateKey.split("-");
+          const mLabel = mNames[parseInt(parts[1], 10) - 1] || parts[1];
+          const displayDateStr = `${parseInt(parts[2], 10)} ${mLabel}`;
+          activeDateMarkerHtml = `
+            <line x1="${actX.toFixed(1)}" y1="${pad.top}" x2="${actX.toFixed(1)}" y2="${pad.top + plotH}" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="3 3" />
+            <rect x="${(actX - 32).toFixed(1)}" y="${(pad.top + plotH + 24).toFixed(1)}" width="64" height="18" rx="4" fill="#0f172a" />
+            <text x="${actX.toFixed(1)}" y="${(pad.top + plotH + 37).toFixed(1)}" fill="#ffffff" font-size="10.5" font-weight="700" text-anchor="middle" font-family="sans-serif">${displayDateStr}</text>
+          `;
         }
 
         const coords = this.series.map(s => [getX(s.datetime), getY(s.ndvi)]);
@@ -3689,10 +3787,10 @@
                     data-idx="${idx}" 
                     cx="${cx}" 
                     cy="${cy}" 
-                    r="${isAct ? 7 : 4.5}" 
+                    r="${isAct ? 7.5 : 5}" 
                     fill="${color}" 
                     stroke="#ffffff" 
-                    stroke-width="1.8" />
+                    stroke-width="${isAct ? 2.5 : 1.8}" />
           `;
         });
 
@@ -3701,8 +3799,9 @@
             ${bandsHtml}
             ${yAxisHtml}
             ${xAxisHtml}
+            ${activeDateMarkerHtml}
             <path d="${areaD}" fill="rgba(22, 163, 74, 0.12)" />
-            <path d="${pathD}" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="${pathD}" fill="none" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
             ${pointsHtml}
           </svg>
         `;
@@ -3733,6 +3832,15 @@
             }
           });
         });
+
+        if (!this._resizeAttached) {
+          this._resizeAttached = true;
+          window.addEventListener("resize", () => {
+            if (this.series && this.series.length && !this.isCollapsed) {
+              this.renderChart(this.selectedIndex);
+            }
+          });
+        }
       }
     }
 
@@ -5415,6 +5523,8 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
     // NDVI Controls Event Handlers
     const btnQuickNdvi = document.getElementById("btn-quick-ndvi");
     const btnCloseNdviDock = document.getElementById("btn-close-ndvi-dock");
+    const btnCollapseNdviDock = document.getElementById("btn-collapse-ndvi-dock");
+    const ndviDockTitleWrap = document.getElementById("ndvi-dock-title-wrap");
     const btnDockClearNdvi = document.getElementById("btn-dock-clear-ndvi");
     const btnNdviPrev = document.getElementById("btn-ndvi-prev");
     const btnNdviNext = document.getElementById("btn-ndvi-next");
@@ -5443,6 +5553,19 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
     if (btnCloseNdviDock) {
       btnCloseNdviDock.addEventListener("click", () => {
         if (ndviManager) ndviManager.closeDock();
+      });
+    }
+
+    if (btnCollapseNdviDock) {
+      btnCollapseNdviDock.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (ndviManager) ndviManager.toggleCollapse();
+      });
+    }
+
+    if (ndviDockTitleWrap) {
+      ndviDockTitleWrap.addEventListener("click", () => {
+        if (ndviManager) ndviManager.toggleCollapse();
       });
     }
 
