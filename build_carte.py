@@ -3772,6 +3772,7 @@ html_template = """<!DOCTYPE html>
         this.currentContext = null;
         this.isWaitingResponse = false;
         this.apiKey = localStorage.getItem("pedo_openai_key") || "";
+        this.workerUrl = "https://autumn-wood-e444.lingering-thunder-a2ad.workers.dev/";
         this.seriesDb = null;
         this.loadSeriesSummaries();
 
@@ -4005,7 +4006,7 @@ html_template = """<!DOCTYPE html>
             <p style="margin: 0 0 16px 0; font-size: 12px; line-height: 1.5;">
               Cliquez sur un polygone pédologique sur la carte pour lancer l'identification guidée de votre sol à l'aide des fiches descriptives officielles.
             </p>
-            ${!this.apiKey ? `
+            ${(!this.apiKey && !this.workerUrl) ? `
               <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 10px; padding: 12px; text-align: left;">
                 <div style="font-weight: 700; color: #854d0e; font-size: 12px; margin-bottom: 4px;">🔑 Clé API OpenAI requise</div>
                 <div style="font-size: 11px; color: #713f12; margin-bottom: 8px;">Entrez votre clé pour activer l'assistant :</div>
@@ -4056,7 +4057,7 @@ html_template = """<!DOCTYPE html>
           await this.loadSeriesSummaries();
         }
 
-        if (!this.apiKey) {
+        if (!this.apiKey && !this.workerUrl) {
           this.renderWelcome();
           if (this.keyPanelEl) this.keyPanelEl.style.display = "block";
           return;
@@ -4109,12 +4110,15 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         this.showTypingIndicator();
 
         try {
-          const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+          const endpoint = this.workerUrl || "https://api.openai.com/v1/chat/completions";
+          const headers = { "Content-Type": "application/json" };
+          if (!this.workerUrl && this.apiKey) {
+            headers["Authorization"] = `Bearer ${this.apiKey}`;
+          }
+
+          const resp = await fetch(endpoint, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${this.apiKey}`
-            },
+            headers: headers,
             body: JSON.stringify({
               model: "gpt-4o-mini",
               messages: this.messages,
@@ -4127,7 +4131,8 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
 
           if (!resp.ok) {
             const errData = await resp.json().catch(() => ({}));
-            throw new Error(errData.error ? errData.error.message : `Erreur OpenAI (${resp.status})`);
+            const msg = errData.error ? (typeof errData.error === 'string' ? errData.error : errData.error.message) : `Erreur (${resp.status})`;
+            throw new Error(msg);
           }
 
           const data = await resp.json();
