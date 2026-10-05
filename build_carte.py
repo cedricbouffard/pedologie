@@ -3682,7 +3682,7 @@ html_template = """<!DOCTYPE html>
       }
 
       const url = "https://storage.googleapis.com/geoqc/BDPPAD/bdppad.fgb";
-      const delta = 0.0001;
+      const delta = 0.00015;
       const bbox = {
         minX: lngLat.lng - delta,
         minY: lngLat.lat - delta,
@@ -3692,12 +3692,11 @@ html_template = """<!DOCTYPE html>
 
       try {
         const iter = deserialize(url, bbox);
-        const cropsByYear = new Map();
+        const candidatesByYear = new Map();
         const pt = [lngLat.lng, lngLat.lat];
 
         for await (const feature of iter) {
           if (!feature || !feature.properties) continue;
-          if (feature.geometry && !isPointInGeom(pt, feature.geometry)) continue;
 
           const props = feature.properties;
           const yr = props.annee ?? props.ANNEE ?? props.year ?? props.YEAR ?? props.an ?? props.AN;
@@ -3707,17 +3706,23 @@ html_template = """<!DOCTYPE html>
           if (yr !== undefined && yr !== null && yr !== "") {
             const yrInt = Math.round(Number(yr));
             if (!isNaN(yrInt) && yrInt >= 1990 && yrInt <= 2035) {
-              const displayCrop = crop || "Culture non déclarée";
-              if (!cropsByYear.has(yrInt)) {
-                cropsByYear.set(yrInt, { year: yrInt, crop: displayCrop });
-              } else if (displayCrop !== "Inconnu" && displayCrop !== "Culture non déclarée" && (cropsByYear.get(yrInt).crop === "Inconnu" || cropsByYear.get(yrInt).crop === "Culture non déclarée")) {
-                cropsByYear.set(yrInt, { year: yrInt, crop: displayCrop });
+              const inside = isPointInGeom(pt, feature.geometry);
+              const hasNamedCrop = Boolean(crop && crop.toLowerCase() !== "inconnu" && crop.toLowerCase() !== "non déclaré" && crop.toLowerCase() !== "non declare");
+              let score = (inside ? 100 : 20) + (hasNamedCrop ? 150 : 0);
+
+              const existing = candidatesByYear.get(yrInt);
+              if (!existing || score > existing.score) {
+                candidatesByYear.set(yrInt, {
+                  year: yrInt,
+                  crop: crop || "Culture non déclarée",
+                  score: score
+                });
               }
             }
           }
         }
 
-        const sorted = Array.from(cropsByYear.values()).sort((a, b) => b.year - a.year);
+        const sorted = Array.from(candidatesByYear.values()).sort((a, b) => b.year - a.year);
         if (sorted.length === 0) {
           if (badgeEl) badgeEl.textContent = "0 trouvée";
           if (contentEl) contentEl.innerHTML = `<div style="color:#64748b; font-style:italic; padding:3px 0;">Aucune déclaration historique trouvée sous ce point.</div>`;
