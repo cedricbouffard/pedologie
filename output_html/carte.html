@@ -3692,6 +3692,9 @@
         this.currentContext = null;
         this.isWaitingResponse = false;
         this.apiKey = localStorage.getItem("pedo_openai_key") || "";
+        this.seriesDb = null;
+        this.loadSeriesSummaries();
+
         this.dockEl = document.getElementById("soil-ai-dock");
         this.messagesEl = document.getElementById("soil-ai-messages");
         this.quickRepliesEl = document.getElementById("soil-ai-quick-replies");
@@ -3708,6 +3711,47 @@
         if (this.apiKey && this.keyInputEl) {
           this.keyInputEl.value = this.apiKey;
         }
+      }
+
+      async loadSeriesSummaries() {
+        if (this.seriesDb) return;
+        try {
+          const res = await fetch("data/series_summaries.json");
+          if (res.ok) {
+            this.seriesDb = await res.json();
+          }
+        } catch (e) {
+          console.warn("Could not load series_summaries.json:", e);
+        }
+      }
+
+      lookupSeries(name) {
+        if (!this.seriesDb || !name) return null;
+        let clean = name.replace(/^Série\s+/i, "").trim().toLowerCase();
+        let slug = clean.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+        return this.seriesDb[slug] || this.seriesDb[clean] || null;
+      }
+
+      formatSeriesDetails(seriesList) {
+        if (!seriesList || seriesList.length === 0) return "- Aucune série documentée.";
+        return seriesList.map(s => {
+          const info = this.lookupSeries(s.name);
+          let str = `- **${s.name}** (~${s.pct}%)`;
+          if (info) {
+            const metaParts = [];
+            if (info.ordre) metaParts.push(`Ordre : ${info.ordre}` + (info.groupe ? ` (${info.groupe})` : ''));
+            if (info.texture) metaParts.push(`Texture : ${info.texture}`);
+            if (info.drainage) metaParts.push(`Drainage : ${info.drainage}`);
+            if (info.materiau) metaParts.push(`Origine : ${info.materiau}`);
+            if (metaParts.length > 0) {
+              str += String.fromCharCode(10) + `  • ` + metaParts.join(" | ");
+            }
+            if (info.description) {
+              str += String.fromCharCode(10) + `  • Caractères physiques : ${info.description}`;
+            }
+          }
+          return str;
+        }).join(String.fromCharCode(10, 10));
       }
 
       initListeners() {
@@ -3790,13 +3834,13 @@
         }
       }
 
-      openWithContext(lngLat, pedoProps = null, parcelProps = null) {
+      openWithContext(lngLat, pedoProps = null) {
         this.open();
-        const context = this.gatherContext(lngLat, pedoProps, parcelProps);
+        const context = this.gatherContext(lngLat, pedoProps);
         this.startDiagnosis(context);
       }
 
-      gatherContext(lngLat, pedoProps, parcelProps) {
+      gatherContext(lngLat, pedoProps) {
         const radiusMeters = 50;
         const deltaLat = radiusMeters / 111320;
         const deltaLng = radiusMeters / (111320 * Math.cos(lngLat.lat * Math.PI / 180));
@@ -3866,8 +3910,7 @@
           appellation,
           region,
           primarySeries,
-          nearbySeries,
-          parcelProps
+          nearbySeries
         };
       }
 
@@ -3880,7 +3923,7 @@
             </div>
             <h4 style="margin: 0 0 6px 0; color: #0f172a; font-size: 14px;">Assistant Pédologue IA</h4>
             <p style="margin: 0 0 16px 0; font-size: 12px; line-height: 1.5;">
-              Cliquez sur un polygone pédologique ou une parcelle sur la carte pour lancer l'identification guidée de votre sol.
+              Cliquez sur un polygone pédologique sur la carte pour lancer l'identification guidée de votre sol à l'aide des fiches descriptives officielles.
             </p>
             ${!this.apiKey ? `
               <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 10px; padding: 12px; text-align: left;">
@@ -3910,7 +3953,7 @@
         }
       }
 
-      startDiagnosis(context) {
+      async startDiagnosis(context) {
         this.currentContext = context;
         this.messages = [];
         if (this.quickRepliesEl) this.quickRepliesEl.innerHTML = "";
@@ -3929,6 +3972,10 @@
           this.contextTextEl.textContent = `${context.appellation || 'Secteur'} • ${seriesCount} série(s) candidates (rayon 50m)`;
         }
 
+        if (!this.seriesDb) {
+          await this.loadSeriesSummaries();
+        }
+
         if (!this.apiKey) {
           this.renderWelcome();
           if (this.keyPanelEl) this.keyPanelEl.style.display = "block";
@@ -3940,24 +3987,15 @@
 
         this.messages.push({
           role: "user",
-          content: "Bonjour ! Je me trouve sur ce point. Peux-tu analyser les types de sols possibles dans ce polygone et à moins de 50 m, et me poser les questions pour identifier le bon sol ?"
+          content: "Bonjour ! Je me trouve sur ce point. Peux-tu analyser les types de sols possibles dans ce polygone et à moins de 50 m d'après leurs fiches descriptives, et me poser les questions pour identifier le bon sol ?"
         });
 
         this.callOpenAi();
       }
 
       buildSystemPrompt(context) {
-        const primaryStr = context.primarySeries.length > 0
-          ? context.primarySeries.map(s => `- **${s.name}** (~${s.pct}% du polygone cartographique)`).join(String.fromCharCode(10))
-          : "- Séries non détaillées dans ce polygone.";
-
-        const nearbyStr = context.nearbySeries.length > 0
-          ? context.nearbySeries.map(s => `- **${s.name}** (~${s.pct}%, présent dans les polygones voisins à moins de 50 mètres)`).join(String.fromCharCode(10))
-          : "- Aucune autre série majeure trouvée à moins de 50 mètres.";
-
-        const parcelStr = context.parcelProps
-          ? `Parcelle BDPPAD nº ${context.parcelProps.IDPAR || context.parcelProps.idpar || ''}, Culture déclarée : ${context.parcelProps.DESCODPR1 || context.parcelProps.descodpr1 || 'Inconnue'}`
-          : "Hors parcelle agricole déclarée";
+        const primaryStr = this.formatSeriesDetails(context.primarySeries);
+        const nearbyStr = this.formatSeriesDetails(context.nearbySeries);
 
         return `Tu es un pédologue expert et agronome chevronné du Québec, chaleureux, scientifique et pragmatique sur le terrain.
 
@@ -3966,25 +4004,24 @@ CONTEXTE GÉOGRAPHIQUE DU POINT ANALYSÉ :
 - Région : ${context.region || 'Québec'}
 - Étude pédologique : ${context.studyTitle} ${context.studyYear ? `(${context.studyYear})` : ''}
 - Appellation cartographique : ${context.appellation || 'N/A'}
-- Données agricoles : ${parcelStr}
 
-SÉRIES DE SOLS DU POLYGONE :
+SÉRIES DE SOLS DU POLYGONE CARTOGRAPHIQUE :
 ${primaryStr}
 
-SÉRIES DE SOLS VOISINES DANS UN RAYON DE 50 MÈTRES :
+SÉRIES DE SOLS DES POLYGONES VOISINS DANS UN RAYON DE 50 MÈTRES :
 ${nearbyStr}
 
 OBJECTIF :
-Guider l'observateur pas à pas pour déterminer quelle série de sol exacte se trouve sous ses pieds parmi les candidates (polygone + voisinage 50 m).
+Guider l'observateur pas à pas sur le terrain pour déterminer quelle série de sol exacte se trouve sous ses pieds parmi les candidates (polygone + voisinage 50 m) en exploitant les contrastes pédologiques documentés ci-dessus.
 
 DIRECTIVES TRÈS STRICTES :
 1. Reste concis (140 à 220 mots maximum par intervention).
 2. Pour chaque étape :
-   - Explique brièvement en quoi les séries candidates diffèrent.
-   - Pose UNE SEULE question concrète et facile à tester sur le terrain sans outil complexe (ex: texture tactile en humectant la terre, présence de cailloux/pierres, couleur/marbrures de rouille sous 20-30 cm, position topographique).
+   - Compare les séries candidates en fonction de leurs contrastes réels décrits ci-dessus (ex: texture tactile au toucher, présence de marbrures orangées/gley, pierrosité/gravier, horizon de surface, position dans le relief).
+   - Pose UNE SEULE question concrète et facile à vérifier sur le terrain sans outil complexe (ex: façonner un boudin de terre humide pour tester la cohésion, frotter entre le pouce et l'index pour évaluer le sable/limon/argile, observer la présence de taches de rouille à 20-30 cm à la bêche, chercher des cailloux).
 3. À la TOUTE FIN de ton message, ajoute TOUJOURS une ligne avec 2 à 4 choix de réponses sous le format exact suivant :
 OPTIONS: [Choix 1 | Choix 2 | Choix 3]
-4. Quand les réponses permettent de trancher, annonce clairement le nom de la série de sol identifiée, ses caractéristiques de texture, son drainage naturel et son potentiel agronomique au Québec.`;
+4. Dès que les observations de l'utilisateur permettent de trancher, nomme clairement la série de sol identifiée, détaille sa texture, son drainage naturel et son potentiel agronomique au Québec.`;
       }
 
       async callOpenAi() {
@@ -4578,7 +4615,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               pProps = parcelFeatures[0].properties;
             }
             if (soilAiAssistant) {
-              soilAiAssistant.openWithContext(e.lngLat, p, pProps);
+              soilAiAssistant.openWithContext(e.lngLat, p);
             }
           });
         }
@@ -4660,7 +4697,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           btnAiInParcelPopup.addEventListener("click", () => {
             popup.remove();
             if (soilAiAssistant) {
-              soilAiAssistant.openWithContext(e.lngLat, null, pf);
+              soilAiAssistant.openWithContext(e.lngLat, null);
             }
           });
         }
