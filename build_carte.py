@@ -1256,7 +1256,7 @@ html_template = """<!DOCTYPE html>
       transform: translateX(-50%) translateY(0);
     }
 
-    /* AI Soil Identifier Popup Button */
+    /* Soil Identifier Popup Button */
     .btn-popup-ai {
       margin-top: 8px;
       width: 100%;
@@ -1264,21 +1264,20 @@ html_template = """<!DOCTYPE html>
       align-items: center;
       justify-content: center;
       gap: 7px;
-      padding: 9px 12px;
-      background: linear-gradient(135deg, #1e4535 0%, #15803d 100%);
+      padding: 8px 12px;
+      background: #0f172a;
       color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.8rem;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      font-size: 0.78rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(30, 69, 53, 0.25);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
       transition: all 0.15s ease;
     }
     .btn-popup-ai:hover {
-      background: linear-gradient(135deg, #14532d 0%, #166534 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(30, 69, 53, 0.35);
+      background: #1e293b;
+      border-color: #334155;
     }
 
     /* Crop History in Popup */
@@ -1319,91 +1318,86 @@ html_template = """<!DOCTYPE html>
       font-size: 11px;
     }
 
-    /* Floating Conversational Soil AI Assistant Dock */
+    /* Floating Conversational Soil Identification Dock (Scientific Minimalist) */
     .soil-ai-dock {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 390px;
-      height: 540px;
-      max-height: calc(100vh - 90px);
+      bottom: 20px;
+      right: 20px;
+      width: 410px;
+      height: 560px;
+      max-height: calc(100vh - 80px);
       background: #ffffff;
       border: 1px solid #cbd5e1;
-      border-radius: 16px;
-      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.25), 0 2px 8px rgba(15, 23, 42, 0.08);
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(15, 23, 42, 0.04);
       z-index: 2200;
       display: none;
       flex-direction: column;
       overflow: hidden;
-      animation: soilAiSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: soilAiSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .soil-ai-dock.open {
       display: flex;
     }
     @keyframes soilAiSlideUp {
-      from { opacity: 0; transform: translateY(20px) scale(0.96); }
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .soil-ai-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 12px 14px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid #1e293b;
     }
     .soil-ai-header-left {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .soil-ai-avatar {
-      position: relative;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    .soil-ai-header-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #1e293b;
+      border: 1px solid #334155;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: #94a3b8;
       flex-shrink: 0;
-    }
-    .soil-ai-status-dot {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 9px;
-      height: 9px;
-      background: #22c55e;
-      border: 2px solid #0f172a;
-      border-radius: 50%;
     }
     .soil-ai-title {
       font-size: 13px;
-      font-weight: 700;
-      line-height: 1.2;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
     }
     .soil-ai-subtitle {
-      font-size: 10px;
+      font-size: 10.5px;
       color: #94a3b8;
+      font-weight: 400;
     }
     .soil-ai-header-right {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
     .soil-ai-icon-btn {
       background: transparent;
       border: none;
       color: #94a3b8;
       cursor: pointer;
-      padding: 4px;
-      border-radius: 6px;
+      padding: 4px 6px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 16px;
+      line-height: 1;
       transition: all 0.15s ease;
     }
     .soil-ai-icon-btn:hover {
@@ -1411,21 +1405,31 @@ html_template = """<!DOCTYPE html>
       background: rgba(255, 255, 255, 0.12);
     }
     .soil-ai-context-strip {
-      background: #f1f5f9;
+      background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
-      padding: 6px 12px;
+      padding: 7px 12px;
       font-size: 11px;
       color: #334155;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      line-height: 1.4;
+    }
+    .soil-ai-context-icon {
+      color: #64748b;
+      flex-shrink: 0;
+      display: flex;
+    }
+    .soil-ai-context-text {
+      flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-weight: 500;
     }
     .soil-ai-key-panel {
-      background: #fefce8;
-      border-bottom: 1px solid #fef08a;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
       padding: 10px 14px;
       font-size: 12px;
     }
@@ -1435,39 +1439,70 @@ html_template = """<!DOCTYPE html>
       padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      background: #ffffff;
+      gap: 12px;
+      background: #fcfcfd;
     }
     .soil-ai-msg {
-      max-width: 88%;
-      padding: 9px 12px;
-      border-radius: 12px;
+      max-width: 92%;
+      padding: 10px 14px;
+      border-radius: 8px;
       font-size: 12.5px;
-      line-height: 1.5;
+      line-height: 1.55;
       word-break: break-word;
     }
     .soil-ai-msg.assistant {
       align-self: flex-start;
-      background: #f8fafc;
+      background: #ffffff;
       border: 1px solid #e2e8f0;
-      color: #1e293b;
-      border-bottom-left-radius: 3px;
+      color: #0f172a;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
     .soil-ai-msg.assistant p {
-      margin: 0 0 6px 0;
+      margin: 0 0 8px 0;
     }
     .soil-ai-msg.assistant p:last-child {
       margin-bottom: 0;
     }
     .soil-ai-msg.assistant ul, .soil-ai-msg.assistant ol {
-      margin: 4px 0 6px 18px;
+      margin: 4px 0 8px 18px;
       padding: 0;
+    }
+    .soil-ai-msg.assistant li {
+      margin-bottom: 3px;
+    }
+    .soil-ai-msg.assistant strong {
+      color: #0f172a;
+      font-weight: 600;
+    }
+    .soil-ai-msg.assistant a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 5px 11px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 11.5px;
+      transition: all 0.15s ease;
+    }
+    .soil-ai-msg.assistant a:hover {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+    .soil-ai-msg.assistant a::after {
+      content: "→";
+      font-size: 12px;
     }
     .soil-ai-msg.user {
       align-self: flex-end;
-      background: #166534;
+      background: #0f172a;
       color: #ffffff;
-      border-bottom-right-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
     .soil-ai-typing {
       align-self: flex-start;
@@ -1475,16 +1510,15 @@ html_template = """<!DOCTYPE html>
       align-items: center;
       gap: 4px;
       padding: 8px 12px;
-      background: #f8fafc;
+      background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      border-bottom-left-radius: 3px;
+      border-radius: 8px;
     }
     .soil-ai-typing span {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
-      background: #16a34a;
+      background: #64748b;
       animation: soilDotBounce 1.2s infinite ease-in-out both;
     }
     .soil-ai-typing span:nth-child(1) { animation-delay: -0.32s; }
@@ -1495,56 +1529,79 @@ html_template = """<!DOCTYPE html>
     }
     .soil-ai-quick-replies {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 6px;
-      padding: 0 14px 8px 14px;
-      background: #ffffff;
+      padding: 8px 14px 10px 14px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
     }
     .soil-ai-chip {
-      background: #f0fdf4;
-      border: 1px solid #86efac;
-      color: #166534;
-      padding: 5px 10px;
-      border-radius: 16px;
-      font-size: 11.5px;
-      font-weight: 600;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+      padding: 7px 11px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       transition: all 0.15s ease;
-      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
     .soil-ai-chip:hover {
-      background: #166534;
+      background: #f1f5f9;
+      border-color: #0f172a;
+      color: #0f172a;
+    }
+    .soil-ai-chip-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      font-size: 10px;
+      flex-shrink: 0;
+      border: 1px solid #e2e8f0;
+    }
+    .soil-ai-chip:hover .soil-ai-chip-letter {
+      background: #0f172a;
       color: #ffffff;
-      border-color: #166534;
-      transform: translateY(-1px);
+      border-color: #0f172a;
     }
     .soil-ai-footer {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 8px 12px;
-      background: #f8fafc;
+      background: #ffffff;
       border-top: 1px solid #e2e8f0;
     }
     .soil-ai-text-input {
       flex: 1;
       border: 1px solid #cbd5e1;
-      border-radius: 20px;
-      padding: 8px 14px;
+      border-radius: 6px;
+      padding: 8px 12px;
       font-size: 12px;
       font-family: inherit;
       outline: none;
       transition: border-color 0.15s ease;
     }
     .soil-ai-text-input:focus {
-      border-color: #16a34a;
-      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.15);
+      border-color: #0f172a;
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
     }
     .soil-ai-send-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: #166534;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #0f172a;
       color: #ffffff;
       border: none;
       display: flex;
@@ -1552,9 +1609,10 @@ html_template = """<!DOCTYPE html>
       justify-content: center;
       cursor: pointer;
       transition: background 0.15s ease;
+      flex-shrink: 0;
     }
     .soil-ai-send-btn:hover {
-      background: #14532d;
+      background: #334155;
     }
     .soil-ai-send-btn:disabled {
       background: #cbd5e1;
@@ -2112,34 +2170,35 @@ html_template = """<!DOCTYPE html>
     <div id="ndvi-chart-container" class="profile-chart-container" style="min-height: 160px;"></div>
   </div>
 
-  <!-- Floating Conversational Soil AI Assistant Dock -->
+  <!-- Floating Conversational Soil Identification Dock -->
   <div id="soil-ai-dock" class="soil-ai-dock">
     <div class="soil-ai-header">
       <div class="soil-ai-header-left">
-        <div class="soil-ai-avatar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-          <span class="soil-ai-status-dot"></span>
+        <div class="soil-ai-header-icon" title="Clé d'identification des sols">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
         </div>
         <div>
-          <div class="soil-ai-title">Assistant Pédologue IA</div>
-          <div class="soil-ai-subtitle">Identification guidée du sol</div>
+          <div class="soil-ai-title">Diagnostic pédologique</div>
+          <div class="soil-ai-subtitle">Clé d'identification de terrain</div>
         </div>
       </div>
       <div class="soil-ai-header-right">
-        <button id="btn-soil-ai-settings" class="soil-ai-icon-btn" type="button" title="Configurer la clé API OpenAI">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <button id="btn-soil-ai-settings" class="soil-ai-icon-btn" type="button" title="Paramètres de l'assistant">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
-        <button id="btn-soil-ai-reset" class="soil-ai-icon-btn" type="button" title="Réinitialiser la conversation">
+        <button id="btn-soil-ai-reset" class="soil-ai-icon-btn" type="button" title="Réinitialiser l'analyse">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
         </button>
-        <button id="btn-soil-ai-close" class="soil-ai-icon-btn" type="button" aria-label="Fermer l'assistant">&times;</button>
+        <button id="btn-soil-ai-close" class="soil-ai-icon-btn" type="button" aria-label="Fermer le diagnostic">&times;</button>
       </div>
     </div>
 
     <!-- Active Context Strip -->
     <div id="soil-ai-context-strip" class="soil-ai-context-strip" style="display:none;">
-      <span class="context-pin">📍</span>
-      <span id="soil-ai-context-text">Point sélectionné</span>
+      <span class="soil-ai-context-icon">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </span>
+      <span id="soil-ai-context-text" class="soil-ai-context-text">Secteur sélectionné</span>
     </div>
 
     <!-- Key Settings Panel (collapsible) -->
@@ -2150,7 +2209,7 @@ html_template = """<!DOCTYPE html>
       </div>
       <div style="display: flex; gap: 6px;">
         <input type="password" id="input-openai-key" class="soil-ai-text-input" placeholder="sk-..." />
-        <button id="btn-save-openai-key" class="profile-dock-btn" type="button" style="background:#166534; color:#fff; border-color:#15803d; font-weight:700;">Enregistrer</button>
+        <button id="btn-save-openai-key" class="profile-dock-btn" type="button" style="background:#0f172a; color:#fff; border-color:#1e293b; font-weight:600;">Enregistrer</button>
       </div>
       <div id="soil-ai-key-status" style="font-size: 11px; margin-top: 5px;"></div>
     </div>
@@ -2160,14 +2219,14 @@ html_template = """<!DOCTYPE html>
       <!-- Dynamic messages injected here -->
     </div>
 
-    <!-- Quick Reply Chips Container -->
+    <!-- Quick Reply Choices Container -->
     <div id="soil-ai-quick-replies" class="soil-ai-quick-replies"></div>
 
     <!-- Input Footer -->
     <form id="soil-ai-form" class="soil-ai-footer">
-      <input type="text" id="soil-ai-user-input" class="soil-ai-text-input" placeholder="Répondez ou décrivez votre sol..." autocomplete="off" />
+      <input type="text" id="soil-ai-user-input" class="soil-ai-text-input" placeholder="Préciser une observation ou répondre..." autocomplete="off" />
       <button type="submit" id="soil-ai-send-btn" class="soil-ai-send-btn" title="Envoyer">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
       </button>
     </form>
   </div>
@@ -2191,9 +2250,9 @@ html_template = """<!DOCTYPE html>
       <span id="ndvi-btn-text">NDVI Sentinel-2</span>
     </button>
     <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 1px;"></div>
-    <button id="btn-quick-ai" class="floating-profile-btn btn-ai-mode" type="button" title="Ouvrir l'Assistant Pédologue IA pour identifier vos sols">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-      <span>Pédologue IA</span>
+    <button id="btn-quick-ai" class="floating-profile-btn btn-ai-mode" type="button" title="Ouvrir la clé de diagnostic pédologique pour identifier vos sols">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+      <span>Diagnostic sol</span>
     </button>
   </div>
 
@@ -3823,6 +3882,9 @@ html_template = """<!DOCTYPE html>
         return seriesList.map(s => {
           const info = this.lookupSeries(s.name);
           let str = `- **${s.name}** (~${s.pct}%)`;
+          if (s.url) {
+            str += ` [Fiche : ${s.url}]`;
+          }
           if (info) {
             const metaParts = [];
             if (info.ordre) metaParts.push(`Ordre : ${info.ordre}` + (info.groupe ? ` (${info.groupe})` : ''));
@@ -3838,6 +3900,100 @@ html_template = """<!DOCTYPE html>
           }
           return str;
         }).join(String.fromCharCode(10, 10));
+      }
+
+      async analyzeTopography(lngLat, geom = null) {
+        try {
+          if (typeof findTileForCoords !== "function" || typeof fromUrl !== "function" || typeof readCogRegion !== "function") {
+            return null;
+          }
+          const tileUrl = findTileForCoords(lngLat.lng, lngLat.lat);
+          if (!tileUrl) return null;
+
+          let minLng = lngLat.lng, maxLng = lngLat.lng, minLat = lngLat.lat, maxLat = lngLat.lat;
+          let hasGeom = false;
+
+          if (geom && geom.coordinates) {
+            const extractCoords = (coords) => {
+              if (!Array.isArray(coords)) return;
+              if (coords.length >= 2 && typeof coords[0] === "number" && typeof coords[1] === "number") {
+                if (coords[0] < minLng) minLng = coords[0];
+                if (coords[0] > maxLng) maxLng = coords[0];
+                if (coords[1] < minLat) minLat = coords[1];
+                if (coords[1] > maxLat) maxLat = coords[1];
+                hasGeom = true;
+              } else {
+                for (const c of coords) extractCoords(c);
+              }
+            };
+            extractCoords(geom.coordinates);
+          }
+
+          const maxRadiusDeg = 400 / 111320;
+          if (!hasGeom || (maxLng - minLng) > maxRadiusDeg * 2 || (maxLat - minLat) > maxRadiusDeg * 2) {
+            minLng = lngLat.lng - maxRadiusDeg;
+            maxLng = lngLat.lng + maxRadiusDeg;
+            minLat = lngLat.lat - maxRadiusDeg;
+            maxLat = lngLat.lat + maxRadiusDeg;
+          } else {
+            const pad = 0.0003;
+            minLng -= pad; maxLng += pad; minLat -= pad; maxLat += pad;
+          }
+
+          const bbox = [minLng, minLat, maxLng, maxLat];
+          const cog = await fromUrl(tileUrl);
+          const region = await readCogRegion(cog, bbox, 64, -32767, false, AbortSignal.timeout(6000), 'bilinear');
+          if (!region || !region.data || !region.sourceBBox) return null;
+
+          const [clickX, clickY] = proj4('EPSG:4326', EPSG_3979_DEF, [lngLat.lng, lngLat.lat]);
+          const px = Math.max(0, Math.min(region.width - 1, Math.round(((clickX - region.sourceBBox[0]) / (region.sourceBBox[2] - region.sourceBBox[0])) * (region.width - 1))));
+          const py = Math.max(0, Math.min(region.height - 1, Math.round(((region.sourceBBox[3] - clickY) / (region.sourceBBox[3] - region.sourceBBox[1])) * (region.height - 1))));
+          const pointAlt = region.data[py * region.width + px];
+
+          if (!Number.isFinite(pointAlt) || pointAlt <= -1000 || pointAlt >= 9000) return null;
+
+          const validAlts = [];
+          for (let i = 0; i < region.data.length; i++) {
+            const v = region.data[i];
+            if (Number.isFinite(v) && v > -1000 && v < 9000) {
+              validAlts.push(v);
+            }
+          }
+
+          if (validAlts.length === 0) return null;
+
+          validAlts.sort((a, b) => a - b);
+          const minAlt = validAlts[0];
+          const maxAlt = validAlts[validAlts.length - 1];
+          const avgAlt = validAlts.reduce((a, b) => a + b, 0) / validAlts.length;
+          const lowerCount = validAlts.filter(v => v <= pointAlt).length;
+          const percentile = Math.round((lowerCount / validAlts.length) * 100);
+
+          let position = "Mi-pente";
+          let catenaEffect = "Position intermédiaire de versant (ruissellement et drainage modérés).";
+          if (percentile >= 70) {
+            position = "Haut de versant / Sommet";
+            catenaEffect = "Zone d'évacuation de l'eau en crête ou haut de pente : favorise les sols bien drainés et réduit le risque d'engorgement superficiel.";
+          } else if (percentile <= 30) {
+            position = "Bas de versant / Dépression";
+            catenaEffect = "Pied de pente ou zone réceptrice : accumulation de l'eau et sédimentation fine, propice aux gleysols ou marbrures d'hydromorphie plus superficielles.";
+          }
+
+          return {
+            pointAlt: Math.round(pointAlt * 10) / 10,
+            minAlt: Math.round(minAlt * 10) / 10,
+            maxAlt: Math.round(maxAlt * 10) / 10,
+            avgAlt: Math.round(avgAlt * 10) / 10,
+            diffFromAvg: Math.round((pointAlt - avgAlt) * 10) / 10,
+            totalRelief: Math.round((maxAlt - minAlt) * 10) / 10,
+            percentile,
+            position,
+            catenaEffect
+          };
+        } catch (err) {
+          console.warn("Topography analysis note:", err);
+          return null;
+        }
       }
 
       initListeners() {
@@ -3871,7 +4027,7 @@ html_template = """<!DOCTYPE html>
               this.apiKey = val;
               localStorage.setItem("pedo_openai_key", val);
               if (this.keyStatusEl) {
-                this.keyStatusEl.innerHTML = `<span style="color:#16a34a; font-weight:600;">✓ Clé enregistrée avec succès !</span>`;
+                this.keyStatusEl.innerHTML = `<span style="color:#16a34a; font-weight:600;">Clé enregistrée avec succès.</span>`;
               }
               setTimeout(() => {
                 if (this.keyPanelEl) this.keyPanelEl.style.display = "none";
@@ -3920,25 +4076,31 @@ html_template = """<!DOCTYPE html>
         }
       }
 
-      openWithContext(lngLat, pedoProps = null) {
+      async openWithContext(lngLat, pedoProps = null, featureGeom = null) {
         this.open();
-        const context = this.gatherContext(lngLat, pedoProps);
+        if (this.contextStripEl && this.contextTextEl) {
+          this.contextStripEl.style.display = "flex";
+          this.contextTextEl.textContent = "Acquisition du secteur et calcul du relief MNT LiDAR...";
+        }
+        const context = await this.gatherContext(lngLat, pedoProps, featureGeom);
         this.startDiagnosis(context);
       }
 
-      gatherContext(lngLat, pedoProps) {
+      async gatherContext(lngLat, pedoProps = null, featureGeom = null) {
         let pProps = pedoProps;
+        let geom = featureGeom;
         const ptPoint = this.map.project(lngLat);
 
         const pedoLayers = [];
         if (this.map.getLayer("pedologie-hit-layer")) pedoLayers.push("pedologie-hit-layer");
         if (this.map.getLayer("pedologie-fill")) pedoLayers.push("pedologie-fill");
 
-        if (!pProps && pedoLayers.length > 0) {
+        if ((!pProps || !geom) && pedoLayers.length > 0) {
           try {
             const hits = this.map.queryRenderedFeatures(ptPoint, { layers: pedoLayers });
             if (hits && hits.length > 0) {
-              pProps = hits[0].properties;
+              if (!pProps) pProps = hits[0].properties;
+              if (!geom) geom = hits[0].geometry;
             }
           } catch (e) {
             console.warn("Could not query pedologie at point:", e);
@@ -3968,6 +4130,7 @@ html_template = """<!DOCTYPE html>
 
         if (!pProps && nearbyPedoFeatures.length > 0) {
           pProps = nearbyPedoFeatures[0].properties;
+          if (!geom) geom = nearbyPedoFeatures[0].geometry;
         }
 
         const primarySeries = [];
@@ -3990,8 +4153,9 @@ html_template = """<!DOCTYPE html>
           for (let i = 1; i <= 4; i++) {
             const desc = (pProps["s" + i + "_desc"] || "").trim();
             const pct = parseFloat(pProps["s" + i + "_pct"]);
+            const url = (pProps["s" + i + "_url"] || "").trim();
             if (desc && !isNaN(pct) && pct > 0) {
-              primarySeries.push({ name: desc, pct: Math.round(pct) });
+              primarySeries.push({ name: desc, pct: Math.round(pct), url: url });
             }
           }
         }
@@ -4003,15 +4167,18 @@ html_template = """<!DOCTYPE html>
           for (let i = 1; i <= 4; i++) {
             const desc = (fp["s" + i + "_desc"] || "").trim();
             const pct = parseFloat(fp["s" + i + "_pct"]);
+            const url = (fp["s" + i + "_url"] || "").trim();
             if (desc && !isNaN(pct) && pct > 0) {
-              if (!primarySeries.some(s => s.name === desc)) {
-                nearbySeriesMap.set(desc, Math.round(pct));
+              if (!primarySeries.some(s => s.name === desc) && !nearbySeriesMap.has(desc)) {
+                nearbySeriesMap.set(desc, { name: desc, pct: Math.round(pct), url: url });
               }
             }
           }
         });
 
-        const nearbySeries = Array.from(nearbySeriesMap.entries()).map(([name, pct]) => ({ name, pct }));
+        const nearbySeries = Array.from(nearbySeriesMap.values());
+
+        const topo = await this.analyzeTopography(lngLat, geom);
 
         return {
           lngLat,
@@ -4020,28 +4187,29 @@ html_template = """<!DOCTYPE html>
           appellation,
           region,
           primarySeries,
-          nearbySeries
+          nearbySeries,
+          topo
         };
       }
 
       renderWelcome() {
         if (!this.messagesEl) return;
         this.messagesEl.innerHTML = `
-          <div style="text-align: center; padding: 20px 10px; color: #64748b;">
-            <div style="width: 44px; height: 44px; border-radius: 50%; background: #f0fdf4; color: #166534; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+          <div style="text-align: center; padding: 24px 14px; color: #475569;">
+            <div style="width: 38px; height: 38px; border-radius: 6px; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
             </div>
-            <h4 style="margin: 0 0 6px 0; color: #0f172a; font-size: 14px;">Assistant Pédologue IA</h4>
-            <p style="margin: 0 0 16px 0; font-size: 12px; line-height: 1.5;">
-              Cliquez sur un polygone pédologique sur la carte pour lancer l'identification guidée de votre sol à l'aide des fiches descriptives officielles.
+            <h4 style="margin: 0 0 6px 0; color: #0f172a; font-size: 13.5px; font-weight: 600;">Clé diagnostique des sols du Québec</h4>
+            <p style="margin: 0 0 16px 0; font-size: 12px; line-height: 1.5; color: #64748b;">
+              Sélectionnez un polygone pédologique ou une parcelle sur la carte pour initier l'analyse topographique LiDAR et l'identification de la série présente.
             </p>
             ${(!this.apiKey && !this.workerUrl) ? `
-              <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 10px; padding: 12px; text-align: left;">
-                <div style="font-weight: 700; color: #854d0e; font-size: 12px; margin-bottom: 4px;">🔑 Clé API OpenAI requise</div>
-                <div style="font-size: 11px; color: #713f12; margin-bottom: 8px;">Entrez votre clé pour activer l'assistant :</div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: left;">
+                <div style="font-weight: 600; color: #0f172a; font-size: 11.5px; margin-bottom: 4px;">Clé d'accès API requise</div>
+                <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Entrez votre clé OpenAI pour activer l'assistant de terrain :</div>
                 <div style="display:flex; gap:6px;">
                   <input type="password" id="welcome-key-input" class="soil-ai-text-input" placeholder="sk-..." style="background:#fff;" />
-                  <button id="welcome-key-btn" class="profile-dock-btn" type="button" style="background:#166534; color:#fff; border-color:#15803d; font-weight:700;">OK</button>
+                  <button id="welcome-key-btn" class="profile-dock-btn" type="button" style="background:#0f172a; color:#fff; border-color:#1e293b; font-weight:600;">Activer</button>
                 </div>
               </div>
             ` : ''}
@@ -4071,15 +4239,19 @@ html_template = """<!DOCTYPE html>
 
         if (this.marker) this.marker.remove();
         const el = document.createElement("div");
-        el.innerHTML = '<div style="width:18px;height:18px;border-radius:50%;background:#16a34a;border:2.5px solid #fff;box-shadow:0 0 12px rgba(22,163,74,0.7);"></div>';
+        el.innerHTML = '<div style="width:14px;height:14px;border-radius:50%;background:#0f172a;border:2.5px solid #fff;box-shadow:0 0 8px rgba(15,23,42,0.6);"></div>';
         this.marker = new maplibregl.Marker({ element: el })
           .setLngLat([context.lngLat.lng, context.lngLat.lat])
           .addTo(this.map);
 
         if (this.contextStripEl && this.contextTextEl) {
           this.contextStripEl.style.display = "flex";
-          const seriesCount = context.primarySeries.length + context.nearbySeries.length;
-          this.contextTextEl.textContent = `${context.appellation || 'Secteur'} • ${seriesCount} série(s) candidates (rayon 50m)`;
+          const seriesNames = context.primarySeries.map(s => s.name).join(", ") || (context.appellation || 'Secteur');
+          let text = `${seriesNames}`;
+          if (context.topo) {
+            text += ` • Alt. ${context.topo.pointAlt} m (${context.topo.position})`;
+          }
+          this.contextTextEl.textContent = text;
         }
 
         if (!this.seriesDb) {
@@ -4091,7 +4263,7 @@ html_template = """<!DOCTYPE html>
             this.contextStripEl.style.display = "flex";
             this.contextTextEl.textContent = "Aucune série cartographiée à cet endroit";
           }
-          this.renderErrorMessage("⚠️ Aucune série de sol officielle n'est documentée sous ce point dans les études pédologiques (zone non cartographiée ou hors inventaire pédologique). Veuillez cliquer sur un polygone pédologique coloré de la carte.");
+          this.renderErrorMessage("Aucune série de sol documentée sous ce point dans les inventaires pédologiques officiels (zone non cartographiée ou hors inventaire). Veuillez sélectionner un secteur cartographié sur la carte.");
           return;
         }
 
@@ -4106,7 +4278,7 @@ html_template = """<!DOCTYPE html>
 
         this.messages.push({
           role: "user",
-          content: "Bonjour ! Je me trouve sur ce point. Peux-tu analyser les types de sols possibles dans ce polygone et à moins de 50 m d'après leurs fiches descriptives, et me poser les questions pour identifier le bon sol ?"
+          content: "Bonjour. Je me trouve sur ce point. Peux-tu analyser les séries de sols candidates dans ce polygone et à moins de 50 m en tenant compte du relief et de la caténa, et me poser la première question discriminante pour identifier le sol présent ?"
         });
 
         this.callOpenAi();
@@ -4116,32 +4288,53 @@ html_template = """<!DOCTYPE html>
         const primaryStr = this.formatSeriesDetails(context.primarySeries);
         const nearbyStr = this.formatSeriesDetails(context.nearbySeries);
 
-        return `Tu es un pédologue expert et agronome chevronné du Québec, chaleureux, scientifique et pragmatique sur le terrain.
+        let topoBlock = "- Altitude et relief : Données altimétriques non disponibles pour ce secteur.";
+        if (context.topo) {
+          const t = context.topo;
+          topoBlock = `- Altitude au point : ${t.pointAlt} m
+- Relief du polygone/secteur : ${t.minAlt} m à ${t.maxAlt} m (dénivelé : ${t.totalRelief} m, moyenne : ${t.avgAlt} m)
+- Position relative dans le versant : ${t.position} (percentile topographique : ${t.percentile}%, écart à la moyenne : ${t.diffFromAvg >= 0 ? '+' : ''}${t.diffFromAvg} m)
+- Incidence topopédologique (caténa) : ${t.catenaEffect}`;
+        }
 
-CONTEXTE GÉOGRAPHIQUE DU POINT ANALYSÉ :
+        return `Tu es un pédologue expert et cartographe des sols du Québec. Ton mandat est de guider un observateur sur le terrain pour identifier avec rigueur la série de sol exacte sous ses pieds selon la classification officielle québécoise.
+
+DONNÉES GÉOGRAPHIQUES DU SITE :
 - Coordonnées : [${context.lngLat.lat.toFixed(5)}°N, ${Math.abs(context.lngLat.lng).toFixed(5)}°O]
 - Région : ${context.region || 'Québec'}
 - Étude pédologique : ${context.studyTitle} ${context.studyYear ? `(${context.studyYear})` : ''}
 - Appellation cartographique : ${context.appellation || 'N/A'}
 
+TOPOGRAPHIE ET CATÉNA (MNT LiDAR 1 m) :
+${topoBlock}
+
 SÉRIES DE SOLS DU POLYGONE CARTOGRAPHIQUE :
 ${primaryStr}
 
-SÉRIES DE SOLS DES POLYGONES VOISINS DANS UN RAYON DE 50 MÈTRES :
+SÉRIES DE SOLS DU VOISINAGE IMMÉDIAT (RAYON 50 MÈTRES) :
 ${nearbyStr}
 
-OBJECTIF :
-Guider l'observateur pas à pas sur le terrain pour déterminer quelle série de sol exacte se trouve sous ses pieds parmi les candidates (polygone + voisinage 50 m) en exploitant les contrastes pédologiques documentés ci-dessus.
-
-DIRECTIVES TRÈS STRICTES :
-1. INTERDICTION FORMELLE de donner des conseils génériques ou des définitions théoriques de livre (ne récite pas comment analyser un sol en général, ne parle pas de kits de pH en magasin). Tu dois t'appuyer exclusivement sur les séries candidates documentées ci-dessus et citer leurs noms dès ta première phrase.
+MÉTHODOLOGIE SCIENTIFIQUE ET DIRECTIVES DE RÉDACTION :
+1. TON ET VOCABULAIRE :
+   - Adopte un ton strictement scientifique, sobre, neutre et professionnel.
+   - INTERDICTION STRICTE : N'utilise AUCUN émoji ni émoticône dans l'ensemble de tes messages.
 2. DÈS TON PREMIER MESSAGE :
-   - Salue l'observateur et cite directement les séries candidates identifiées sur ce site précis (avec leurs textures et drainages respectifs).
-   - Pose immédiatement UNE SEULE question concrète et facile à vérifier sur le terrain sans outil complexe (ex: façonner un boudin de terre pour évaluer l'argile vs le sable/limon, observer des marbrures orangées à 25 cm à la bêche, chercher des cailloux) permettant de trancher entre ces séries précises.
-3. Reste concis (140 à 220 mots maximum par intervention).
-4. À la TOUTE FIN de ton message, ajoute TOUJOURS une ligne avec 2 à 4 choix de réponses sous le format exact suivant :
+   - Énonce clairement les séries candidates présentes sur ce site avec leurs textures et drainages caractéristiques.
+   - Utilise immédiatement l'altitude (${context.topo ? context.topo.pointAlt + ' m' : 'du site'}) et la position dans la caténa (${context.topo ? context.topo.position : 'du secteur'}) pour expliquer comment le relief oriente le drainage naturel et oriente le diagnostic vers telle ou telle série.
+   - Pose UNE SEULE question morphologique discriminante et facile à vérifier sur le terrain (ex: texture tactile au doigt de l'horizon de surface Ap, présence de marbrures d'oxydoréduction à 25-40 cm à la bêche, pierrosité).
+3. CHOIX DE RÉPONSES STRICTEMENT ADAPTÉS (OBLIGATOIRE) :
+   - À la toute dernière ligne de ton intervention, ajoute obligatoirement :
 OPTIONS: [Choix 1 | Choix 2 | Choix 3]
-5. Dès que les observations de l'utilisateur permettent de trancher, nomme clairement la série de sol identifiée, détaille sa texture, son drainage naturel et son potentiel agronomique au Québec.`;
+   - Chaque choix DOIT répondre directement et fidèlement à la question posée, sous la forme d'observations de terrain concrètes, contrastées et mutuellement exclusives permettant de trancher entre les séries candidates.
+   - Ne formule aucun choix vague ou hors de propos.
+4. CONFIRMATION FINALE ET FICHE DESCRIPTIVE :
+   - Dès que les réponses permettent de conclure, confirme la série identifiée (ex: Série Sainte-Rosalie).
+   - Décris ses caractères de terrain : texture, classe de drainage naturel et potentiel agronomique.
+   - Inclus OBLIGATOIREMENT le lien Markdown vers la fiche descriptive officielle :
+     [Consulter la fiche descriptive officielle de la série X](URL)
+     (reprends exactement l'URL de la fiche fournie dans les données ci-dessus pour la série identifiée).
+5. CONCISION :
+   - Réponses concises et denses (130 à 190 mots maximum).`;
       }
 
       async callOpenAi() {
@@ -4161,7 +4354,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             body: JSON.stringify({
               model: "gpt-4o-mini",
               messages: this.messages,
-              temperature: 0.6,
+              temperature: 0.5,
               max_tokens: 700
             })
           });
@@ -4202,7 +4395,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
 
         let displayText = rawText;
         let options = [];
-        const optMatch = rawText.match(/OPTIONS:\\s*\\[(.*?)\\]/i);
+        const optMatch = rawText.match(/OPTIONS:\\s*\\[(.*?)\\]/is);
         if (optMatch) {
           displayText = rawText.replace(optMatch[0], "").trim();
           options = optMatch[1].split("|").map(s => s.trim()).filter(Boolean);
@@ -4215,17 +4408,22 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         const msgDiv = document.createElement("div");
         msgDiv.className = "soil-ai-msg assistant";
         msgDiv.innerHTML = htmlContent;
+        msgDiv.querySelectorAll("a").forEach(a => {
+          a.setAttribute("target", "_blank");
+          a.setAttribute("rel", "noopener noreferrer");
+        });
         this.messagesEl.appendChild(msgDiv);
         this.scrollToBottom();
 
         if (this.quickRepliesEl) {
           this.quickRepliesEl.innerHTML = "";
           if (options.length > 0) {
-            options.forEach(opt => {
+            options.forEach((opt, idx) => {
               const btn = document.createElement("button");
               btn.className = "soil-ai-chip";
               btn.type = "button";
-              btn.textContent = opt;
+              const letter = String.fromCharCode(65 + idx);
+              btn.innerHTML = `<span class="soil-ai-chip-letter">${letter}</span><span>${opt}</span>`;
               btn.addEventListener("click", () => {
                 this.sendMessage(opt);
               });
@@ -4620,13 +4818,13 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           parcelBadgeHtml = `
             <div class="parcel-info-badge" style="margin-bottom: 12px; padding: 7px 10px; background: #f8fafc; border: 1px solid #cbd5e1; border-left: 3.5px solid #0f172a; border-radius: 6px; font-size: 0.78rem;">
               <div style="font-weight: 600; color: #0f172a; display: flex; justify-content: space-between; align-items: center;">
-                <span>🌾 Parcelle agricole BDPPAD ${pid ? `nº ${pid}` : ''}</span>
+                <span>Parcelle agricole BDPPAD ${pid ? `nº ${pid}` : ''}</span>
                 ${supStr ? `<span style="font-weight: 700; color: #1e293b;">${supStr}</span>` : ''}
               </div>
               ${crop ? `<div style="color: #334155; margin-top: 3px;">Culture : <strong>${crop}</strong>${group ? ` <span style="color:#64748b;">(${group})</span>` : ''}</div>` : ''}
               <div class="popup-crop-history">
                 <div class="crop-history-header">
-                  <span>📜 Historique des cultures (2003–2026)</span>
+                  <span>Historique des cultures (2003–2026)</span>
                   <span class="crop-history-badge">Chargement...</span>
                 </div>
                 <div class="crop-history-content">
@@ -4714,11 +4912,11 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               ${cardsHtml}
               <button id="btn-popup-ndvi" type="button" class="btn-popup-ndvi">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
-                <span>🌿 Évolution NDVI annuelle (Sentinel-2)</span>
+                <span>Évolution NDVI annuelle (Sentinel-2)</span>
               </button>
               <button id="btn-popup-ai-identify" type="button" class="btn-popup-ai">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><circle cx="9" cy="10" r="1" fill="currentColor"></circle><circle cx="12" cy="10" r="1" fill="currentColor"></circle><circle cx="15" cy="10" r="1" fill="currentColor"></circle></svg>
-                <span>💬 Identifier mon type de sol (Assistant IA)</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+                <span>Identifier la série de sol (Diagnostic terrain)</span>
               </button>
             </div>
           </div>
@@ -4746,12 +4944,8 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         if (btnAiInPopup) {
           btnAiInPopup.addEventListener("click", () => {
             popup.remove();
-            let pProps = null;
-            if (parcelFeatures && parcelFeatures.length > 0) {
-              pProps = parcelFeatures[0].properties;
-            }
             if (soilAiAssistant) {
-              soilAiAssistant.openWithContext(e.lngLat, p);
+              soilAiAssistant.openWithContext(e.lngLat, p, e.features && e.features.length ? e.features[0].geometry : null);
             }
           });
         }
@@ -4797,7 +4991,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               </div>
               <div class="popup-crop-history" style="margin-top: 10px;">
                 <div class="crop-history-header">
-                  <span>📜 Historique des cultures (2003–2026)</span>
+                  <span>Historique des cultures (2003–2026)</span>
                   <span class="crop-history-badge">Chargement...</span>
                 </div>
                 <div class="crop-history-content">
@@ -4806,11 +5000,11 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               </div>
               <button id="btn-parcel-popup-ndvi" type="button" class="btn-popup-ndvi">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
-                <span>🌿 Évolution NDVI annuelle (Sentinel-2)</span>
+                <span>Évolution NDVI annuelle (Sentinel-2)</span>
               </button>
               <button id="btn-parcel-popup-ai" type="button" class="btn-popup-ai">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><circle cx="9" cy="10" r="1" fill="currentColor"></circle><circle cx="12" cy="10" r="1" fill="currentColor"></circle><circle cx="15" cy="10" r="1" fill="currentColor"></circle></svg>
-                <span>💬 Identifier mon type de sol (Assistant IA)</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+                <span>Identifier la série de sol (Diagnostic terrain)</span>
               </button>
             </div>
           </div>
@@ -4834,15 +5028,17 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             popup.remove();
             if (soilAiAssistant) {
               let pedoProps = null;
+              let pedoGeom = null;
               try {
                 const hits = map.queryRenderedFeatures(e.point, {
                   layers: ["pedologie-hit-layer", "pedologie-fill"].filter(l => map.getLayer(l))
                 });
                 if (hits && hits.length > 0) {
                   pedoProps = hits[0].properties;
+                  pedoGeom = hits[0].geometry;
                 }
               } catch (err) {}
-              soilAiAssistant.openWithContext(e.lngLat, pedoProps);
+              soilAiAssistant.openWithContext(e.lngLat, pedoProps, pedoGeom);
             }
           });
         }
