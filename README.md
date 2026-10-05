@@ -6,7 +6,8 @@
 > **Portail numérique unifié des 79 mémoires d'inventaire pédologique, du répertoire des séries de sols et du glossaire pédologique québécois.**
 > Agriculture et Agroalimentaire Canada (SISCan) & Ministère de l'Agriculture, des Pêcheries et de l'Alimentation du Québec (MAPAQ).
 >
-> 🌐 Dépôt & signalement d'erreurs : [https://github.com/cedricbouffard/pedologie](https://github.com/cedricbouffard/pedologie)
+> 🌐 Dépôt & signalement d'erreurs : [https://github.com/cedricbouffard/pedologie](https://github.com/cedricbouffard/pedologie)  
+> 📜 Licence : [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ---
 
@@ -93,3 +94,13 @@ Le dépôt est configuré pour un déploiement direct sur **GitHub Pages**.
 ```
 
 ---
+
+## Licence
+
+Ce projet est distribué sous la licence **GNU General Public License v3.0 (GPLv3)**.
+
+Conformément au principe de **copyleft / partage à l'identique (Share-Alike)** de cette licence :
+- Tout utilisateur est libre de copier, distribuer et modifier le code source et les contenus du projet.
+- **Obligation de réciprocité** : Toute personne ou organisation qui utilise, adapte ou modifie ce travail et le redistribue (y compris sous forme d'application ou de dérivé) **doit impérativement publier ses modifications et son code source sous une licence équivalente (GPLv3)**.
+
+Pour consulter le texte intégral des termes et conditions, voir le fichier [LICENSE](LICENSE) à la racine du dépôt ou la page [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.fr.html).
