@@ -21,7 +21,7 @@
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js"></script>
   <script src="geolibre-contour.js"></script>
-  <script src="https://unpkg.com/flatgeobuf@3.34.0/dist/flatgeobuf-geojson.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatgeobuf@3.34.0/dist/flatgeobuf-geojson.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
 
   <style>
@@ -3604,7 +3604,20 @@
       const badgeEl = container.querySelector(".crop-history-badge");
       const contentEl = container.querySelector(".crop-history-content");
 
-      if (typeof window.flatgeobuf === "undefined" || !window.flatgeobuf.geojson) {
+      const getDeserializeFn = () => {
+        if (typeof window.flatgeobuf !== "undefined") {
+          if (typeof window.flatgeobuf.deserialize === "function") return window.flatgeobuf.deserialize.bind(window.flatgeobuf);
+          if (window.flatgeobuf.geojson && typeof window.flatgeobuf.geojson.deserialize === "function") return window.flatgeobuf.geojson.deserialize.bind(window.flatgeobuf.geojson);
+        }
+        if (typeof flatgeobuf !== "undefined") {
+          if (typeof flatgeobuf.deserialize === "function") return flatgeobuf.deserialize.bind(flatgeobuf);
+          if (flatgeobuf.geojson && typeof flatgeobuf.geojson.deserialize === "function") return flatgeobuf.geojson.deserialize.bind(flatgeobuf.geojson);
+        }
+        return null;
+      };
+
+      const deserialize = getDeserializeFn();
+      if (!deserialize) {
         if (badgeEl) badgeEl.textContent = "FlatGeobuf non chargé";
         if (contentEl) contentEl.innerHTML = `<span style="color:#64748b; font-size:11px;">Module FlatGeobuf non disponible.</span>`;
         return;
@@ -3620,7 +3633,7 @@
       };
 
       try {
-        const iter = window.flatgeobuf.geojson.deserialize(url, bbox);
+        const iter = deserialize(url, bbox);
         const cropsByYear = new Map();
 
         for await (const feature of iter) {
