@@ -21,6 +21,8 @@
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js"></script>
   <script src="geolibre-contour.js"></script>
+  <script src="https://unpkg.com/flatgeobuf@3.34.0/dist/flatgeobuf-geojson.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -1241,6 +1243,311 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* AI Soil Identifier Popup Button */
+    .btn-popup-ai {
+      margin-top: 8px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 12px;
+      background: linear-gradient(135deg, #1e4535 0%, #15803d 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(30, 69, 53, 0.25);
+      transition: all 0.15s ease;
+    }
+    .btn-popup-ai:hover {
+      background: linear-gradient(135deg, #14532d 0%, #166534 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(30, 69, 53, 0.35);
+    }
+
+    /* Crop History in Popup */
+    .popup-crop-history {
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    .crop-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .crop-history-title {
+      font-weight: 700;
+      font-size: 0.76rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .crop-history-list {
+      max-height: 130px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .crop-history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2.5px 4px;
+      border-bottom: 1px dashed #e2e8f0;
+      font-size: 11px;
+    }
+
+    /* Floating Conversational Soil AI Assistant Dock */
+    .soil-ai-dock {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 390px;
+      height: 540px;
+      max-height: calc(100vh - 90px);
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.25), 0 2px 8px rgba(15, 23, 42, 0.08);
+      z-index: 2200;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: soilAiSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .soil-ai-dock.open {
+      display: flex;
+    }
+    @keyframes soilAiSlideUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .soil-ai-header {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .soil-ai-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .soil-ai-avatar {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .soil-ai-status-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 9px;
+      height: 9px;
+      background: #22c55e;
+      border: 2px solid #0f172a;
+      border-radius: 50%;
+    }
+    .soil-ai-title {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .soil-ai-subtitle {
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .soil-ai-header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .soil-ai-icon-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .soil-ai-icon-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .soil-ai-context-strip {
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 6px 12px;
+      font-size: 11px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .soil-ai-key-panel {
+      background: #fefce8;
+      border-bottom: 1px solid #fef08a;
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+    .soil-ai-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #ffffff;
+    }
+    .soil-ai-msg {
+      max-width: 88%;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .soil-ai-msg.assistant {
+      align-self: flex-start;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #1e293b;
+      border-bottom-left-radius: 3px;
+    }
+    .soil-ai-msg.assistant p {
+      margin: 0 0 6px 0;
+    }
+    .soil-ai-msg.assistant p:last-child {
+      margin-bottom: 0;
+    }
+    .soil-ai-msg.assistant ul, .soil-ai-msg.assistant ol {
+      margin: 4px 0 6px 18px;
+      padding: 0;
+    }
+    .soil-ai-msg.user {
+      align-self: flex-end;
+      background: #166534;
+      color: #ffffff;
+      border-bottom-right-radius: 3px;
+    }
+    .soil-ai-typing {
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      border-bottom-left-radius: 3px;
+    }
+    .soil-ai-typing span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #16a34a;
+      animation: soilDotBounce 1.2s infinite ease-in-out both;
+    }
+    .soil-ai-typing span:nth-child(1) { animation-delay: -0.32s; }
+    .soil-ai-typing span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes soilDotBounce {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .soil-ai-quick-replies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 14px 8px 14px;
+      background: #ffffff;
+    }
+    .soil-ai-chip {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #166534;
+      padding: 5px 10px;
+      border-radius: 16px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .soil-ai-chip:hover {
+      background: #166534;
+      color: #ffffff;
+      border-color: #166534;
+      transform: translateY(-1px);
+    }
+    .soil-ai-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+    }
+    .soil-ai-text-input {
+      flex: 1;
+      border: 1px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .soil-ai-text-input:focus {
+      border-color: #16a34a;
+      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.15);
+    }
+    .soil-ai-send-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #166534;
+      color: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .soil-ai-send-btn:hover {
+      background: #14532d;
+    }
+    .soil-ai-send-btn:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
     /* Mobile Responsive Rules */
     @media (max-width: 768px) {
       .nav-brand-sub { display: none; }
@@ -1452,6 +1759,16 @@
       }
       .share-toast.show {
         transform: translateX(-50%) translateY(0) !important;
+      }
+
+      .soil-ai-dock {
+        left: 8px !important;
+        right: 8px !important;
+        width: auto !important;
+        bottom: 62px !important;
+        height: 72vh !important;
+        max-height: calc(100vh - 120px) !important;
+        border-radius: 16px !important;
       }
     }
   </style>
@@ -1782,6 +2099,66 @@
     <div id="ndvi-chart-container" class="profile-chart-container" style="min-height: 160px;"></div>
   </div>
 
+  <!-- Floating Conversational Soil AI Assistant Dock -->
+  <div id="soil-ai-dock" class="soil-ai-dock">
+    <div class="soil-ai-header">
+      <div class="soil-ai-header-left">
+        <div class="soil-ai-avatar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+          <span class="soil-ai-status-dot"></span>
+        </div>
+        <div>
+          <div class="soil-ai-title">Assistant Pédologue IA</div>
+          <div class="soil-ai-subtitle">Identification guidée du sol</div>
+        </div>
+      </div>
+      <div class="soil-ai-header-right">
+        <button id="btn-soil-ai-settings" class="soil-ai-icon-btn" type="button" title="Configurer la clé API OpenAI">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+        <button id="btn-soil-ai-reset" class="soil-ai-icon-btn" type="button" title="Réinitialiser la conversation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+        </button>
+        <button id="btn-soil-ai-close" class="soil-ai-icon-btn" type="button" aria-label="Fermer l'assistant">&times;</button>
+      </div>
+    </div>
+
+    <!-- Active Context Strip -->
+    <div id="soil-ai-context-strip" class="soil-ai-context-strip" style="display:none;">
+      <span class="context-pin">📍</span>
+      <span id="soil-ai-context-text">Point sélectionné</span>
+    </div>
+
+    <!-- Key Settings Panel (collapsible) -->
+    <div id="soil-ai-key-panel" class="soil-ai-key-panel" style="display:none;">
+      <div style="font-weight: 600; margin-bottom: 4px; color: #0f172a;">Clé API OpenAI</div>
+      <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">
+        Entrez votre clé OpenAI (<code>sk-...</code>). Elle est conservée uniquement dans votre navigateur (localStorage).
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <input type="password" id="input-openai-key" class="soil-ai-text-input" placeholder="sk-..." />
+        <button id="btn-save-openai-key" class="profile-dock-btn" type="button" style="background:#166534; color:#fff; border-color:#15803d; font-weight:700;">Enregistrer</button>
+      </div>
+      <div id="soil-ai-key-status" style="font-size: 11px; margin-top: 5px;"></div>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="soil-ai-messages" class="soil-ai-messages">
+      <!-- Dynamic messages injected here -->
+    </div>
+
+    <!-- Quick Reply Chips Container -->
+    <div id="soil-ai-quick-replies" class="soil-ai-quick-replies"></div>
+
+    <!-- Input Footer -->
+    <form id="soil-ai-form" class="soil-ai-footer">
+      <input type="text" id="soil-ai-user-input" class="soil-ai-text-input" placeholder="Répondez ou décrivez votre sol..." autocomplete="off" />
+      <button type="submit" id="soil-ai-send-btn" class="soil-ai-send-btn" title="Envoyer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+  </div>
+
   <!-- Floating Quick Profile Toolbar on Map -->
   <div id="map-profile-toolbar" class="map-profile-toolbar">
     <button id="btn-quick-profile" class="floating-profile-btn" type="button" title="Tracer une coupe topographique (cliquez sur la carte, double-clic ou clic droit pour calculer)">
@@ -1799,6 +2176,11 @@
     <button id="btn-quick-ndvi" class="floating-profile-btn btn-ndvi-mode" type="button" title="Activer l'analyse NDVI Sentinel-2 (cliquez sur une parcelle ou n'importe où sur la carte)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
       <span id="ndvi-btn-text">NDVI Sentinel-2</span>
+    </button>
+    <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 1px;"></div>
+    <button id="btn-quick-ai" class="floating-profile-btn btn-ai-mode" type="button" title="Ouvrir l'Assistant Pédologue IA pour identifier vos sols">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <span>Pédologue IA</span>
     </button>
   </div>
 
@@ -3214,10 +3596,535 @@
       }
     }
 
+    // BDPPAD FlatGeobuf Crop History Loader (2003-2026)
+    async function loadCropHistory(lngLat, popupDom) {
+      const container = popupDom ? popupDom.querySelector(".popup-crop-history") : null;
+      if (!container) return;
+
+      const badgeEl = container.querySelector(".crop-history-badge");
+      const contentEl = container.querySelector(".crop-history-content");
+
+      if (typeof window.flatgeobuf === "undefined" || !window.flatgeobuf.geojson) {
+        if (badgeEl) badgeEl.textContent = "FlatGeobuf non chargé";
+        if (contentEl) contentEl.innerHTML = `<span style="color:#64748b; font-size:11px;">Module FlatGeobuf non disponible.</span>`;
+        return;
+      }
+
+      const url = "https://storage.googleapis.com/geoqc/BDPPAD/bdppad.fgb";
+      const delta = 0.00003;
+      const bbox = {
+        minX: lngLat.lng - delta,
+        minY: lngLat.lat - delta,
+        maxX: lngLat.lng + delta,
+        maxY: lngLat.lat + delta
+      };
+
+      try {
+        const iter = window.flatgeobuf.geojson.deserialize(url, bbox);
+        const cropsByYear = new Map();
+
+        for await (const feature of iter) {
+          if (!feature || !feature.properties) continue;
+          const props = feature.properties;
+          const yr = props.annee || props.ANNEE || props.year || props.YEAR || props.an || props.AN;
+          const crop = props.DESCODPR1 || props.descodpr1 || props.culture || props.CULTURE || props.crop || props.CROP;
+          if (yr && crop) {
+            const yrInt = parseInt(yr, 10);
+            if (!isNaN(yrInt) && !cropsByYear.has(yrInt)) {
+              cropsByYear.set(yrInt, {
+                year: yrInt,
+                crop: String(crop).trim()
+              });
+            }
+          }
+        }
+
+        const sorted = Array.from(cropsByYear.values()).sort((a, b) => b.year - a.year);
+        if (sorted.length === 0) {
+          if (badgeEl) badgeEl.textContent = "0 trouvée";
+          if (contentEl) contentEl.innerHTML = `<div style="color:#64748b; font-style:italic; padding:3px 0;">Aucune déclaration historique trouvée sous ce point.</div>`;
+          return;
+        }
+
+        if (badgeEl) badgeEl.textContent = `${sorted.length} saisons`;
+        let rowsHtml = '<div class="crop-history-list">';
+        for (const item of sorted) {
+          let badgeColor = "#166534";
+          let badgeBg = "#f0fdf4";
+          const cLower = item.crop.toLowerCase();
+          if (cLower.includes("maïs") || cLower.includes("mais")) {
+            badgeColor = "#854d0e"; badgeBg = "#fefce8";
+          } else if (cLower.includes("soya")) {
+            badgeColor = "#15803d"; badgeBg = "#dcfce7";
+          } else if (cLower.includes("blé") || cLower.includes("orge") || cLower.includes("avoine") || cLower.includes("céréale")) {
+            badgeColor = "#b45309"; badgeBg = "#fffbeb";
+          } else if (cLower.includes("foin") || cLower.includes("prairie") || cLower.includes("pâturage")) {
+            badgeColor = "#047857"; badgeBg = "#ecfdf5";
+          }
+          rowsHtml += `
+            <div class="crop-history-item">
+              <span style="font-weight:700; color:#334155; font-family:var(--font-mono, monospace);">${item.year}</span>
+              <span style="font-weight:600; color:${badgeColor}; background:${badgeBg}; padding:1.5px 6px; border-radius:4px;">${item.crop}</span>
+            </div>
+          `;
+        }
+        rowsHtml += '</div>';
+        if (contentEl) contentEl.innerHTML = rowsHtml;
+      } catch (err) {
+        console.warn("FGB crop history query note:", err);
+        if (badgeEl) badgeEl.textContent = "FGB en cours";
+        if (contentEl) {
+          contentEl.innerHTML = `
+            <div style="color: #64748b; font-size: 10.5px; line-height: 1.4; padding: 2px 0;">
+              <em>Fichier <code>bdppad.fgb</code> en cours de téléversement sur le stockage Google Cloud. Dès qu'il sera déployé, l'historique 2003–2026 s'affichera ici automatiquement.</em>
+            </div>
+          `;
+        }
+      }
+    }
+
+    // Conversational Soil AI Assistant (Identification Guidée du Sol)
+    class SoilAiAssistant {
+      constructor(mapInstance) {
+        this.map = mapInstance;
+        this.isOpen = false;
+        this.messages = [];
+        this.currentContext = null;
+        this.isWaitingResponse = false;
+        this.apiKey = localStorage.getItem("pedo_openai_key") || "";
+        this.dockEl = document.getElementById("soil-ai-dock");
+        this.messagesEl = document.getElementById("soil-ai-messages");
+        this.quickRepliesEl = document.getElementById("soil-ai-quick-replies");
+        this.keyPanelEl = document.getElementById("soil-ai-key-panel");
+        this.contextStripEl = document.getElementById("soil-ai-context-strip");
+        this.contextTextEl = document.getElementById("soil-ai-context-text");
+        this.keyInputEl = document.getElementById("input-openai-key");
+        this.keyStatusEl = document.getElementById("soil-ai-key-status");
+        this.userInputEl = document.getElementById("soil-ai-user-input");
+        this.formEl = document.getElementById("soil-ai-form");
+        this.marker = null;
+
+        this.initListeners();
+        if (this.apiKey && this.keyInputEl) {
+          this.keyInputEl.value = this.apiKey;
+        }
+      }
+
+      initListeners() {
+        const btnClose = document.getElementById("btn-soil-ai-close");
+        const btnSettings = document.getElementById("btn-soil-ai-settings");
+        const btnReset = document.getElementById("btn-soil-ai-reset");
+        const btnSaveKey = document.getElementById("btn-save-openai-key");
+
+        if (btnClose) btnClose.addEventListener("click", () => this.close());
+        if (btnSettings) {
+          btnSettings.addEventListener("click", () => {
+            if (this.keyPanelEl) {
+              const isShown = this.keyPanelEl.style.display !== "none";
+              this.keyPanelEl.style.display = isShown ? "none" : "block";
+            }
+          });
+        }
+        if (btnReset) {
+          btnReset.addEventListener("click", () => {
+            if (this.currentContext) {
+              this.startDiagnosis(this.currentContext);
+            } else {
+              this.renderWelcome();
+            }
+          });
+        }
+        if (btnSaveKey && this.keyInputEl) {
+          btnSaveKey.addEventListener("click", () => {
+            const val = this.keyInputEl.value.trim();
+            if (val) {
+              this.apiKey = val;
+              localStorage.setItem("pedo_openai_key", val);
+              if (this.keyStatusEl) {
+                this.keyStatusEl.innerHTML = `<span style="color:#16a34a; font-weight:600;">✓ Clé enregistrée avec succès !</span>`;
+              }
+              setTimeout(() => {
+                if (this.keyPanelEl) this.keyPanelEl.style.display = "none";
+                if (this.currentContext && this.messages.length === 0) {
+                  this.startDiagnosis(this.currentContext);
+                }
+              }, 600);
+            } else {
+              this.apiKey = "";
+              localStorage.removeItem("pedo_openai_key");
+              if (this.keyStatusEl) {
+                this.keyStatusEl.innerHTML = `<span style="color:#dc2626;">Clé supprimée.</span>`;
+              }
+            }
+          });
+        }
+
+        if (this.formEl) {
+          this.formEl.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const text = this.userInputEl ? this.userInputEl.value.trim() : "";
+            if (text && !this.isWaitingResponse) {
+              this.sendMessage(text);
+              if (this.userInputEl) this.userInputEl.value = "";
+            }
+          });
+        }
+      }
+
+      open() {
+        if (!this.dockEl) return;
+        this.dockEl.classList.add("open");
+        this.isOpen = true;
+        if (!this.currentContext && this.messages.length === 0) {
+          this.renderWelcome();
+        }
+      }
+
+      close() {
+        if (!this.dockEl) return;
+        this.dockEl.classList.remove("open");
+        this.isOpen = false;
+        if (this.marker) {
+          this.marker.remove();
+          this.marker = null;
+        }
+      }
+
+      openWithContext(lngLat, pedoProps = null, parcelProps = null) {
+        this.open();
+        const context = this.gatherContext(lngLat, pedoProps, parcelProps);
+        this.startDiagnosis(context);
+      }
+
+      gatherContext(lngLat, pedoProps, parcelProps) {
+        const radiusMeters = 50;
+        const deltaLat = radiusMeters / 111320;
+        const deltaLng = radiusMeters / (111320 * Math.cos(lngLat.lat * Math.PI / 180));
+
+        const p1 = this.map.project([lngLat.lng - deltaLng, lngLat.lat - deltaLat]);
+        const p2 = this.map.project([lngLat.lng + deltaLng, lngLat.lat + deltaLat]);
+
+        const bbox = [
+          [Math.min(p1.x, p2.x), Math.min(p1.y, p2.y)],
+          [Math.max(p1.x, p2.x), Math.max(p1.y, p2.y)]
+        ];
+
+        let nearbyPedoFeatures = [];
+        try {
+          nearbyPedoFeatures = this.map.queryRenderedFeatures(bbox, { layers: ["pedologie-fill"] });
+        } catch (e) {
+          nearbyPedoFeatures = [];
+        }
+
+        const primarySeries = [];
+        let studyTitle = "";
+        let studyYear = "";
+        let appellation = "";
+        let region = "";
+
+        if (pedoProps) {
+          const rawEtude = String(pedoProps.No_etude || pedoProps.etude_code || "").trim();
+          let cleanEtudeCode = rawEtude.replace(/^0+/, "");
+          const studyInfo = (typeof STUDY_NAMES !== "undefined")
+            ? (STUDY_NAMES[rawEtude] || STUDY_NAMES[cleanEtudeCode] || STUDY_NAMES[rawEtude.padStart(2, "0")])
+            : null;
+          studyTitle = studyInfo ? studyInfo.title : (rawEtude ? "Étude nº " + rawEtude : "Étude pédologique");
+          studyYear = studyInfo ? studyInfo.year : "";
+          appellation = (pedoProps.Appellation_cartographique || "").trim();
+          region = (pedoProps.Nom_region || pedoProps.nom_region || "").trim();
+
+          for (let i = 1; i <= 4; i++) {
+            const desc = (pedoProps["s" + i + "_desc"] || "").trim();
+            const pct = parseFloat(pedoProps["s" + i + "_pct"]);
+            if (desc && !isNaN(pct) && pct > 0) {
+              primarySeries.push({ name: desc, pct: Math.round(pct) });
+            }
+          }
+        }
+
+        const nearbySeriesMap = new Map();
+        nearbyPedoFeatures.forEach(feat => {
+          const fp = feat.properties;
+          if (!fp) return;
+          for (let i = 1; i <= 4; i++) {
+            const desc = (fp["s" + i + "_desc"] || "").trim();
+            const pct = parseFloat(fp["s" + i + "_pct"]);
+            if (desc && !isNaN(pct) && pct > 0) {
+              if (!primarySeries.some(s => s.name === desc)) {
+                nearbySeriesMap.set(desc, Math.round(pct));
+              }
+            }
+          }
+        });
+
+        const nearbySeries = Array.from(nearbySeriesMap.entries()).map(([name, pct]) => ({ name, pct }));
+
+        return {
+          lngLat,
+          studyTitle,
+          studyYear,
+          appellation,
+          region,
+          primarySeries,
+          nearbySeries,
+          parcelProps
+        };
+      }
+
+      renderWelcome() {
+        if (!this.messagesEl) return;
+        this.messagesEl.innerHTML = `
+          <div style="text-align: center; padding: 20px 10px; color: #64748b;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: #f0fdf4; color: #166534; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            </div>
+            <h4 style="margin: 0 0 6px 0; color: #0f172a; font-size: 14px;">Assistant Pédologue IA</h4>
+            <p style="margin: 0 0 16px 0; font-size: 12px; line-height: 1.5;">
+              Cliquez sur un polygone pédologique ou une parcelle sur la carte pour lancer l'identification guidée de votre sol.
+            </p>
+            ${!this.apiKey ? `
+              <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 10px; padding: 12px; text-align: left;">
+                <div style="font-weight: 700; color: #854d0e; font-size: 12px; margin-bottom: 4px;">🔑 Clé API OpenAI requise</div>
+                <div style="font-size: 11px; color: #713f12; margin-bottom: 8px;">Entrez votre clé pour activer l'assistant :</div>
+                <div style="display:flex; gap:6px;">
+                  <input type="password" id="welcome-key-input" class="soil-ai-text-input" placeholder="sk-..." style="background:#fff;" />
+                  <button id="welcome-key-btn" class="profile-dock-btn" type="button" style="background:#166534; color:#fff; border-color:#15803d; font-weight:700;">OK</button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+
+        const welcomeBtn = document.getElementById("welcome-key-btn");
+        const welcomeInput = document.getElementById("welcome-key-input");
+        if (welcomeBtn && welcomeInput) {
+          welcomeBtn.addEventListener("click", () => {
+            const k = welcomeInput.value.trim();
+            if (k) {
+              this.apiKey = k;
+              localStorage.setItem("pedo_openai_key", k);
+              if (this.keyInputEl) this.keyInputEl.value = k;
+              this.renderWelcome();
+            }
+          });
+        }
+      }
+
+      startDiagnosis(context) {
+        this.currentContext = context;
+        this.messages = [];
+        if (this.quickRepliesEl) this.quickRepliesEl.innerHTML = "";
+        if (this.messagesEl) this.messagesEl.innerHTML = "";
+
+        if (this.marker) this.marker.remove();
+        const el = document.createElement("div");
+        el.innerHTML = '<div style="width:18px;height:18px;border-radius:50%;background:#16a34a;border:2.5px solid #fff;box-shadow:0 0 12px rgba(22,163,74,0.7);"></div>';
+        this.marker = new maplibregl.Marker({ element: el })
+          .setLngLat([context.lngLat.lng, context.lngLat.lat])
+          .addTo(this.map);
+
+        if (this.contextStripEl && this.contextTextEl) {
+          this.contextStripEl.style.display = "flex";
+          const seriesCount = context.primarySeries.length + context.nearbySeries.length;
+          this.contextTextEl.textContent = `${context.appellation || 'Secteur'} • ${seriesCount} série(s) candidates (rayon 50m)`;
+        }
+
+        if (!this.apiKey) {
+          this.renderWelcome();
+          if (this.keyPanelEl) this.keyPanelEl.style.display = "block";
+          return;
+        }
+
+        const systemPrompt = this.buildSystemPrompt(context);
+        this.messages.push({ role: "system", content: systemPrompt });
+
+        this.messages.push({
+          role: "user",
+          content: "Bonjour ! Je me trouve sur ce point. Peux-tu analyser les types de sols possibles dans ce polygone et à moins de 50 m, et me poser les questions pour identifier le bon sol ?"
+        });
+
+        this.callOpenAi();
+      }
+
+      buildSystemPrompt(context) {
+        const primaryStr = context.primarySeries.length > 0
+          ? context.primarySeries.map(s => `- **${s.name}** (~${s.pct}% du polygone cartographique)`).join(String.fromCharCode(10))
+          : "- Séries non détaillées dans ce polygone.";
+
+        const nearbyStr = context.nearbySeries.length > 0
+          ? context.nearbySeries.map(s => `- **${s.name}** (~${s.pct}%, présent dans les polygones voisins à moins de 50 mètres)`).join(String.fromCharCode(10))
+          : "- Aucune autre série majeure trouvée à moins de 50 mètres.";
+
+        const parcelStr = context.parcelProps
+          ? `Parcelle BDPPAD nº ${context.parcelProps.IDPAR || context.parcelProps.idpar || ''}, Culture déclarée : ${context.parcelProps.DESCODPR1 || context.parcelProps.descodpr1 || 'Inconnue'}`
+          : "Hors parcelle agricole déclarée";
+
+        return `Tu es un pédologue expert et agronome chevronné du Québec, chaleureux, scientifique et pragmatique sur le terrain.
+
+CONTEXTE GÉOGRAPHIQUE DU POINT ANALYSÉ :
+- Coordonnées : [${context.lngLat.lat.toFixed(5)}°N, ${Math.abs(context.lngLat.lng).toFixed(5)}°O]
+- Région : ${context.region || 'Québec'}
+- Étude pédologique : ${context.studyTitle} ${context.studyYear ? `(${context.studyYear})` : ''}
+- Appellation cartographique : ${context.appellation || 'N/A'}
+- Données agricoles : ${parcelStr}
+
+SÉRIES DE SOLS DU POLYGONE :
+${primaryStr}
+
+SÉRIES DE SOLS VOISINES DANS UN RAYON DE 50 MÈTRES :
+${nearbyStr}
+
+OBJECTIF :
+Guider l'observateur pas à pas pour déterminer quelle série de sol exacte se trouve sous ses pieds parmi les candidates (polygone + voisinage 50 m).
+
+DIRECTIVES TRÈS STRICTES :
+1. Reste concis (140 à 220 mots maximum par intervention).
+2. Pour chaque étape :
+   - Explique brièvement en quoi les séries candidates diffèrent.
+   - Pose UNE SEULE question concrète et facile à tester sur le terrain sans outil complexe (ex: texture tactile en humectant la terre, présence de cailloux/pierres, couleur/marbrures de rouille sous 20-30 cm, position topographique).
+3. À la TOUTE FIN de ton message, ajoute TOUJOURS une ligne avec 2 à 4 choix de réponses sous le format exact suivant :
+OPTIONS: [Choix 1 | Choix 2 | Choix 3]
+4. Quand les réponses permettent de trancher, annonce clairement le nom de la série de sol identifiée, ses caractéristiques de texture, son drainage naturel et son potentiel agronomique au Québec.`;
+      }
+
+      async callOpenAi() {
+        this.isWaitingResponse = true;
+        this.showTypingIndicator();
+
+        try {
+          const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${this.apiKey}`
+            },
+            body: JSON.stringify({
+              model: "gpt-4o-mini",
+              messages: this.messages,
+              temperature: 0.6,
+              max_tokens: 700
+            })
+          });
+
+          this.removeTypingIndicator();
+
+          if (!resp.ok) {
+            const errData = await resp.json().catch(() => ({}));
+            throw new Error(errData.error ? errData.error.message : `Erreur OpenAI (${resp.status})`);
+          }
+
+          const data = await resp.json();
+          const assistantText = data.choices && data.choices[0] && data.choices[0].message
+            ? data.choices[0].message.content
+            : "Désolé, aucune réponse générée.";
+
+          this.messages.push({ role: "assistant", content: assistantText });
+          this.renderAssistantMessage(assistantText);
+        } catch (err) {
+          this.removeTypingIndicator();
+          console.error("OpenAI call error:", err);
+          this.renderErrorMessage(err.message);
+        } finally {
+          this.isWaitingResponse = false;
+        }
+      }
+
+      sendMessage(userText) {
+        this.messages.push({ role: "user", content: userText });
+        this.renderUserMessage(userText);
+        if (this.quickRepliesEl) this.quickRepliesEl.innerHTML = "";
+        this.callOpenAi();
+      }
+
+      renderAssistantMessage(rawText) {
+        if (!this.messagesEl) return;
+
+        let displayText = rawText;
+        let options = [];
+        const optMatch = rawText.match(/OPTIONS:\s*\[(.*?)\]/i);
+        if (optMatch) {
+          displayText = rawText.replace(optMatch[0], "").trim();
+          options = optMatch[1].split("|").map(s => s.trim()).filter(Boolean);
+        }
+
+        const htmlContent = (typeof marked !== "undefined" && marked.parse)
+          ? marked.parse(displayText)
+          : ("<p>" + displayText.split(String.fromCharCode(10, 10)).join("</p><p>") + "</p>");
+
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "soil-ai-msg assistant";
+        msgDiv.innerHTML = htmlContent;
+        this.messagesEl.appendChild(msgDiv);
+        this.scrollToBottom();
+
+        if (this.quickRepliesEl) {
+          this.quickRepliesEl.innerHTML = "";
+          if (options.length > 0) {
+            options.forEach(opt => {
+              const btn = document.createElement("button");
+              btn.className = "soil-ai-chip";
+              btn.type = "button";
+              btn.textContent = opt;
+              btn.addEventListener("click", () => {
+                this.sendMessage(opt);
+              });
+              this.quickRepliesEl.appendChild(btn);
+            });
+          }
+        }
+      }
+
+      renderUserMessage(text) {
+        if (!this.messagesEl) return;
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "soil-ai-msg user";
+        msgDiv.textContent = text;
+        this.messagesEl.appendChild(msgDiv);
+        this.scrollToBottom();
+      }
+
+      renderErrorMessage(errMsg) {
+        if (!this.messagesEl) return;
+        const div = document.createElement("div");
+        div.className = "soil-ai-msg assistant";
+        div.style.borderColor = "#fca5a5";
+        div.style.background = "#fef2f2";
+        div.innerHTML = `
+          <div style="color:#b91c1c; font-weight:700; font-size:12px; margin-bottom:4px;">Erreur OpenAI</div>
+          <div style="font-size:11.5px; color:#7f1d1d; margin-bottom:8px;">${errMsg}</div>
+          <button type="button" class="profile-dock-btn" style="background:#fee2e2; border-color:#fca5a5; color:#991b1b; font-weight:600;" onclick="document.getElementById('btn-soil-ai-settings').click()">Vérifier ma clé API</button>
+        `;
+        this.messagesEl.appendChild(div);
+        this.scrollToBottom();
+      }
+
+      showTypingIndicator() {
+        if (!this.messagesEl) return;
+        const div = document.createElement("div");
+        div.id = "soil-ai-typing-indicator";
+        div.className = "soil-ai-typing";
+        div.innerHTML = `<span></span><span></span><span></span>`;
+        this.messagesEl.appendChild(div);
+        this.scrollToBottom();
+      }
+
+      removeTypingIndicator() {
+        const el = document.getElementById("soil-ai-typing-indicator");
+        if (el) el.remove();
+      }
+
+      scrollToBottom() {
+        if (this.messagesEl) {
+          this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+        }
+      }
+    }
+
     let topoManager = null;
     let contourManager = null;
     let profileManager = null;
     let ndviManager = null;
+    let soilAiAssistant = null;
 
     map.on("load", () => {
       // 1. Google Hybrid Raster Source
@@ -3427,6 +4334,9 @@
       ndviManager.initYearSelect();
       ndviManager.syncStretchUi();
 
+      // Instantiate Soil AI Assistant
+      soilAiAssistant = new SoilAiAssistant(map);
+
       // Map click handler for transect line drawing & NDVI mode
       map.on("click", (e) => {
         if (ndviManager && ndviManager.isActiveMode) {
@@ -3541,6 +4451,15 @@
                 ${supStr ? `<span style="font-weight: 700; color: #1e293b;">${supStr}</span>` : ''}
               </div>
               ${crop ? `<div style="color: #334155; margin-top: 3px;">Culture : <strong>${crop}</strong>${group ? ` <span style="color:#64748b;">(${group})</span>` : ''}</div>` : ''}
+              <div class="popup-crop-history">
+                <div class="crop-history-header">
+                  <span>📜 Historique des cultures (2003–2026)</span>
+                  <span class="crop-history-badge">Chargement...</span>
+                </div>
+                <div class="crop-history-content">
+                  <div style="color: #64748b; font-size: 11px; padding: 2px 0;">Interrogation de bdppad.fgb...</div>
+                </div>
+              </div>
             </div>
           `;
         }
@@ -3624,6 +4543,10 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
                 <span>🌿 Évolution NDVI annuelle (Sentinel-2)</span>
               </button>
+              <button id="btn-popup-ai-identify" type="button" class="btn-popup-ai">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><circle cx="9" cy="10" r="1" fill="currentColor"></circle><circle cx="12" cy="10" r="1" fill="currentColor"></circle><circle cx="15" cy="10" r="1" fill="currentColor"></circle></svg>
+                <span>💬 Identifier mon type de sol (Assistant IA)</span>
+              </button>
             </div>
           </div>
         `;
@@ -3644,6 +4567,24 @@
             }
             if (ndviManager) ndviManager.analyzeLocation(e.lngLat, pProps);
           });
+        }
+
+        const btnAiInPopup = popupDom ? popupDom.querySelector("#btn-popup-ai-identify") : null;
+        if (btnAiInPopup) {
+          btnAiInPopup.addEventListener("click", () => {
+            popup.remove();
+            let pProps = null;
+            if (parcelFeatures && parcelFeatures.length > 0) {
+              pProps = parcelFeatures[0].properties;
+            }
+            if (soilAiAssistant) {
+              soilAiAssistant.openWithContext(e.lngLat, p, pProps);
+            }
+          });
+        }
+
+        if (parcelFeatures && parcelFeatures.length > 0) {
+          loadCropHistory(e.lngLat, popupDom);
         }
       });
 
@@ -3681,9 +4622,22 @@
                 ${supStr ? `<div>Superficie : <strong>${supStr}</strong></div>` : ''}
                 <div style="margin-top: 8px; color: #64748b; font-size: 0.74rem;">Base de Données des Parcelles Agricoles Déclarées (BDPPAD)</div>
               </div>
+              <div class="popup-crop-history" style="margin-top: 10px;">
+                <div class="crop-history-header">
+                  <span>📜 Historique des cultures (2003–2026)</span>
+                  <span class="crop-history-badge">Chargement...</span>
+                </div>
+                <div class="crop-history-content">
+                  <div style="color: #64748b; font-size: 11px; padding: 2px 0;">Interrogation de bdppad.fgb...</div>
+                </div>
+              </div>
               <button id="btn-parcel-popup-ndvi" type="button" class="btn-popup-ndvi">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
                 <span>🌿 Évolution NDVI annuelle (Sentinel-2)</span>
+              </button>
+              <button id="btn-parcel-popup-ai" type="button" class="btn-popup-ai">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><circle cx="9" cy="10" r="1" fill="currentColor"></circle><circle cx="12" cy="10" r="1" fill="currentColor"></circle><circle cx="15" cy="10" r="1" fill="currentColor"></circle></svg>
+                <span>💬 Identifier mon type de sol (Assistant IA)</span>
               </button>
             </div>
           </div>
@@ -3701,6 +4655,17 @@
             if (ndviManager) ndviManager.analyzeLocation(e.lngLat, pf);
           });
         }
+        const btnAiInParcelPopup = popupDom ? popupDom.querySelector("#btn-parcel-popup-ai") : null;
+        if (btnAiInParcelPopup) {
+          btnAiInParcelPopup.addEventListener("click", () => {
+            popup.remove();
+            if (soilAiAssistant) {
+              soilAiAssistant.openWithContext(e.lngLat, null, pf);
+            }
+          });
+        }
+
+        loadCropHistory(e.lngLat, popupDom);
       });
     });
 
@@ -4009,6 +4974,19 @@
     if (btnQuickNdvi) {
       btnQuickNdvi.addEventListener("click", () => {
         if (ndviManager) ndviManager.toggleMode();
+      });
+    }
+
+    const btnQuickAi = document.getElementById("btn-quick-ai");
+    if (btnQuickAi) {
+      btnQuickAi.addEventListener("click", () => {
+        if (soilAiAssistant) {
+          if (soilAiAssistant.isOpen) {
+            soilAiAssistant.close();
+          } else {
+            soilAiAssistant.open();
+          }
+        }
       });
     }
 
