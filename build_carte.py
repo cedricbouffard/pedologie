@@ -1256,9 +1256,66 @@ html_template = """<!DOCTYPE html>
       transform: translateX(-50%) translateY(0);
     }
 
+    /* Tabbed Popup Navigation */
+    .popup-tabs-header {
+      display: flex;
+      align-items: stretch;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 3px 36px 0 6px;
+      gap: 3px;
+    }
+    .popup-tab-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 6px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .popup-tab-btn:hover {
+      color: #0f172a;
+      background: rgba(226, 232, 240, 0.6);
+    }
+    .popup-tab-btn.active {
+      color: #0f172a;
+      background: #ffffff;
+      border-bottom: 2px solid #0f172a;
+      font-weight: 700;
+    }
+    .popup-tab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #16a34a;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .popup-tab-pane {
+      display: none;
+      padding: 13px 15px 15px 15px;
+      font-size: 12px;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .popup-tab-pane.active {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     /* Soil Identifier Popup Button */
     .btn-popup-ai {
-      margin-top: 8px;
       width: 100%;
       display: flex;
       align-items: center;
@@ -1280,9 +1337,30 @@ html_template = """<!DOCTYPE html>
       border-color: #334155;
     }
 
+    /* NDVI Popup Action Button */
+    .btn-popup-ndvi {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 12px;
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #86efac;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .btn-popup-ndvi:hover {
+      background: #dcfce7;
+      border-color: #4ade80;
+    }
+
     /* Crop History in Popup */
     .popup-crop-history {
-      margin-top: 10px;
       padding: 8px 10px;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
@@ -1302,8 +1380,16 @@ html_template = """<!DOCTYPE html>
       align-items: center;
       gap: 5px;
     }
+    .crop-history-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748b;
+      background: #e2e8f0;
+      padding: 1.5px 6px;
+      border-radius: 4px;
+    }
     .crop-history-list {
-      max-height: 130px;
+      max-height: 180px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -1313,7 +1399,7 @@ html_template = """<!DOCTYPE html>
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 2.5px 4px;
+      padding: 3px 5px;
       border-bottom: 1px dashed #e2e8f0;
       font-size: 11px;
     }
@@ -2119,7 +2205,7 @@ html_template = """<!DOCTYPE html>
     <!-- Active date banner & layer controls -->
     <div id="ndvi-active-controls" class="ndvi-active-controls" style="display: none;">
       <div class="ndvi-header-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
-        <div class="ndvi-date-badge" id="ndvi-selected-date-badge">📅 Date sélectionnée : —</div>
+        <div class="ndvi-date-badge" id="ndvi-selected-date-badge">Date sélectionnée : —</div>
         <div class="ndvi-nav-buttons">
           <button id="btn-ndvi-prev" class="ndvi-nav-btn" type="button" title="Acquisition précédente">&larr; Précédente</button>
           <button id="btn-ndvi-next" class="ndvi-nav-btn" type="button" title="Acquisition suivante">Suivante &rarr;</button>
@@ -2148,7 +2234,7 @@ html_template = """<!DOCTYPE html>
             <input type="range" id="ndvi-stretch-max" min="20" max="100" step="5" value="85" class="slider" style="width: 60px;" title="Borne maximale (vert)" />
             <span id="ndvi-stretch-max-val" class="val-badge">0.85</span>
 
-            <button id="btn-ndvi-auto-stretch" class="profile-dock-btn" type="button" title="Ajuster automatiquement les bornes pour révéler les variations intra-parcelle" style="padding: 2px 8px; color: #166534; font-weight: 700; background: #dcfce7; border-color: #86efac; cursor: pointer;">⚡ Auto</button>
+            <button id="btn-ndvi-auto-stretch" class="profile-dock-btn" type="button" title="Ajuster automatiquement les bornes pour révéler les variations intra-parcelle" style="padding: 2px 8px; color: #166534; font-weight: 700; background: #dcfce7; border-color: #86efac; cursor: pointer;">Auto</button>
           </div>
         </div>
 
@@ -2248,11 +2334,6 @@ html_template = """<!DOCTYPE html>
     <button id="btn-quick-ndvi" class="floating-profile-btn btn-ndvi-mode" type="button" title="Activer l'analyse NDVI Sentinel-2 (cliquez sur une parcelle ou n'importe où sur la carte)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
       <span id="ndvi-btn-text">NDVI Sentinel-2</span>
-    </button>
-    <div style="width: 1px; height: 18px; background: #cbd5e1; margin: 0 1px;"></div>
-    <button id="btn-quick-ai" class="floating-profile-btn btn-ai-mode" type="button" title="Ouvrir la clé de diagnostic pédologique pour identifier vos sols">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
-      <span>Diagnostic sol</span>
     </button>
   </div>
 
@@ -3261,7 +3342,7 @@ html_template = """<!DOCTYPE html>
         }
 
         if (statsBar) {
-          statsBar.innerHTML = `<span class="stat-chip">⏳ Recherche des scènes Sentinel-2 L2A pour la saison ${this.selectedYear} (mars &rarr; déc.)...</span>`;
+          statsBar.innerHTML = `<span class="stat-chip">Recherche des scènes Sentinel-2 L2A pour la saison ${this.selectedYear} (mars &rarr; déc.)...</span>`;
         }
         if (container) {
           container.innerHTML = `
@@ -3328,7 +3409,7 @@ html_template = """<!DOCTYPE html>
           );
 
           if (statsBar) {
-            statsBar.innerHTML = `<span class="stat-chip">🛰️ ${uniqueItems.length} passages candidats (${yr}) • Filtrage nuages SCL en cours (0/${uniqueItems.length})...</span>`;
+            statsBar.innerHTML = `<span class="stat-chip">${uniqueItems.length} passages candidats (${yr}) • Filtrage nuages SCL en cours (0/${uniqueItems.length})...</span>`;
           }
 
           const sampled = [];
@@ -3396,7 +3477,7 @@ html_template = """<!DOCTYPE html>
             }
             completed += batch.length;
             if (statsBar) {
-              statsBar.innerHTML = `<span class="stat-chip">🛰️ Filtrage des nuages SCL (${Math.min(completed, uniqueItems.length)}/${uniqueItems.length}) • ${sampled.length} retenus, ${cloudFilteredCount} nuageux...</span>`;
+              statsBar.innerHTML = `<span class="stat-chip">Filtrage des nuages SCL (${Math.min(completed, uniqueItems.length)}/${uniqueItems.length}) • ${sampled.length} retenus, ${cloudFilteredCount} nuageux...</span>`;
             }
           }
 
@@ -3421,7 +3502,7 @@ html_template = """<!DOCTYPE html>
               <span class="stat-chip" style="background:#dcfce7; border-color:#86efac; color:#14532d;">Pic estival : <strong>${maxNdvi.toFixed(2)}</strong> (${this.series[peakIdx].dateKey})</span>
               <span class="stat-chip">Dernier NDVI : <strong>${latest.ndvi.toFixed(2)}</strong> (${latest.dateKey})</span>
               <span class="stat-chip">Observations claires : <strong>${this.series.length} dates</strong></span>
-              ${cloudFilteredCount > 0 ? `<span class="stat-chip" style="color:#475569;" title="Passages éliminés car le pixel était sous un nuage, une ombre de nuage ou de la neige (SCL)">☁️ ${cloudFilteredCount} passages nuageux éliminés (SCL)</span>` : ''}
+              ${cloudFilteredCount > 0 ? `<span class="stat-chip" style="color:#475569;" title="Passages éliminés car le pixel était sous un nuage, une ombre de nuage ou de la neige (SCL)">Masque SCL : ${cloudFilteredCount} passages nuageux éliminés</span>` : ''}
             `;
           }
 
@@ -3448,7 +3529,7 @@ html_template = """<!DOCTYPE html>
 
         if (controlsRow) controlsRow.style.display = "flex";
         if (badge) {
-          badge.innerHTML = `📅 <strong>${scene.dateKey}</strong> &bull; NDVI : <strong>${scene.ndvi.toFixed(3)}</strong> &bull; SCL : <span style="background:#dcfce7;color:#14532d;padding:1px 6px;border-radius:4px;font-weight:600;">${this.getSclLabel(scene.scl)}</span> &bull; Nuages scène : ${scene.cloud.toFixed(1)}% &bull; (${scene.platform})`;
+          badge.innerHTML = `<strong>${scene.dateKey}</strong> &bull; NDVI : <strong>${scene.ndvi.toFixed(3)}</strong> &bull; SCL : <span style="background:#dcfce7;color:#14532d;padding:1px 6px;border-radius:4px;font-weight:600;">${this.getSclLabel(scene.scl)}</span> &bull; Nuages scène : ${scene.cloud.toFixed(1)}% &bull; (${scene.platform})`;
         }
         if (btnPrev) btnPrev.disabled = (index <= 0);
         if (btnNext) btnNext.disabled = (index >= this.series.length - 1);
@@ -3655,7 +3736,7 @@ html_template = """<!DOCTYPE html>
             const idx = parseInt(circle.dataset.idx, 10);
             const item = this.series[idx];
             if (hoverInfo) {
-              hoverInfo.innerHTML = `🛰️ <strong>${item.dateKey}</strong> &bull; NDVI : <strong>${item.ndvi.toFixed(3)}</strong> &bull; SCL : <strong>${this.getSclLabel(item.scl)}</strong> &bull; Nuages scène : ${item.cloud.toFixed(1)}% &bull; Cliquez pour afficher la tuile satellite sur la carte`;
+              hoverInfo.innerHTML = `<strong>${item.dateKey}</strong> &bull; NDVI : <strong>${item.ndvi.toFixed(3)}</strong> &bull; SCL : <strong>${this.getSclLabel(item.scl)}</strong> &bull; Nuages scène : ${item.cloud.toFixed(1)}% &bull; Cliquez pour afficher la tuile satellite sur la carte`;
             }
           });
 
@@ -4776,148 +4857,234 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "";
       });
 
-      // Click to identify with rich popup
-      map.on("click", "pedologie-fill", (e) => {
+      // Unified Tabbed Popup for Sols, Cultures, and NDVI
+      function openTabbedFeaturePopup(e, defaultTab) {
         if (profileManager && profileManager.isDrawing) return;
         if (ndviManager && ndviManager.isActiveMode) {
           let parcelProps = null;
-          const parcelFeatures = map.queryRenderedFeatures(e.point, { layers: ["parcelles-fill"] });
+          const parcelFeatures = map.queryRenderedFeatures(e.point, { layers: ["parcelles-fill"].filter(l => map.getLayer(l)) });
           if (parcelFeatures && parcelFeatures.length > 0) {
             parcelProps = parcelFeatures[0].properties;
           }
           ndviManager.analyzeLocation(e.lngLat, parcelProps);
           return;
         }
-        if (!e.features || !e.features.length) return;
-        const p = e.features[0].properties;
 
-        const rawEtude = String(p.No_etude || p.etude_code || "").trim();
-        const etudeUrl = (p.etude_url || "").trim();
-        const appellation = (p.Appellation_cartographique || "").trim();
-
-        let studyInfo = null;
-        let cleanEtudeCode = rawEtude.replace(/^0+/, "");
-        if (rawEtude) {
-          studyInfo = STUDY_NAMES[rawEtude] || STUDY_NAMES[cleanEtudeCode] || STUDY_NAMES[rawEtude.padStart(2, "0")];
+        // 1. Query pedologie (from visible layer or hit layer)
+        let pedoProps = null;
+        let pedoGeom = null;
+        const pedoHits = map.queryRenderedFeatures(e.point, {
+          layers: ["pedologie-fill", "pedologie-hit-layer"].filter(l => map.getLayer(l))
+        });
+        if (pedoHits && pedoHits.length > 0) {
+          pedoProps = pedoHits[0].properties;
+          pedoGeom = pedoHits[0].geometry;
         }
-        const studyTitle = studyInfo ? studyInfo.title : (rawEtude ? "Étude pédologique nº " + rawEtude : "Étude pédologique");
-        const studyYear = studyInfo ? studyInfo.year : "";
-        const localPqFile = "pq" + cleanEtudeCode.toLowerCase() + ".html";
 
-        // Query parcel features at click point
-        let parcelBadgeHtml = "";
-        const parcelFeatures = map.queryRenderedFeatures(e.point, { layers: ["parcelles-fill"] });
-        if (parcelFeatures && parcelFeatures.length > 0) {
-          const pf = parcelFeatures[0].properties;
+        // 2. Query parcelles
+        let parcelProps = null;
+        const parcelHits = map.queryRenderedFeatures(e.point, {
+          layers: ["parcelles-fill"].filter(l => map.getLayer(l))
+        });
+        if (parcelHits && parcelHits.length > 0) {
+          parcelProps = parcelHits[0].properties;
+        }
+
+        if (!pedoProps && !parcelProps) return;
+
+        let activeTab = defaultTab || (pedoProps ? "sols" : "cultures");
+        if (!pedoProps && parcelProps) activeTab = "cultures";
+        if (!parcelProps && pedoProps && activeTab === "cultures") activeTab = "sols";
+
+        // Tab 1: Sols HTML
+        let solsTabHtml = "";
+        if (pedoProps) {
+          const p = pedoProps;
+          const rawEtude = String(p.No_etude || p.etude_code || "").trim();
+          const etudeUrl = (p.etude_url || "").trim();
+          const appellation = (p.Appellation_cartographique || "").trim();
+
+          let studyInfo = null;
+          let cleanEtudeCode = rawEtude.replace(/^0+/, "");
+          if (rawEtude) {
+            studyInfo = STUDY_NAMES[rawEtude] || STUDY_NAMES[cleanEtudeCode] || STUDY_NAMES[rawEtude.padStart(2, "0")];
+          }
+          const studyTitle = studyInfo ? studyInfo.title : (rawEtude ? "Étude pédologique nº " + rawEtude : "Étude pédologique");
+          const studyYear = studyInfo ? studyInfo.year : "";
+          const localPqFile = "pq" + cleanEtudeCode.toLowerCase() + ".html";
+
+          let cardsHtml = "";
+          let validSeriesCount = 0;
+          for (let i = 1; i <= 4; i++) {
+            const desc = (p["s" + i + "_desc"] || "").trim();
+            const rawPct = p["s" + i + "_pct"];
+            const pctNum = parseFloat(rawPct);
+            const rawUrl = (p["s" + i + "_url"] || "").trim();
+            if (!desc || isNaN(pctNum) || pctNum <= 0) continue;
+            validSeriesCount++;
+            const pctDisplay = Math.round(pctNum);
+            cardsHtml += `
+              <div class="pedo-series-card">
+                <div class="pedo-series-top">
+                  <span class="pedo-series-name">${desc}</span>
+                  <span class="pedo-series-pct">${pctDisplay}%</span>
+                </div>
+                <div class="pedo-progress-track">
+                  <div class="pedo-progress-fill" style="width: ${Math.min(pctDisplay, 100)}%;"></div>
+                </div>
+                ${rawUrl ? `
+                  <div class="pedo-series-action">
+                    <a href="${rawUrl}" target="_blank" rel="noopener noreferrer" class="pedo-series-link">
+                      <span>Consulter la fiche descriptive</span>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                      </svg>
+                    </a>
+                  </div>` : ""}
+              </div>
+            `;
+          }
+          if (!cardsHtml) {
+            cardsHtml = '<div style="color: #64748b; font-style: italic; padding: 6px 0;">Séries de sols non détaillées pour ce polygone.</div>';
+          }
+
+          solsTabHtml = `
+            <div class="pedo-study-meta">
+              ${rawEtude ? `<span class="pedo-study-badge">Étude nº ${rawEtude}</span>` : ""}
+              ${studyYear ? `<span class="pedo-study-year">(${studyYear})</span>` : ""}
+            </div>
+            <h3 class="pedo-popup-title">${studyTitle}</h3>
+            ${appellation ? `<div class="pedo-appellation" title="Appellation cartographique">${appellation}</div>` : ""}
+            
+            <div class="pedo-links-row">
+              <a href="${localPqFile}" target="_blank" rel="noopener noreferrer" class="pedo-study-link">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <span>Mémoire sur le portail &rarr;</span>
+              </a>
+              ${etudeUrl ? `
+                <a href="${etudeUrl}" target="_blank" rel="noopener noreferrer" class="pedo-pdf-link">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                  </svg>
+                  <span>Rapport PDF &rarr;</span>
+                </a>` : ""}
+            </div>
+
+            ${validSeriesCount > 0 ? '<div class="pedo-series-heading" style="margin-top: 6px;">Séries de sols identifiées</div>' : ''}
+            ${cardsHtml}
+
+            <button id="btn-tab-ai-identify" type="button" class="btn-popup-ai" style="margin-top: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+              <span>Identifier la série de sol (Diagnostic terrain)</span>
+            </button>
+          `;
+        } else {
+          solsTabHtml = `
+            <div style="color: #64748b; font-size: 12px; padding: 16px 4px; text-align: center;">
+              Aucune donnée pédologique cartographiée sous ce point.
+            </div>
+          `;
+        }
+
+        // Tab 2: Cultures HTML
+        let culturesTabHtml = "";
+        if (parcelProps) {
+          const pf = parcelProps;
           const pid = pf.IDPAR || pf.idpar || "";
           const sup = pf.SUPHEC || pf.suphec || "";
           const crop = pf.DESCODPR1 || pf.descodpr1 || "";
           const group = pf.DESGROPRO || pf.desgropro || "";
           const supNum = parseFloat(sup);
           const supStr = !isNaN(supNum) ? supNum.toFixed(1) + " ha" : (sup ? sup + " ha" : "");
-          parcelBadgeHtml = `
-            <div class="parcel-info-badge" style="margin-bottom: 12px; padding: 7px 10px; background: #f8fafc; border: 1px solid #cbd5e1; border-left: 3.5px solid #0f172a; border-radius: 6px; font-size: 0.78rem;">
-              <div style="font-weight: 600; color: #0f172a; display: flex; justify-content: space-between; align-items: center;">
-                <span>Parcelle agricole BDPPAD ${pid ? `nº ${pid}` : ''}</span>
+
+          culturesTabHtml = `
+            <div class="parcel-info-badge" style="padding: 9px 11px; background: #f8fafc; border: 1px solid #cbd5e1; border-left: 3.5px solid #0f172a; border-radius: 6px; font-size: 0.8rem;">
+              <div style="font-weight: 700; color: #0f172a; display: flex; justify-content: space-between; align-items: center;">
+                <span>Parcelle BDPPAD ${pid ? `nº ${pid}` : ''}</span>
                 ${supStr ? `<span style="font-weight: 700; color: #1e293b;">${supStr}</span>` : ''}
               </div>
-              ${crop ? `<div style="color: #334155; margin-top: 3px;">Culture : <strong>${crop}</strong>${group ? ` <span style="color:#64748b;">(${group})</span>` : ''}</div>` : ''}
-              <div class="popup-crop-history">
-                <div class="crop-history-header">
-                  <span>Historique des cultures (2003–2026)</span>
-                  <span class="crop-history-badge">Chargement...</span>
-                </div>
-                <div class="crop-history-content">
-                  <div style="color: #64748b; font-size: 11px; padding: 2px 0;">Interrogation de bdppad.fgb...</div>
-                </div>
+              ${crop ? `<div style="color: #334155; margin-top: 4px;">Culture 2026 : <strong>${crop}</strong>${group ? ` <span style="color:#64748b;">(${group})</span>` : ''}</div>` : ''}
+            </div>
+
+            <div class="popup-crop-history" style="margin-top: 4px;">
+              <div class="crop-history-header">
+                <span class="crop-history-title">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  <span>Historique des rotations (2003–2026)</span>
+                </span>
+                <span class="crop-history-badge">Chargement...</span>
+              </div>
+              <div class="crop-history-content">
+                <div style="color: #64748b; font-size: 11px; padding: 4px 0;">Interrogation de l'historique FlatGeobuf...</div>
+              </div>
+            </div>
+          `;
+        } else {
+          culturesTabHtml = `
+            <div style="color: #64748b; font-size: 11.5px; padding: 4px 0; line-height: 1.45;">
+              Aucun contour de parcelle BDPPAD 2026 enregistré à cet endroit précis.
+            </div>
+            <div class="popup-crop-history" style="margin-top: 4px;">
+              <div class="crop-history-header">
+                <span class="crop-history-title">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  <span>Recherche historique (2003–2026)</span>
+                </span>
+                <span class="crop-history-badge">Chargement...</span>
+              </div>
+              <div class="crop-history-content">
+                <div style="color: #64748b; font-size: 11px; padding: 4px 0;">Interrogation de bdppad.fgb...</div>
               </div>
             </div>
           `;
         }
 
-        let cardsHtml = "";
-        let validSeriesCount = 0;
-
-        for (let i = 1; i <= 4; i++) {
-          const desc = (p["s" + i + "_desc"] || "").trim();
-          const rawPct = p["s" + i + "_pct"];
-          const pctNum = parseFloat(rawPct);
-          const rawUrl = (p["s" + i + "_url"] || "").trim();
-
-          if (!desc || isNaN(pctNum) || pctNum <= 0) continue;
-
-          validSeriesCount++;
-          const pctDisplay = Math.round(pctNum);
-
-          cardsHtml += `
-            <div class="pedo-series-card">
-              <div class="pedo-series-top">
-                <span class="pedo-series-name">${desc}</span>
-                <span class="pedo-series-pct">${pctDisplay}%</span>
-              </div>
-              <div class="pedo-progress-track">
-                <div class="pedo-progress-fill" style="width: ${Math.min(pctDisplay, 100)}%;"></div>
-              </div>
-              ${rawUrl ? `
-                <div class="pedo-series-action">
-                  <a href="${rawUrl}" target="_blank" rel="noopener noreferrer" class="pedo-series-link">
-                    <span>Consulter la fiche descriptive</span>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                  </a>
-                </div>` : ""}
-            </div>
-          `;
-        }
-
-        if (!cardsHtml) {
-          cardsHtml = '<div style="color: #64748b; font-style: italic; padding: 6px 0;">Séries de sols non détaillées pour ce polygone.</div>';
-        }
+        // Tab 3: NDVI HTML
+        const ndviTabHtml = `
+          <div style="font-size: 12px; color: #334155; line-height: 1.5; padding: 4px 0;">
+            <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px; font-size: 12.5px;">Vigueur Végétale &mdash; Sentinel-2</div>
+            <p style="margin: 0 0 10px 0; color: #475569; font-size: 11.5px;">
+              Analysez la courbe annuelle de l'indice de végétation par différence normalisée (NDVI) à 10 m de résolution pour ce point ou cette parcelle agricole (2018&ndash;2026).
+            </p>
+            <button id="btn-tab-ndvi" type="button" class="btn-popup-ndvi">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+              <span>Analyser l'évolution NDVI annuelle</span>
+            </button>
+          </div>
+        `;
 
         const popupHtml = `
           <div class="pedo-popup">
-            <div class="pedo-popup-header">
-              <div class="pedo-study-meta">
-                ${rawEtude ? `<span class="pedo-study-badge">Étude nº ${rawEtude}</span>` : ""}
-                ${studyYear ? `<span class="pedo-study-year">(${studyYear})</span>` : ""}
-              </div>
-              <h3 class="pedo-popup-title">${studyTitle}</h3>
-              ${appellation ? `<div class="pedo-appellation" title="Appellation cartographique">${appellation}</div>` : ""}
-              
-              <div class="pedo-links-row">
-                <a href="${localPqFile}" target="_blank" rel="noopener noreferrer" class="pedo-study-link">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                  </svg>
-                  <span>Mémoire sur le portail &rarr;</span>
-                </a>
-                ${etudeUrl ? `
-                  <a href="${etudeUrl}" target="_blank" rel="noopener noreferrer" class="pedo-pdf-link">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                    </svg>
-                    <span>Rapport PDF &rarr;</span>
-                  </a>` : ""}
-              </div>
+            <div class="popup-tabs-header">
+              <button type="button" class="popup-tab-btn ${activeTab === 'sols' ? 'active' : ''}" data-tab="sols">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>Sols</span>
+              </button>
+              <button type="button" class="popup-tab-btn ${activeTab === 'cultures' ? 'active' : ''}" data-tab="cultures">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>
+                <span>Cultures</span>
+                ${parcelProps ? `<span class="popup-tab-dot" title="Parcelle agricole présente"></span>` : ''}
+              </button>
+              <button type="button" class="popup-tab-btn ${activeTab === 'ndvi' ? 'active' : ''}" data-tab="ndvi">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+                <span>NDVI</span>
+              </button>
             </div>
-            <div class="pedo-popup-body">
-              ${parcelBadgeHtml}
-              ${validSeriesCount > 0 ? '<div class="pedo-series-heading">Séries de sols identifiées</div>' : ''}
-              ${cardsHtml}
-              <button id="btn-popup-ndvi" type="button" class="btn-popup-ndvi">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
-                <span>Évolution NDVI annuelle (Sentinel-2)</span>
-              </button>
-              <button id="btn-popup-ai-identify" type="button" class="btn-popup-ai">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
-                <span>Identifier la série de sol (Diagnostic terrain)</span>
-              </button>
+            <div class="popup-tab-pane ${activeTab === 'sols' ? 'active' : ''}" data-tab="sols">
+              ${solsTabHtml}
+            </div>
+            <div class="popup-tab-pane ${activeTab === 'cultures' ? 'active' : ''}" data-tab="cultures">
+              ${culturesTabHtml}
+            </div>
+            <div class="popup-tab-pane ${activeTab === 'ndvi' ? 'active' : ''}" data-tab="ndvi">
+              ${ndviTabHtml}
             </div>
           </div>
         `;
@@ -4928,122 +5095,53 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           .addTo(map);
 
         const popupDom = popup.getElement();
-        const btnNdviInPopup = popupDom ? popupDom.querySelector("#btn-popup-ndvi") : null;
-        if (btnNdviInPopup) {
-          btnNdviInPopup.addEventListener("click", () => {
-            popup.remove();
-            let pProps = null;
-            if (parcelFeatures && parcelFeatures.length > 0) {
-              pProps = parcelFeatures[0].properties;
-            }
-            if (ndviManager) ndviManager.analyzeLocation(e.lngLat, pProps);
+        if (popupDom) {
+          // Tab switching
+          const tabBtns = popupDom.querySelectorAll(".popup-tab-btn");
+          const tabPanes = popupDom.querySelectorAll(".popup-tab-pane");
+          tabBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+              const tabName = btn.dataset.tab;
+              tabBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
+              tabPanes.forEach(p => p.classList.toggle("active", p.dataset.tab === tabName));
+            });
           });
-        }
 
-        const btnAiInPopup = popupDom ? popupDom.querySelector("#btn-popup-ai-identify") : null;
-        if (btnAiInPopup) {
-          btnAiInPopup.addEventListener("click", () => {
-            popup.remove();
-            if (soilAiAssistant) {
-              soilAiAssistant.openWithContext(e.lngLat, p, e.features && e.features.length ? e.features[0].geometry : null);
-            }
-          });
-        }
+          // NDVI trigger
+          const btnNdviInPopup = popupDom.querySelector("#btn-tab-ndvi");
+          if (btnNdviInPopup) {
+            btnNdviInPopup.addEventListener("click", () => {
+              popup.remove();
+              if (ndviManager) ndviManager.analyzeLocation(e.lngLat, parcelProps);
+            });
+          }
 
-        if (parcelFeatures && parcelFeatures.length > 0) {
+          // Diagnostic terrain IA trigger
+          const btnAiInPopup = popupDom.querySelector("#btn-tab-ai-identify");
+          if (btnAiInPopup) {
+            btnAiInPopup.addEventListener("click", () => {
+              popup.remove();
+              if (soilAiAssistant) {
+                soilAiAssistant.openWithContext(e.lngLat, pedoProps, pedoGeom);
+              }
+            });
+          }
+
+          // Trigger crop history query
           loadCropHistory(e.lngLat, popupDom);
         }
+      }
+
+      // Click on pedologie-fill
+      map.on("click", "pedologie-fill", (e) => {
+        openTabbedFeaturePopup(e, "sols");
       });
 
-      // Standalone Click on Parcels when clicked outside pedologie
+      // Click on parcelles-fill
       map.on("click", "parcelles-fill", (e) => {
-        if (profileManager && profileManager.isDrawing) return;
-        if (ndviManager && ndviManager.isActiveMode) {
-          if (ndviManager) ndviManager.analyzeLocation(e.lngLat, e.features && e.features.length ? e.features[0].properties : null);
-          return;
-        }
-        const pedoFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill"] });
-        if (pedoFeatures && pedoFeatures.length > 0) return;
-        if (!e.features || !e.features.length) return;
-        const pf = e.features[0].properties;
-        const pid = pf.IDPAR || pf.idpar || "";
-        const sup = pf.SUPHEC || pf.suphec || "";
-        const crop = pf.DESCODPR1 || pf.descodpr1 || "";
-        const group = pf.DESGROPRO || pf.desgropro || "";
-        const supNum = parseFloat(sup);
-        const supStr = !isNaN(supNum) ? supNum.toFixed(1) + " ha" : (sup ? sup + " ha" : "");
-
-        const popupHtml = `
-          <div class="pedo-popup">
-            <div class="pedo-popup-header">
-              <div class="pedo-study-meta">
-                <span class="pedo-study-badge" style="background:#0f172a;color:#fff;">BDPPAD 2026</span>
-              </div>
-              <h3 class="pedo-popup-title">Parcelle agricole nº ${pid || 'Inconnue'}</h3>
-              ${crop ? `<div class="pedo-appellation">${crop}</div>` : ''}
-            </div>
-            <div class="pedo-popup-body">
-              <div style="font-size: 0.8rem; color: #334155; line-height: 1.55;">
-                ${crop ? `<div>Culture principale : <strong>${crop}</strong></div>` : ''}
-                ${group ? `<div>Groupe : <strong>${group}</strong></div>` : ''}
-                ${supStr ? `<div>Superficie : <strong>${supStr}</strong></div>` : ''}
-                <div style="margin-top: 8px; color: #64748b; font-size: 0.74rem;">Base de Données des Parcelles Agricoles Déclarées (BDPPAD)</div>
-              </div>
-              <div class="popup-crop-history" style="margin-top: 10px;">
-                <div class="crop-history-header">
-                  <span>Historique des cultures (2003–2026)</span>
-                  <span class="crop-history-badge">Chargement...</span>
-                </div>
-                <div class="crop-history-content">
-                  <div style="color: #64748b; font-size: 11px; padding: 2px 0;">Interrogation de bdppad.fgb...</div>
-                </div>
-              </div>
-              <button id="btn-parcel-popup-ndvi" type="button" class="btn-popup-ndvi">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
-                <span>Évolution NDVI annuelle (Sentinel-2)</span>
-              </button>
-              <button id="btn-parcel-popup-ai" type="button" class="btn-popup-ai">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
-                <span>Identifier la série de sol (Diagnostic terrain)</span>
-              </button>
-            </div>
-          </div>
-        `;
-        const popup = new maplibregl.Popup({ closeButton: true, offset: 8 })
-          .setLngLat(e.lngLat)
-          .setHTML(popupHtml)
-          .addTo(map);
-
-        const popupDom = popup.getElement();
-        const btnNdviInParcelPopup = popupDom ? popupDom.querySelector("#btn-parcel-popup-ndvi") : null;
-        if (btnNdviInParcelPopup) {
-          btnNdviInParcelPopup.addEventListener("click", () => {
-            popup.remove();
-            if (ndviManager) ndviManager.analyzeLocation(e.lngLat, pf);
-          });
-        }
-        const btnAiInParcelPopup = popupDom ? popupDom.querySelector("#btn-parcel-popup-ai") : null;
-        if (btnAiInParcelPopup) {
-          btnAiInParcelPopup.addEventListener("click", () => {
-            popup.remove();
-            if (soilAiAssistant) {
-              let pedoProps = null;
-              let pedoGeom = null;
-              try {
-                const hits = map.queryRenderedFeatures(e.point, {
-                  layers: ["pedologie-hit-layer", "pedologie-fill"].filter(l => map.getLayer(l))
-                });
-                if (hits && hits.length > 0) {
-                  pedoProps = hits[0].properties;
-                  pedoGeom = hits[0].geometry;
-                }
-              } catch (err) {}
-              soilAiAssistant.openWithContext(e.lngLat, pedoProps, pedoGeom);
-            }
-          });
-        }
-
-        loadCropHistory(e.lngLat, popupDom);
+        const pedoFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill"].filter(l => map.getLayer(l)) });
+        if (pedoFeatures && pedoFeatures.length > 0) return; // Handled by pedologie-fill click
+        openTabbedFeaturePopup(e, "cultures");
       });
     });
 
@@ -5352,19 +5450,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
     if (btnQuickNdvi) {
       btnQuickNdvi.addEventListener("click", () => {
         if (ndviManager) ndviManager.toggleMode();
-      });
-    }
-
-    const btnQuickAi = document.getElementById("btn-quick-ai");
-    if (btnQuickAi) {
-      btnQuickAi.addEventListener("click", () => {
-        if (soilAiAssistant) {
-          if (soilAiAssistant.isOpen) {
-            soilAiAssistant.close();
-          } else {
-            soilAiAssistant.open();
-          }
-        }
       });
     }
 
