@@ -21,8 +21,8 @@
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js"></script>
   <script src="geolibre-contour.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatgeobuf@3.34.0/dist/flatgeobuf-geojson.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  <script src="flatgeobuf-geojson.min.js"></script>
+  <script src="marked.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -3604,15 +3604,25 @@
       const badgeEl = container.querySelector(".crop-history-badge");
       const contentEl = container.querySelector(".crop-history-content");
 
+      let fgb = (typeof window.flatgeobuf !== "undefined" ? window.flatgeobuf : null)
+        || (typeof flatgeobuf !== "undefined" ? flatgeobuf : null);
+
+      if (!fgb || (!fgb.deserialize && (!fgb.geojson || !fgb.geojson.deserialize))) {
+        // Wait up to 1200ms in case script tag is still executing
+        for (let retry = 0; retry < 6; retry++) {
+          await new Promise(r => setTimeout(r, 200));
+          fgb = (typeof window.flatgeobuf !== "undefined" ? window.flatgeobuf : null)
+            || (typeof flatgeobuf !== "undefined" ? flatgeobuf : null);
+          if (fgb && (typeof fgb.deserialize === "function" || (fgb.geojson && typeof fgb.geojson.deserialize === "function"))) {
+            break;
+          }
+        }
+      }
+
       const getDeserializeFn = () => {
-        if (typeof window.flatgeobuf !== "undefined") {
-          if (typeof window.flatgeobuf.deserialize === "function") return window.flatgeobuf.deserialize.bind(window.flatgeobuf);
-          if (window.flatgeobuf.geojson && typeof window.flatgeobuf.geojson.deserialize === "function") return window.flatgeobuf.geojson.deserialize.bind(window.flatgeobuf.geojson);
-        }
-        if (typeof flatgeobuf !== "undefined") {
-          if (typeof flatgeobuf.deserialize === "function") return flatgeobuf.deserialize.bind(flatgeobuf);
-          if (flatgeobuf.geojson && typeof flatgeobuf.geojson.deserialize === "function") return flatgeobuf.geojson.deserialize.bind(flatgeobuf.geojson);
-        }
+        if (!fgb) return null;
+        if (typeof fgb.deserialize === "function") return fgb.deserialize.bind(fgb);
+        if (fgb.geojson && typeof fgb.geojson.deserialize === "function") return fgb.geojson.deserialize.bind(fgb.geojson);
         return null;
       };
 
