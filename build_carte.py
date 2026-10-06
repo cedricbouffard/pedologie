@@ -4994,6 +4994,22 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         // 10. Zones inondables (MRNF)
         this.defaultCatalog = [
           {
+            id: "carte_hydro_mapaq",
+            category: "eau",
+            name: "Carte numérisée des cours d'eau (MAPAQ)",
+            subtitle: "Réseau hydrographique numérisé Info-Sols",
+            url: "https://www.info-sols.ca/api/data/local?map=hydrographie",
+            layers: "carte_hydro",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 0.85,
+            insertPosition: "above_pedologie",
+            attribution: "© Gouvernement du Québec (MAPAQ / Info-Sols)",
+            description: "Carte officielle numérisée des cours d'eau du MAPAQ (Info-Sols), incluant les cours d'eau agricoles, branches et fossés d'égouttement.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 6c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/><path d="M2 12c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/><path d="M2 18c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/></svg>`
+          },
+          {
             id: "eau_grhq",
             category: "eau",
             name: "Hydrographie — Réseau (GRHQ)",
@@ -5036,6 +5052,38 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             insertPosition: "bottom",
             attribution: "© Gouvernement du Québec (MRNF - Imagerie continue)",
             description: "Mosaïque d'orthophotographies aériennes officielles continue couvrant le Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "photos_1964_monteregie",
+            category: "imagerie",
+            name: "Photos aériennes 1964 (Montérégie-Est)",
+            subtitle: "Photographies aériennes historiques (Info-Sols)",
+            url: "https://www.info-sols.ca/api/data/local?map=monteregie_est",
+            layers: "orthos_1964_me",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MAPAQ / Info-Sols)",
+            description: "Mosaïque de photographies aériennes historiques de 1964 couvrant la région de la Montérégie-Est (Info-Sols / MAPAQ).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "photos_2000_infosols",
+            category: "imagerie",
+            name: "Photos aériennes 2000 (Info-Sols)",
+            subtitle: "Campagne de photographies aériennes 2000",
+            url: "https://www.info-sols.ca/api/data/local?map=photo_aerienne",
+            layers: "orthos_2000",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Info-Sols / Gouvernement du Québec",
+            description: "Campagne de photographies aériennes numérisées de l'an 2000 issue du portail Info-Sols.",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
           },
           {
@@ -5226,12 +5274,13 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           const fmt = config.format || "png32";
           return `${cleanUrl}/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=${fmt}&transparent=true&f=image${layersParam}`;
         }
-        const cleanUrl = config.url.split("?")[0];
+        const [cleanUrl, existingQuery] = config.url.split("?");
+        const queryPrefix = existingQuery ? `${existingQuery}&` : "";
         const crsParam = config.version === "1.1.1" ? "SRS=EPSG:3857" : "CRS=EPSG:3857";
         const transparent = config.transparent ? "TRUE" : "FALSE";
         const styles = config.styles || "";
         const fmt = config.format || "image/png";
-        return `${cleanUrl}?SERVICE=WMS&VERSION=${config.version || '1.3.0'}&REQUEST=GetMap&${crsParam}&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&LAYERS=${config.layers}&STYLES=${styles}&FORMAT=${fmt}&TRANSPARENT=${transparent}`;
+        return `${cleanUrl}?${queryPrefix}SERVICE=WMS&VERSION=${config.version || '1.3.0'}&REQUEST=GetMap&${crsParam}&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&LAYERS=${config.layers}&STYLES=${styles}&FORMAT=${fmt}&TRANSPARENT=${transparent}`;
       }
 
       ensureCadastreLayers(cfg) {
