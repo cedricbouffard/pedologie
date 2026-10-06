@@ -6248,18 +6248,62 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         }
 
         // 4. Query drainage (plans de drainage agricole)
-        let drainageProps = null;
-        const drainageHits = map.queryRenderedFeatures(e.point, {
+        let drainagePlans = [];
+        const seenDrainageKeys = new Set();
+        const drainageBbox = [
+          [e.point.x - 5, e.point.y - 5],
+          [e.point.x + 5, e.point.y + 5]
+        ];
+        const drainageHits = map.queryRenderedFeatures(drainageBbox, {
           layers: ["drainage-fill"].filter(l => map.getLayer(l))
         });
-        if (drainageHits && drainageHits.length > 0) {
-          drainageProps = drainageHits[0].properties;
+
+        const activeDrainageLots = new Set();
+        if (cadastreProps && cadastreProps.NO_LOT) {
+          activeDrainageLots.add(String(cadastreProps.NO_LOT).trim());
         }
 
-        if (!pedoProps && !parcelProps && !cadastreProps && !drainageProps) return;
+        if (drainageHits && drainageHits.length > 0) {
+          drainageHits.forEach(h => {
+            const p = h.properties || {};
+            if (p.no_lot) activeDrainageLots.add(String(p.no_lot).trim());
+            const key = (p.nom || "") + "___" + (p.url || "") + "___" + (p.no_lot || "");
+            if (key !== "___" && !seenDrainageKeys.has(key)) {
+              seenDrainageKeys.add(key);
+              drainagePlans.push(p);
+            }
+          });
+        }
+
+        // If a lot number is known and drainage layer is rendered, also check any sister plans rendered for that exact same lot
+        if (activeDrainageLots.size > 0 && map.getLayer("drainage-fill")) {
+          const sisterHits = map.queryRenderedFeatures({ layers: ["drainage-fill"] });
+          sisterHits.forEach(h => {
+            const p = h.properties || {};
+            const lot = String(p.no_lot || "").trim();
+            if (lot && activeDrainageLots.has(lot)) {
+              const key = (p.nom || "") + "___" + (p.url || "") + "___" + (p.no_lot || "");
+              if (key !== "___" && !seenDrainageKeys.has(key)) {
+                seenDrainageKeys.add(key);
+                drainagePlans.push(p);
+              }
+            }
+          });
+        }
+
+        // Natural sort by plan name (page 1 before page 2, page 9 before page 10, etc.)
+        drainagePlans.sort((a, b) => {
+          const nomA = a.nom || "";
+          const nomB = b.nom || "";
+          return nomA.localeCompare(nomB, undefined, { numeric: true, sensitivity: "base" });
+        });
+
+        const drainageProps = drainagePlans.length > 0 ? drainagePlans[0] : null;
+
+        if (!pedoProps && !parcelProps && !cadastreProps && drainagePlans.length === 0) return;
 
         // If only cadastre was clicked (neither pedology, parcel, nor drainage)
-        if (!pedoProps && !parcelProps && !drainageProps && cadastreProps) {
+        if (!pedoProps && !parcelProps && drainagePlans.length === 0 && cadastreProps) {
           const lotNum = cadastreProps.NO_LOT || "Inconnu";
           const lotHtml = `
             <div class="pedo-popup" style="padding: 10px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
@@ -6276,36 +6320,87 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         }
 
         // If only drainage plan was clicked (with optional cadastre info)
-        if (!pedoProps && !parcelProps && drainageProps) {
-          const lotNum = drainageProps.no_lot || (cadastreProps ? cadastreProps.NO_LOT : "") || "Inconnu";
-          const nomFichier = drainageProps.nom || "Plan_drainage.jpg";
-          const planUrl = drainageProps.url || "";
-          const drainageHtml = `
-            <div class="pedo-popup" style="padding: 12px 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-width: 250px;">
-              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                <span style="font-size: 10px; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">Plan de drainage</span>
-                <span style="font-size: 11px; color: #64748b; margin-left: auto;">Info-Sols</span>
-              </div>
-              <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Lot nº ${lotNum}</div>
+        if (!pedoProps && !parcelProps && drainagePlans.length > 0) {
+          const lotsList = Array.from(new Set(drainagePlans.map(p => p.no_lot).filter(Boolean)));
+          const lotLabel = lotsList.length > 0 
+            ? lotsList.join(", ") 
+            : (cadastreProps ? cadastreProps.NO_LOT : "Inconnu");
+
+          const formatDrainageUrl = (raw) => {
+            if (!raw || typeof raw !== "string") return "";
+            let u = raw.trim();
+            if (u.includes("/dbase/fichiers/")) u = u.replace("/dbase/fichiers/", "/api/fichiers/");
+            return u;
+          };
+
+          let plansListHtml = "";
+          if (drainagePlans.length === 1) {
+            const dp = drainagePlans[0];
+            const nomFichier = dp.nom || "Plan_drainage.jpg";
+            const planUrl = formatDrainageUrl(dp.url || "");
+            plansListHtml = `
               <div style="font-size: 11.5px; color: #475569; margin-bottom: 10px;">Fichier : <code style="font-size: 11px; background: #f1f5f9; padding: 2px 4px; border-radius: 3px; color: #0f172a;">${nomFichier}</code></div>
               ${planUrl ? `
                 <a href="${planUrl}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 6px; background: #0284c7; color: #ffffff; text-decoration: none; font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: 5px; box-sizing: border-box; transition: background 0.15s ease;">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                   <span>Consulter le plan numérisé (JPG)</span>
                 </a>
-              ` : ''}
+              ` : '<div style="color: #94a3b8; font-size: 11px;">Lien indisponible.</div>'}
+            `;
+          } else {
+            plansListHtml = `
+              <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">
+                ${drainagePlans.length} documents répertoriés à cet emplacement :
+              </div>
+              <div style="max-height: 250px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 6px;">
+                ${drainagePlans.map((dp, idx) => {
+                  const nom = dp.nom || `Document ${idx + 1}`;
+                  const planUrl = formatDrainageUrl(dp.url || "");
+                  const subLot = dp.no_lot ? `<span style="font-size: 9.5px; color: #0284c7; background: #e0f2fe; padding: 1px 4px; border-radius: 3px; font-weight: 600; margin-left: auto;">Lot ${dp.no_lot}</span>` : "";
+                  return `
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #0284c7; border-radius: 5px; padding: 6px 8px; display: flex; flex-direction: column; gap: 4px;">
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                        <span style="font-weight: 600; font-size: 11px; color: #0f172a; word-break: break-all; line-height: 1.3;">${nom}</span>
+                        ${subLot}
+                      </div>
+                      <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 2px;">
+                        ${planUrl ? `
+                          <a href="${planUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; background: #0284c7; color: #ffffff; text-decoration: none; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 4px; transition: background 0.15s ease;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            <span>Ouvrir (JPG)</span>
+                          </a>
+                        ` : '<span style="color: #94a3b8; font-size: 10px;">Lien indisponible</span>'}
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            `;
+          }
+
+          const drainageHtml = `
+            <div class="pedo-popup" style="padding: 12px 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-width: 260px; max-width: 320px;">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <span style="font-size: 10px; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">
+                  ${drainagePlans.length > 1 ? `Plans de drainage (${drainagePlans.length})` : "Plan de drainage"}
+                </span>
+                <span style="font-size: 11px; color: #64748b; margin-left: auto;">Info-Sols</span>
+              </div>
+              <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Lot nº ${lotLabel}</div>
+              ${plansListHtml}
             </div>
           `;
-          new maplibregl.Popup({ maxWidth: "300px", className: "pedo-custom-popup", closeButton: true })
+          new maplibregl.Popup({ maxWidth: "340px", className: "pedo-custom-popup", closeButton: true })
             .setLngLat(e.lngLat)
             .setHTML(drainageHtml)
             .addTo(map);
           return;
         }
 
-        let activeTab = defaultTab || (pedoProps ? "sols" : (parcelProps ? "cultures" : "drainage"));
+        let activeTab = defaultTab || (drainagePlans.length > 0 && defaultTab === "drainage" ? "drainage" : (pedoProps ? "sols" : (parcelProps ? "cultures" : "drainage")));
         if (!pedoProps && parcelProps) activeTab = defaultTab || "cultures";
         if (!parcelProps && pedoProps && activeTab === "cultures") activeTab = "sols";
+        if (defaultTab === "drainage" && drainagePlans.length > 0) activeTab = "drainage";
 
         // Tab 1: Sols HTML
         let solsTabHtml = "";
@@ -6474,37 +6569,88 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
 
         // Tab 4: Drainage HTML
         let drainageTabHtml = "";
-        if (drainageProps) {
-          const dp = drainageProps;
-          const lotVal = dp.no_lot || (cadastreProps ? cadastreProps.NO_LOT : "") || "Inconnu";
-          const nomFichier = dp.nom || "Plan_drainage.jpg";
-          const planUrl = dp.url || "";
+        if (drainagePlans.length > 0) {
+          const lotsList = Array.from(new Set(drainagePlans.map(p => p.no_lot).filter(Boolean)));
+          const lotVal = lotsList.length > 0 
+            ? lotsList.join(", ") 
+            : (cadastreProps ? cadastreProps.NO_LOT : "Inconnu");
 
-          drainageTabHtml = `
-            <div class="parcel-info-badge" style="padding: 10px 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-left: 3.5px solid #0284c7; border-radius: 6px; font-size: 0.8rem; margin-bottom: 10px;">
-              <div style="font-weight: 700; color: #0369a1; display: flex; justify-content: space-between; align-items: center;">
-                <span>Plan de drainage souterrain</span>
-                <span style="font-weight: 700; color: #0284c7;">Lot nº ${lotVal}</span>
+          const formatDrainageUrl = (raw) => {
+            if (!raw || typeof raw !== "string") return "";
+            let u = raw.trim();
+            if (u.includes("/dbase/fichiers/")) u = u.replace("/dbase/fichiers/", "/api/fichiers/");
+            return u;
+          };
+
+          if (drainagePlans.length === 1) {
+            const dp = drainagePlans[0];
+            const nomFichier = dp.nom || "Plan_drainage.jpg";
+            const planUrl = formatDrainageUrl(dp.url || "");
+
+            drainageTabHtml = `
+              <div class="parcel-info-badge" style="padding: 10px 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-left: 3.5px solid #0284c7; border-radius: 6px; font-size: 0.8rem; margin-bottom: 10px;">
+                <div style="font-weight: 700; color: #0369a1; display: flex; justify-content: space-between; align-items: center;">
+                  <span>Plan de drainage souterrain</span>
+                  <span style="font-weight: 700; color: #0284c7;">Lot nº ${lotVal}</span>
+                </div>
+                <div style="color: #334155; margin-top: 5px; font-size: 11.5px;">Fichier : <code style="font-size: 10.5px; background: #e0f2fe; padding: 2px 5px; border-radius: 3px; color: #0369a1;">${nomFichier}</code></div>
+                <div style="color: #64748b; margin-top: 3px; font-size: 11px;">Source : Cartothèque Info-Sols / MAPAQ</div>
               </div>
-              <div style="color: #334155; margin-top: 5px; font-size: 11.5px;">Fichier : <code style="font-size: 10.5px; background: #e0f2fe; padding: 2px 5px; border-radius: 3px; color: #0369a1;">${nomFichier}</code></div>
-              <div style="color: #64748b; margin-top: 3px; font-size: 11px;">Source : Cartothèque Info-Sols / MAPAQ</div>
-            </div>
 
-            <p style="margin: 0 0 12px 0; color: #475569; font-size: 11.5px; line-height: 1.45;">
-              Ce polygone correspond à un aménagement de drains agricoles souterrains numérisé à haute résolution.
-            </p>
+              <p style="margin: 0 0 12px 0; color: #475569; font-size: 11.5px; line-height: 1.45;">
+                Ce polygone correspond à un aménagement de drains agricoles souterrains numérisé à haute résolution.
+              </p>
 
-            ${planUrl ? `
-              <a href="${planUrl}" target="_blank" rel="noopener noreferrer" class="pedo-study-link" style="background: #0284c7; color: #ffffff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; box-sizing: border-box; transition: background 0.15s ease;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                  <polyline points="15 3 21 3 21 9"></polyline>
-                  <line x1="10" y1="14" x2="21" y2="3"></line>
-                </svg>
-                <span>Consulter le plan numérisé (JPG)</span>
-              </a>
-            ` : '<div style="color: #94a3b8; font-size: 11px;">Lien du document non disponible.</div>'}
-          `;
+              ${planUrl ? `
+                <a href="${planUrl}" target="_blank" rel="noopener noreferrer" class="pedo-study-link" style="background: #0284c7; color: #ffffff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; box-sizing: border-box; transition: background 0.15s ease;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                  <span>Consulter le plan numérisé (JPG)</span>
+                </a>
+              ` : '<div style="color: #94a3b8; font-size: 11px;">Lien du document non disponible.</div>'}
+            `;
+          } else {
+            drainageTabHtml = `
+              <div class="parcel-info-badge" style="padding: 10px 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-left: 3.5px solid #0284c7; border-radius: 6px; font-size: 0.8rem; margin-bottom: 10px;">
+                <div style="font-weight: 700; color: #0369a1; display: flex; justify-content: space-between; align-items: center;">
+                  <span>Plans de drainage souterrain</span>
+                  <span style="font-weight: 700; color: #0284c7;">Lot nº ${lotVal}</span>
+                </div>
+                <div style="color: #334155; margin-top: 4px; font-size: 11.5px;">
+                  <strong>${drainagePlans.length} plans ou feuillets</strong> numérisés pour cet emplacement.
+                </div>
+                <div style="color: #64748b; margin-top: 2px; font-size: 11px;">Source : Cartothèque Info-Sols / MAPAQ</div>
+              </div>
+
+              <div style="max-height: 230px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                ${drainagePlans.map((dp, idx) => {
+                  const nom = dp.nom || `Document ${idx + 1}`;
+                  const planUrl = formatDrainageUrl(dp.url || "");
+                  const subLot = dp.no_lot ? `<span style="font-size: 9.5px; color: #0284c7; background: #e0f2fe; padding: 1px 4px; border-radius: 3px; font-weight: 600; margin-left: auto;">Lot ${dp.no_lot}</span>` : "";
+                  return `
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #0284c7; border-radius: 5px; padding: 7px 9px; display: flex; flex-direction: column; gap: 5px;">
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                        <span style="font-weight: 600; font-size: 11px; color: #0f172a; word-break: break-all; line-height: 1.3;">${nom}</span>
+                        ${subLot}
+                      </div>
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                        <span style="font-size: 10px; color: #64748b;">Feuillet JPG</span>
+                        ${planUrl ? `
+                          <a href="${planUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; background: #0284c7; color: #ffffff; text-decoration: none; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 4px; transition: background 0.15s ease;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            <span>Ouvrir (JPG)</span>
+                          </a>
+                        ` : '<span style="color: #94a3b8; font-size: 10px;">Lien indisponible</span>'}
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            `;
+          }
         } else {
           drainageTabHtml = `
             <div style="color: #64748b; font-size: 12px; padding: 16px 4px; text-align: center;">
@@ -6529,11 +6675,11 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
                 <span>NDVI</span>
               </button>
-              ${drainageProps ? `
+              ${drainagePlans.length > 0 ? `
               <button type="button" class="popup-tab-btn ${activeTab === 'drainage' ? 'active' : ''}" data-tab="drainage">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-                <span>Drainage</span>
-                <span class="popup-tab-dot" title="Plan de drainage disponible" style="background: #0284c7;"></span>
+                <span>Drainage${drainagePlans.length > 1 ? ` (${drainagePlans.length})` : ''}</span>
+                <span class="popup-tab-dot" title="${drainagePlans.length} plan(s) de drainage disponible(s)" style="background: #0284c7;"></span>
               </button>` : ''}
             </div>
             <div class="popup-tab-pane ${activeTab === 'sols' ? 'active' : ''}" data-tab="sols">
@@ -6545,7 +6691,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             <div class="popup-tab-pane ${activeTab === 'ndvi' ? 'active' : ''}" data-tab="ndvi">
               ${ndviTabHtml}
             </div>
-            ${drainageProps ? `
+            ${drainagePlans.length > 0 ? `
             <div class="popup-tab-pane ${activeTab === 'drainage' ? 'active' : ''}" data-tab="drainage">
               ${drainageTabHtml}
             </div>` : ''}
@@ -6595,40 +6741,54 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         }
       }
 
+      // Click on drainage-fill
+      map.on("click", "drainage-fill", (e) => {
+        if (e.originalEvent && e.originalEvent._handled) return;
+        if (e.originalEvent) e.originalEvent._handled = true;
+        openTabbedFeaturePopup(e, "drainage");
+      });
+
       // Click on pedologie-fill
       map.on("click", "pedologie-fill", (e) => {
+        if (e.originalEvent && e.originalEvent._handled) return;
+        const drainageFeatures = map.queryRenderedFeatures(e.point, { layers: ["drainage-fill"].filter(l => map.getLayer(l)) });
+        if (drainageFeatures && drainageFeatures.length > 0) {
+          if (e.originalEvent) e.originalEvent._handled = true;
+          openTabbedFeaturePopup(e, "drainage");
+          return;
+        }
+        if (e.originalEvent) e.originalEvent._handled = true;
         openTabbedFeaturePopup(e, "sols");
       });
 
       // Click on parcelles-fill
       map.on("click", "parcelles-fill", (e) => {
+        if (e.originalEvent && e.originalEvent._handled) return;
+        const drainageFeatures = map.queryRenderedFeatures(e.point, { layers: ["drainage-fill"].filter(l => map.getLayer(l)) });
+        if (drainageFeatures && drainageFeatures.length > 0) {
+          if (e.originalEvent) e.originalEvent._handled = true;
+          openTabbedFeaturePopup(e, "drainage");
+          return;
+        }
         const pedoFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill"].filter(l => map.getLayer(l)) });
         if (pedoFeatures && pedoFeatures.length > 0) return; // Handled by pedologie-fill click
+        if (e.originalEvent) e.originalEvent._handled = true;
         openTabbedFeaturePopup(e, "cultures");
       });
 
       // Click on cadastre-fill
       map.on("click", "cadastre-fill", (e) => {
-        const otherFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill", "parcelles-fill", "drainage-fill"].filter(l => map.getLayer(l)) });
-        if (otherFeatures && otherFeatures.length > 0) return; // Handled by pedologie, parcelles or drainage
-        openTabbedFeaturePopup(e, "cultures");
-      });
-
-      // Hover on cadastre-fill
-      map.on("mouseenter", "cadastre-fill", () => {
-        if (profileManager && profileManager.isDrawing) return;
-        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "pointer";
-      });
-      map.on("mouseleave", "cadastre-fill", () => {
-        if (profileManager && profileManager.isDrawing) return;
-        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "";
-      });
-
-      // Click on drainage-fill
-      map.on("click", "drainage-fill", (e) => {
+        if (e.originalEvent && e.originalEvent._handled) return;
+        const drainageFeatures = map.queryRenderedFeatures(e.point, { layers: ["drainage-fill"].filter(l => map.getLayer(l)) });
+        if (drainageFeatures && drainageFeatures.length > 0) {
+          if (e.originalEvent) e.originalEvent._handled = true;
+          openTabbedFeaturePopup(e, "drainage");
+          return;
+        }
         const otherFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill", "parcelles-fill"].filter(l => map.getLayer(l)) });
         if (otherFeatures && otherFeatures.length > 0) return; // Handled by pedologie or parcelles
-        openTabbedFeaturePopup(e, "drainage");
+        if (e.originalEvent) e.originalEvent._handled = true;
+        openTabbedFeaturePopup(e, "cultures");
       });
 
       // Hover on drainage-fill
