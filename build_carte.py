@@ -5076,7 +5076,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             url: "https://www.info-sols.ca/api/data/local?map=hydrographie",
             layers: "carte_hydro",
             format: "image/png",
-            transparent: true,
+            transparent: false,
             version: "1.3.0",
             minZoom: 9.5,
             defaultOpacity: 1.0,
