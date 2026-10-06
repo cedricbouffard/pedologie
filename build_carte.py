@@ -687,11 +687,130 @@ html_template = """<!DOCTYPE html>
     }
 
     /* WMS Layers Section (Info-Sols & Québec) */
+    .wms-filter-bar {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 5px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      margin-bottom: 6px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .wms-filter-bar:focus-within {
+      border-color: #0f172a;
+      box-shadow: 0 0 0 1px #0f172a;
+    }
+    .wms-filter-input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 11px;
+      width: 100%;
+      color: #0f172a;
+      font-family: inherit;
+    }
+    .wms-groups-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      padding: 0 2px;
+    }
+    .wms-btn-action {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #0284c7;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .wms-btn-action:hover {
+      text-decoration: underline;
+    }
+    .wms-group {
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      background: #ffffff;
+      margin-bottom: 6px;
+      overflow: hidden;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .wms-group[open] {
+      border-color: #cbd5e1;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+    .wms-group-header {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 9px;
+      cursor: pointer;
+      user-select: none;
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+      transition: background 0.15s ease;
+    }
+    .wms-group-header::-webkit-details-marker {
+      display: none;
+    }
+    .wms-group-header:hover {
+      background: #f1f5f9;
+    }
+    .wms-group-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+    }
+    .wms-group-icon {
+      color: #475569;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .wms-group-badge {
+      font-size: 9px;
+      font-weight: 700;
+      color: #0284c7;
+      background: #e0f2fe;
+      padding: 1px 6px;
+      border-radius: 10px;
+      margin-left: 4px;
+      display: none;
+      flex-shrink: 0;
+    }
+    .wms-group-chevron {
+      width: 12px;
+      height: 12px;
+      color: #64748b;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .wms-group[open] > .wms-group-header .wms-group-chevron {
+      transform: rotate(180deg);
+    }
+    .wms-group-content {
+      padding: 6px 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #ffffff;
+      border-top: 1px solid #f1f5f9;
+    }
     .wms-layers-list {
       display: flex;
       flex-direction: column;
-      gap: 7px;
-      margin-top: 6px;
+      gap: 0;
+      margin-top: 4px;
     }
     .wms-layer-item {
       background: #f8fafc;
@@ -2287,7 +2406,7 @@ html_template = """<!DOCTYPE html>
         </div>
 
         <div class="tool-sublabel" style="margin-bottom: 2px;">
-          Hydrographie, cadastre et imagerie du Québec
+          Foncier, hydrographie, milieux humides, foresterie &amp; imagerie
         </div>
 
         <div id="wms-layers-list" class="wms-layers-list">
@@ -4825,6 +4944,40 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         this._cadastreDebounceTimer = null;
         this._cadastreMoveListener = null;
 
+        // Categories for grouping layers in collapsible dropdowns
+        this.categories = [
+          {
+            id: "foncier",
+            title: "Foncier & Aménagement",
+            icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+            defaultOpen: true
+          },
+          {
+            id: "eau",
+            title: "Hydrographie & Milieux humides",
+            icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+            defaultOpen: true
+          },
+          {
+            id: "foret",
+            title: "Foresterie & Environnement",
+            icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L7 9h3l-4 7h6l-3 5h8l-3-5h6l-4-7h3L12 2z"/></svg>`,
+            defaultOpen: true
+          },
+          {
+            id: "imagerie",
+            title: "Photographies aériennes & Orthophotos",
+            icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
+            defaultOpen: false
+          },
+          {
+            id: "custom",
+            title: "Couches personnalisées",
+            icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+            defaultOpen: true
+          }
+        ];
+
         // Preconfigured catalog:
         // 1. Hydrographie — Réseau (cours d'eau permanents & intermittents - MRNF eau.qlr)
         // 2. Cadastre du Québec (Lots rénovés - GeoJSON vectoriel au-dessus de tout, 1 numéro/lot)
@@ -4839,6 +4992,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         this.defaultCatalog = [
           {
             id: "eau_grhq",
+            category: "eau",
             name: "Hydrographie — Réseau (GRHQ)",
             subtitle: "Cours d'eau permanents & intermittents",
             url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/GRHQ_simple_WMS/MapServer/WMSServer",
@@ -4854,6 +5008,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "cadastre_quebec",
+            category: "foncier",
             name: "Cadastre du Québec (Lots rénovés)",
             subtitle: "Limites foncières & numéro de lot unique (zoom 14+)",
             type: "cadastre_geojson",
@@ -4866,6 +5021,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "orthophotos_quebec",
+            category: "imagerie",
             name: "Photographies aériennes (Orthomosaïque QC)",
             subtitle: "Imagerie continue haute résolution (MRNF)",
             url: "https://servicesmatriciels.mern.gouv.qc.ca/erdas-iws/ogc/wms/Imagerie_Continue",
@@ -4881,6 +5037,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "ortho_monteregie",
+            category: "imagerie",
             name: "Orthomosaïque Montérégie (MRNF - 20 cm)",
             subtitle: "Campagne haute résolution (Info-Sols)",
             url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
@@ -4896,6 +5053,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "ortho_estrie",
+            category: "imagerie",
             name: "Orthomosaïque Estrie (MRNF - 20 cm)",
             subtitle: "Campagne 2023 haute résolution (Info-Sols)",
             url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
@@ -4911,6 +5069,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "ortho_centre_qc",
+            category: "imagerie",
             name: "Orthomosaïque Centre-du-Québec (MRNF - 20 cm)",
             subtitle: "Campagne 2020 haute résolution (Info-Sols)",
             url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
@@ -4926,6 +5085,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "ortho_chaudiere",
+            category: "imagerie",
             name: "Orthomosaïque Chaudière-Appalaches (MRNF - 15 cm)",
             subtitle: "Campagne 2020 très haute résolution (MRNF)",
             url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
@@ -4941,6 +5101,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "cptaq_zone_agricole",
+            category: "foncier",
             name: "Zone agricole provinciale (CPTAQ)",
             subtitle: "Territoire protégé au cadastre (LPTAA)",
             url: "https://carto.cptaq.gouv.qc.ca/cgi-bin/v2/cptaq",
@@ -4956,6 +5117,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "eau_grhq_surfaces",
+            category: "eau",
             name: "Hydrographie — Plans d'eau (GRHQ)",
             subtitle: "Lacs, réservoirs & fleuve St-Laurent",
             url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/GRHQ_simple_WMS/MapServer/WMSServer",
@@ -4971,6 +5133,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "inondation_mrnf",
+            category: "eau",
             name: "Zones inondables (MRNF)",
             subtitle: "Cartographie des plaines inondables à risque",
             url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/Zones_a_risque_inondation_WMS/MapServer/WMSServer",
@@ -4986,6 +5149,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "milieux_humides",
+            category: "eau",
             name: "Milieux humides potentiels (MELCCFP)",
             subtitle: "Cartographie provinciale (Tourbières, marais, marécages)",
             url: "https://geo.environnement.gouv.qc.ca/donnees/services/Biodiversite/MH_potentiels/MapServer/WMSServer",
@@ -5001,6 +5165,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           },
           {
             id: "plans_drainage",
+            category: "foncier",
             name: "Plans de drainage agricole (Info-Sols)",
             subtitle: "Périmètres drainés & plans numérisés (JPG)",
             type: "drainage_pmtiles",
@@ -5009,6 +5174,21 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             attribution: "© Info-Sols / MAPAQ / Producteurs de grains du Québec",
             description: "Périmètres des travaux de drainage agricole souterrain et accès direct aux plans d'ingénierie numérisés haute résolution (JPG).",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`
+          },
+          {
+            id: "deboisement_gfw",
+            category: "foret",
+            name: "Déboisement — Couvert forestier (GFW)",
+            subtitle: "Pertes annuelles Landsat 2001–2024 (Global Forest Watch)",
+            type: "xyz",
+            url: "https://tiles.globalforestwatch.org/umd_tree_cover_loss/latest/dynamic/{z}/{x}/{y}.png",
+            format: "image/png",
+            transparent: true,
+            defaultOpacity: 0.80,
+            insertPosition: "below_pedologie",
+            attribution: "© Global Forest Watch / Hansen / UMD / WRI / Esri",
+            description: "Pertes et perturbations du couvert forestier détectées par satellites Landsat à 30 m de résolution (Global Forest Watch / GLAD / UMD). Source du service : Global Forest Watch Tree Loss (ArcGIS ImageServer / GFW Tile Cache API). Rose/magenta = perte de couvert forestier.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L7 9h3l-4 7h6l-3 5h8l-3-5h6l-4-7h3L12 2z"/></svg>`
           }
         ];
       }
@@ -5034,6 +5214,9 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
       }
 
       getTileUrl(config) {
+        if (config.type === "xyz") {
+          return config.url;
+        }
         if (config.type === "arcgis_rest") {
           const cleanUrl = config.url.split("?")[0].replace(/\\/export\\/?$/, "");
           const layersParam = config.layers !== undefined && config.layers !== "" ? `&layers=show:${config.layers}` : "";
@@ -5399,6 +5582,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         }
 
         if (typeof updateUrl === "function") updateUrl();
+        this.updateCategoryBadges();
       }
 
       setOpacity(id, opacity) {
@@ -5431,13 +5615,132 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         if (typeof updateUrl === "function") updateUrl();
       }
 
+      updateCategoryBadges() {
+        this.categories.forEach(cat => {
+          const badge = document.getElementById(`cat-badge-${cat.id}`);
+          if (!badge) return;
+          const layersInCat = Array.from(this.registry.values()).filter(c => (c.category || "custom") === cat.id);
+          const activeCount = layersInCat.filter(c => this.activeLayerIds.has(c.id)).length;
+          if (activeCount > 0) {
+            badge.textContent = `${activeCount} active${activeCount > 1 ? "s" : ""}`;
+            badge.style.display = "inline-block";
+          } else {
+            badge.style.display = "none";
+          }
+        });
+      }
+
       renderAllInSidebar() {
         const container = document.getElementById("wms-layers-list");
         if (!container) return;
         container.innerHTML = "";
-        this.registry.forEach((cfg) => {
-          this.renderLayerItem(cfg, container);
+
+        // 1. Search / filter bar
+        const searchWrap = document.createElement("div");
+        searchWrap.className = "wms-filter-bar";
+        searchWrap.innerHTML = `
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="wms-filter-input" placeholder="Filtrer les couches..." class="wms-filter-input" autocomplete="off" />
+          <button type="button" id="wms-filter-clear" style="display:none; background:none; border:none; padding:0; cursor:pointer; color:#94a3b8; font-size:13px; line-height:1;" title="Effacer">&times;</button>
+        `;
+        container.appendChild(searchWrap);
+
+        // 2. Actions row
+        const actionsRow = document.createElement("div");
+        actionsRow.className = "wms-groups-actions";
+        actionsRow.innerHTML = `
+          <span style="font-size: 10px; color: #64748b; font-weight: 500;">${this.registry.size} couches disponibles</span>
+          <button type="button" id="btn-toggle-all-groups" class="wms-btn-action">Tout déplier</button>
+        `;
+        container.appendChild(actionsRow);
+
+        // 3. Category groups
+        this.categories.forEach(cat => {
+          const layersInCat = Array.from(this.registry.values()).filter(c => (c.category || "custom") === cat.id);
+          if (cat.id === "custom" && layersInCat.length === 0) return; // Hide custom group if empty
+
+          const anyActive = layersInCat.some(c => this.activeLayerIds.has(c.id));
+          const isOpen = anyActive || cat.defaultOpen;
+
+          const groupEl = document.createElement("details");
+          groupEl.className = "wms-group";
+          groupEl.id = `wms-group-${cat.id}`;
+          groupEl.dataset.cat = cat.id;
+          if (isOpen) groupEl.open = true;
+
+          groupEl.innerHTML = `
+            <summary class="wms-group-header">
+              <div class="wms-group-title">
+                <span class="wms-group-icon">${cat.icon}</span>
+                <span>${cat.title}</span>
+                <span class="wms-group-badge" id="cat-badge-${cat.id}"></span>
+              </div>
+              <svg class="wms-group-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="wms-group-content" id="wms-group-items-${cat.id}"></div>
+          `;
+
+          container.appendChild(groupEl);
+
+          const itemsContainer = groupEl.querySelector(`#wms-group-items-${cat.id}`);
+          layersInCat.forEach(cfg => {
+            this.renderLayerItem(cfg, itemsContainer);
+          });
         });
+
+        this.setupFilterEvents();
+        this.updateCategoryBadges();
+      }
+
+      setupFilterEvents() {
+        const inp = document.getElementById("wms-filter-input");
+        const clearBtn = document.getElementById("wms-filter-clear");
+        const toggleAllBtn = document.getElementById("btn-toggle-all-groups");
+        if (!inp) return;
+
+        inp.addEventListener("input", () => {
+          const q = inp.value.trim().toLowerCase();
+          if (clearBtn) clearBtn.style.display = q ? "block" : "none";
+
+          this.registry.forEach(cfg => {
+            const itemEl = document.getElementById(`wms-item-${cfg.id}`);
+            if (!itemEl) return;
+            const textMatch = !q ||
+              cfg.name.toLowerCase().includes(q) ||
+              (cfg.subtitle && cfg.subtitle.toLowerCase().includes(q)) ||
+              (cfg.description && cfg.description.toLowerCase().includes(q));
+            itemEl.style.display = textMatch ? "block" : "none";
+          });
+
+          this.categories.forEach(cat => {
+            const groupEl = document.getElementById(`wms-group-${cat.id}`);
+            if (!groupEl) return;
+            const items = groupEl.querySelectorAll(".wms-layer-item");
+            let hasVisible = false;
+            items.forEach(it => {
+              if (it.style.display !== "none") hasVisible = true;
+            });
+            groupEl.style.display = hasVisible ? "block" : "none";
+            if (q && hasVisible) groupEl.open = true;
+          });
+        });
+
+        if (clearBtn) {
+          clearBtn.addEventListener("click", () => {
+            inp.value = "";
+            inp.dispatchEvent(new Event("input"));
+            inp.focus();
+          });
+        }
+
+        if (toggleAllBtn) {
+          toggleAllBtn.addEventListener("click", () => {
+            const allGroups = document.querySelectorAll(".wms-group");
+            const anyClosed = Array.from(allGroups).some(g => !g.open);
+            allGroups.forEach(g => g.open = anyClosed);
+            toggleAllBtn.textContent = anyClosed ? "Tout replier" : "Tout déplier";
+          });
+        }
       }
 
       renderLayerItem(cfg, container) {
