@@ -5072,13 +5072,14 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             id: "carte_hydro_mapaq",
             category: "eau",
             name: "Carte numérisée des cours d'eau (MAPAQ)",
-            subtitle: "Réseau hydrographique numérisé Info-Sols",
+            subtitle: "Réseau hydrographique numérisé Info-Sols (zoom 10+)",
             url: "https://www.info-sols.ca/api/data/local?map=hydrographie",
             layers: "carte_hydro",
             format: "image/png",
             transparent: true,
             version: "1.3.0",
-            defaultOpacity: 0.85,
+            minZoom: 9.5,
+            defaultOpacity: 1.0,
             insertPosition: "above_pedologie",
             attribution: "© Gouvernement du Québec (MAPAQ / Info-Sols)",
             description: "Carte officielle numérisée des cours d'eau du MAPAQ (Info-Sols), incluant les cours d'eau agricoles, branches et fossés d'égouttement.",
@@ -5117,7 +5118,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             id: "orthophotos_quebec",
             category: "imagerie",
             name: "Photographies aériennes (Orthomosaïque QC)",
-            subtitle: "Imagerie continue haute résolution (MRNF)",
+            subtitle: "Imagerie continue provinciale (MRNF)",
             url: "https://servicesmatriciels.mern.gouv.qc.ca/erdas-iws/ogc/wms/Imagerie_Continue",
             layers: "Imagerie_GQ",
             format: "image/jpeg",
@@ -5127,6 +5128,246 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             insertPosition: "bottom",
             attribution: "© Gouvernement du Québec (MRNF - Imagerie continue)",
             description: "Mosaïque d'orthophotographies aériennes officielles continue couvrant le Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_geomont_2023_m",
+            category: "imagerie",
+            name: "Photos aériennes 2023 — Montérégie (GeoMont)",
+            subtitle: "Haute résolution 2023 (GeoMont)",
+            url: "https://orthophotos2023.geomont.qc.ca/WMS/mapserv",
+            layers: "GeoMont_Orthophotos_2023",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© GeoMont / Montérégie",
+            description: "Campagne d'orthophotographies aériennes 2023 à très haute résolution couvrant la Montérégie (GeoMont).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_geomont_2023_e",
+            category: "imagerie",
+            name: "Photos aériennes 2023 — Estrie (GeoMont)",
+            subtitle: "Haute résolution 2023 (GeoMont)",
+            url: "https://estrie-ortho2023.geomont.qc.ca/WMS/mapserv",
+            layers: "GeoMont_Orthophotos_2023_Estrie",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© GeoMont / Estrie",
+            description: "Campagne d'orthophotographies aériennes 2023 à très haute résolution couvrant l'Estrie (GeoMont).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_geomont_2020",
+            category: "imagerie",
+            name: "Photos aériennes 2020 — Montérégie (GeoMont)",
+            subtitle: "Campagne 2020 haute résolution (GeoMont)",
+            url: "https://orthophotos2020.geomont.qc.ca/WMS/mapserv",
+            layers: "GeoMont_Orthophotos_2020",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© GeoMont",
+            description: "Campagne d'orthophotographies aériennes 2020 couvrant la Montérégie (GeoMont).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_geomont_2017",
+            category: "imagerie",
+            name: "Photos aériennes 2017 — Montérégie (GeoMont)",
+            subtitle: "Campagne 2017 haute résolution (GeoMont)",
+            url: "https://orthophotos2017.geomont.qc.ca/WMS/mapserv",
+            layers: "GeoMont_Orthophotos_2017",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© GeoMont",
+            description: "Campagne d'orthophotographies aériennes 2017 couvrant la Montérégie (GeoMont).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_monteregie",
+            category: "imagerie",
+            name: "Orthomosaïque Montérégie (MRNF - 20 cm)",
+            subtitle: "Campagne 2020 (MRNF / Info-Sols)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2020_2020_Partenariat_Monteregie_20cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Montérégie)",
+            description: "Orthophotographies aériennes haute résolution (20 cm RVB) de la Montérégie.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_estrie",
+            category: "imagerie",
+            name: "Orthomosaïque Estrie (MRNF - 20 cm)",
+            subtitle: "Campagne 2023 (MRNF / Info-Sols)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2023_2023_Partenariat_Estrie_20cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Estrie)",
+            description: "Orthophotographies aériennes 2023 haute résolution (20 cm RVB) de l'Estrie.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_centre_qc",
+            category: "imagerie",
+            name: "Orthomosaïque Centre-du-Québec (MRNF - 20 cm)",
+            subtitle: "Campagne 2020 (MRNF / Info-Sols)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2020_2020_Partenariat_Centre-du-Quebec_20cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Centre-du-Québec)",
+            description: "Orthophotographies aériennes 2020 haute résolution (20 cm RVB) du Centre-du-Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_chaudiere",
+            category: "imagerie",
+            name: "Orthomosaïque Chaudière-Appalaches (MRNF - 15 cm)",
+            subtitle: "Campagne 2020 (MRNF)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2020_2020_Partenariat_Chaudiere-Appalaches_15cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF)",
+            description: "Orthophotographies aériennes 2020 à 15 cm/pixel de la région Chaudière-Appalaches.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_laurentides_2022",
+            category: "imagerie",
+            name: "Orthomosaïque Laurentides 2022 (MRNF - 20 cm)",
+            subtitle: "Campagne 2022 haute résolution (MRNF)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2022_2022_Partenariat_Laurentides_20cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF)",
+            description: "Orthophotographies aériennes 2022 (20 cm RVB) des Laurentides.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_cmq_2021",
+            category: "imagerie",
+            name: "Orthomosaïque Québec 2021 (CMQ - 12 cm)",
+            subtitle: "Très haute résolution 12 cm (MRNF / CMQ)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2021_2021_Partenariat_CMQ_12cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF / CMQ)",
+            description: "Orthomosaïque 2021 ultra-haute résolution (12 cm RVB) de la Communauté métropolitaine de Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "photos_2009_monteregie_est",
+            category: "imagerie",
+            name: "Photos aériennes 2009 (Montérégie-Est)",
+            subtitle: "Décennal écoforestier (Info-Sols)",
+            url: "https://www.info-sols.ca/api/data/local?map=monteregie_est",
+            layers: "orthos_2009_me",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec / Info-Sols",
+            description: "Couverture d'orthophotos du décennal écoforestier 2009 couvrant la Montérégie-Est (Info-Sols).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "photos_2009_monteregie_ouest",
+            category: "imagerie",
+            name: "Photos aériennes 2009 (Montérégie-Ouest)",
+            subtitle: "Décennal écoforestier (Info-Sols)",
+            url: "https://www.info-sols.ca/api/data/local?map=monteregie_ouest",
+            layers: "orthos_2009_mo",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec / Info-Sols",
+            description: "Couverture d'orthophotos du décennal écoforestier 2009 couvrant la Montérégie-Ouest (Info-Sols).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "photos_2007_estrie",
+            category: "imagerie",
+            name: "Photos aériennes 2007 (Estrie)",
+            subtitle: "Campagne 2007 (Info-Sols)",
+            url: "https://www.info-sols.ca/api/data/local?map=estrie",
+            layers: "orthos_2007_e",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec / Info-Sols",
+            description: "Photographies aériennes numérisées 2007 de l'Estrie (Info-Sols).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "photos_2000_infosols",
+            category: "imagerie",
+            name: "Photos aériennes 2000 (Info-Sols)",
+            subtitle: "Campagne historique 2000 (Info-Sols)",
+            url: "https://www.info-sols.ca/api/data/local?map=photo_aerienne",
+            layers: "orthos_2000",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Info-Sols / Gouvernement du Québec",
+            description: "Campagne de photographies aériennes numérisées de l'an 2000 issue du portail Info-Sols.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "photos_1979_infosols",
+            category: "imagerie",
+            name: "Photos aériennes 1979 (Info-Sols)",
+            subtitle: "Photographies aériennes historiques 1979",
+            url: "https://www.info-sols.ca/api/data/local?map=photo_aerienne",
+            layers: "orthos_1979",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Info-Sols / Gouvernement du Québec",
+            description: "Photographies aériennes historiques de 1979 du Québec issues du portail Info-Sols.",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
           },
           {
@@ -5143,86 +5384,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             insertPosition: "bottom",
             attribution: "© Gouvernement du Québec (MAPAQ / Info-Sols)",
             description: "Mosaïque de photographies aériennes historiques de 1964 couvrant la région de la Montérégie-Est (Info-Sols / MAPAQ).",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "photos_2000_infosols",
-            category: "imagerie",
-            name: "Photos aériennes 2000 (Info-Sols)",
-            subtitle: "Campagne de photographies aériennes 2000",
-            url: "https://www.info-sols.ca/api/data/local?map=photo_aerienne",
-            layers: "orthos_2000",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Info-Sols / Gouvernement du Québec",
-            description: "Campagne de photographies aériennes numérisées de l'an 2000 issue du portail Info-Sols.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "ortho_monteregie",
-            category: "imagerie",
-            name: "Orthomosaïque Montérégie (MRNF - 20 cm)",
-            subtitle: "Campagne haute résolution (Info-Sols)",
-            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
-            layers: "Orthomosaique_2020_2020_Partenariat_Monteregie_20cm_RVB",
-            format: "image/jpeg",
-            transparent: false,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Montérégie)",
-            description: "Orthophotographies aériennes haute résolution (20 cm RVB) de la Montérégie.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "ortho_estrie",
-            category: "imagerie",
-            name: "Orthomosaïque Estrie (MRNF - 20 cm)",
-            subtitle: "Campagne 2023 haute résolution (Info-Sols)",
-            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
-            layers: "Orthomosaique_2023_2023_Partenariat_Estrie_20cm_RVB",
-            format: "image/jpeg",
-            transparent: false,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Estrie)",
-            description: "Orthophotographies aériennes 2023 haute résolution (20 cm RVB) de l'Estrie.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "ortho_centre_qc",
-            category: "imagerie",
-            name: "Orthomosaïque Centre-du-Québec (MRNF - 20 cm)",
-            subtitle: "Campagne 2020 haute résolution (Info-Sols)",
-            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
-            layers: "Orthomosaique_2020_2020_Partenariat_Centre-du-Quebec_20cm_RVB",
-            format: "image/jpeg",
-            transparent: false,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Centre-du-Québec)",
-            description: "Orthophotographies aériennes 2020 haute résolution (20 cm RVB) du Centre-du-Québec.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "ortho_chaudiere",
-            category: "imagerie",
-            name: "Orthomosaïque Chaudière-Appalaches (MRNF - 15 cm)",
-            subtitle: "Campagne 2020 très haute résolution (MRNF)",
-            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
-            layers: "Orthomosaique_2020_2020_Partenariat_Chaudiere-Appalaches_15cm_RVB",
-            format: "image/jpeg",
-            transparent: false,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Gouvernement du Québec (MRNF)",
-            description: "Orthophotographies aériennes 2020 à 15 cm/pixel de la région Chaudière-Appalaches.",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
           },
           {
@@ -5592,7 +5753,9 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         if (!this.map.getLayer(layerId)) {
           let beforeLayer;
           if (cfg.insertPosition === "above_pedologie") {
-            if (this.map.getLayer("parcelles-line-bg")) {
+            if (this.map.getLayer("parcelles-fill")) {
+              beforeLayer = "parcelles-fill";
+            } else if (this.map.getLayer("parcelles-line-bg")) {
               beforeLayer = "parcelles-line-bg";
             } else if (this.map.getLayer("pedologie-line")) {
               beforeLayer = "pedologie-line";
@@ -5692,6 +5855,9 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             this.ensureMapLayer(id);
             this.map.setLayoutProperty(layerId, "visibility", "visible");
             this.activeLayerIds.add(id);
+            if (typeof bringTopLayersToFront === "function") {
+              bringTopLayersToFront();
+            }
           } else {
             if (this.map.getLayer(layerId)) {
               this.map.setLayoutProperty(layerId, "visibility", "none");
@@ -6229,7 +6395,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         }
       }
 
-      // Function to ensure parcels, cadastre and contours stay properly layered
+      // Function to ensure parcels, cadastre, contours and hydrography stay properly layered
       function bringTopLayersToFront() {
         // 0. Courbes de niveau au-dessus du relief topographique
         if (map.getLayer("hrdem-topo-layer") && map.getLayer("gc-contour-minor")) {
@@ -6240,6 +6406,13 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             }
           });
         }
+        // 0.5 Hydrographie numérisée (MAPAQ et GRHQ) au-dessus de tous les rasters et de la pédologie
+        const hydroBeforeId = map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined;
+        ["wms-layer-carte_hydro_mapaq", "wms-layer-eau_grhq"].forEach(id => {
+          if (map.getLayer(id)) {
+            map.moveLayer(id, hydroBeforeId);
+          }
+        });
         // 1. Parcels above soils, contours, and WMS
         ["parcelles-fill", "parcelles-line-bg", "parcelles-line-fg"].forEach(id => {
           if (map.getLayer(id)) {
@@ -6949,6 +7122,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
       if (map.getLayer("google-hybrid-layer")) {
         map.setLayoutProperty("google-hybrid-layer", "visibility", "none");
       }
+      if (typeof bringTopLayersToFront === "function") bringTopLayersToFront();
     });
 
     btnSat.addEventListener("click", () => {
@@ -6957,6 +7131,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
       if (map.getLayer("google-hybrid-layer")) {
         map.setLayoutProperty("google-hybrid-layer", "visibility", "visible");
       }
+      if (typeof bringTopLayersToFront === "function") bringTopLayersToFront();
     });
 
     // Pedo Layer Toggle & Opacity Slider
@@ -6982,6 +7157,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         map.setLayoutProperty("pedologie-labels", "visibility", isVisible ? "visible" : "none");
         map.setPaintProperty("pedologie-labels", "text-opacity", opacity);
       }
+      if (typeof bringTopLayersToFront === "function") bringTopLayersToFront();
     }
 
     togglePedo.addEventListener("change", updatePedoLayerVisibility);
