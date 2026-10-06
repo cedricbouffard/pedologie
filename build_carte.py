@@ -686,6 +686,106 @@ html_template = """<!DOCTYPE html>
       box-shadow: 0 0 0 1px white;
     }
 
+    /* WMS Layers Section (Info-Sols & Québec) */
+    .wms-layers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 6px;
+    }
+    .wms-layer-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 7px 9px;
+      transition: all 0.15s ease;
+    }
+    .wms-layer-item:hover {
+      border-color: #cbd5e1;
+    }
+    .wms-layer-item.active {
+      background: #ffffff;
+      border-color: #94a3b8;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .wms-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .wms-item-info {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      flex: 1;
+    }
+    .wms-item-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f5f9;
+      color: #475569;
+      flex-shrink: 0;
+    }
+    .wms-layer-item.active .wms-item-icon {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .wms-item-titles {
+      min-width: 0;
+      flex: 1;
+    }
+    .wms-item-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .wms-item-subtitle {
+      font-size: 9.5px;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .wms-item-controls {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed #e2e8f0;
+      display: none;
+    }
+    .wms-layer-item.active .wms-item-controls {
+      display: block;
+    }
+    .wms-badge-src {
+      display: inline-block;
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0 4px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      letter-spacing: 0.2px;
+    }
+    .wms-add-panel {
+      margin-top: 8px;
+      padding: 9px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 7px;
+    }
+
     /* Source info line */
     .source-info-line {
       font-size: 9.5px;
@@ -2176,6 +2276,40 @@ html_template = """<!DOCTYPE html>
         </div>
       </div>
 
+      <!-- 5. Couches WMS (Info-Sols & Québec) -->
+      <div class="tool-card" id="card-wms">
+        <div class="tool-card-header">
+          <div class="tool-card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span>Couches WMS (Info-Sols &amp; QC)</span>
+          </div>
+          <button id="btn-toggle-add-wms" class="profile-dock-btn" type="button" style="padding: 2px 7px; font-size: 10.5px;" title="Ajouter un flux WMS externe personnalisé">+ Ajouter</button>
+        </div>
+
+        <div class="tool-sublabel" style="margin-bottom: 2px;">
+          Flux cartographiques officiels du Québec
+        </div>
+
+        <div id="wms-layers-list" class="wms-layers-list">
+          <!-- Alimenté dynamiquement par WmsLayerManager -->
+        </div>
+
+        <!-- Formulaire d'ajout de flux WMS personnalisé -->
+        <div id="wms-custom-add-box" class="wms-add-panel" style="display: none;">
+          <div style="font-size: 11px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Nouveau flux WMS externe</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <input type="text" id="custom-wms-name" class="soil-ai-text-input" placeholder="Nom de la couche" style="font-size: 11px; padding: 4px 8px;" />
+            <input type="url" id="custom-wms-url" class="soil-ai-text-input" placeholder="URL WMS (https://.../WMSServer)" style="font-size: 11px; padding: 4px 8px;" />
+            <input type="text" id="custom-wms-layers" class="soil-ai-text-input" placeholder="Identifiants (ex: 9,10 ou nom_couche)" style="font-size: 11px; padding: 4px 8px;" />
+            <div style="display: flex; gap: 6px; margin-top: 2px;">
+              <button id="btn-confirm-add-wms" type="button" class="profile-dock-btn" style="background: #0f172a; color: #fff; border-color: #0f172a; flex: 1; padding: 5px 0; font-weight: 600;">Ajouter à la carte</button>
+              <button id="btn-cancel-add-wms" type="button" class="profile-dock-btn" style="padding: 5px 8px;">Annuler</button>
+            </div>
+            <div id="custom-wms-error" style="font-size: 10px; color: #b91c1c; display: none;"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Bouton Partager la vue -->
       <div style="padding-top: 2px;">
         <button id="btn-panel-share" type="button" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 12px; background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #166534; cursor: pointer; transition: all 0.15s ease;">
@@ -2525,6 +2659,17 @@ html_template = """<!DOCTYPE html>
         if (!layers.includes("ndvi")) layers.push("ndvi");
       }
 
+      // WMS layers
+      let wms = [];
+      if (searchParams.has("wms")) {
+        wms = searchParams.get("wms").split(",").map(s => s.trim().toLowerCase());
+      } else if (hashStr) {
+        const hashParams = new URLSearchParams(hashStr.includes("&") ? hashStr : "");
+        if (hashParams.has("wms")) {
+          wms = hashParams.get("wms").split(",").map(s => s.trim().toLowerCase());
+        }
+      }
+
       // Basemap
       let basemap = searchParams.get("basemap");
       if (!basemap && hashStr) {
@@ -2547,6 +2692,7 @@ html_template = """<!DOCTYPE html>
         zoom,
         basemap,
         layers,
+        wms,
         pedoOp: pedoOp ? parseInt(pedoOp, 10) : null,
         parcellesOp: parcellesOp ? parseInt(parcellesOp, 10) : null,
         topoOp: topoOp ? parseInt(topoOp, 10) : null,
@@ -4668,11 +4814,390 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
       }
     }
 
+    class WmsLayerManager {
+      constructor(map) {
+        this.map = map;
+        this.registry = new Map();
+        this.activeLayerIds = new Set();
+        this.storageKey = "pedo_custom_wms_layers";
+
+        // Preconfigured catalog:
+        // 1. eau.qlr (Hydrographie linéaire: cours d'eau permanents & intermittents)
+        // 2. Info-Sols: Plans d'eau (Surfaces GRHQ)
+        // 3. Info-Sols: Zone agricole CPTAQ
+        // 4. Info-Sols: Zones à risque d'inondation
+        // 5. Info-Sols: Carte écoforestière MRNF
+        this.defaultCatalog = [
+          {
+            id: "eau_grhq",
+            name: "Hydrographie — Réseau (GRHQ)",
+            subtitle: "Cours d'eau permanents & intermittents (MRNF)",
+            badge: "eau.qlr",
+            badgeColor: "#0284c7",
+            url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/GRHQ_simple_WMS/MapServer/WMSServer",
+            layers: "9,10,11,12,13,14,15,16",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 0.90,
+            insertPosition: "above_pedologie",
+            attribution: "© Gouvernement du Québec (MRNF - GRHQ)",
+            description: "Réseau hydrographique officiel du Québec (cours d'eau permanents et intermittents, conforme à eau.qlr).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 6c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/><path d="M2 12c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/><path d="M2 18c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/></svg>`
+          },
+          {
+            id: "eau_grhq_surfaces",
+            name: "Hydrographie — Plans d'eau (GRHQ)",
+            subtitle: "Lacs, réservoirs & fleuve St-Laurent",
+            badge: "MRNF",
+            badgeColor: "#0369a1",
+            url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/GRHQ_simple_WMS/MapServer/WMSServer",
+            layers: "1,2,3,4,5,6,7",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 0.75,
+            insertPosition: "below_pedologie",
+            attribution: "© Gouvernement du Québec (MRNF - GRHQ)",
+            description: "Surfaces et plans d'eau du Québec à toutes les échelles (1:125 000 à 1:40 000 000).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`
+          },
+          {
+            id: "cptaq_zone_agricole",
+            name: "Zone agricole provinciale (CPTAQ)",
+            subtitle: "Territoire protégé au cadastre (LPTAA)",
+            badge: "Info-Sols",
+            badgeColor: "#15803d",
+            url: "https://carto.cptaq.gouv.qc.ca/cgi-bin/v2/cptaq",
+            layers: "zone_agricole",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 0.55,
+            insertPosition: "below_pedologie",
+            attribution: "© CPTAQ",
+            description: "Zonage agricole officiel de la Commission de protection du territoire agricole du Québec (couche Info-Sols).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>`
+          },
+          {
+            id: "inondation_mrnf",
+            name: "Zones inondables (MRNF)",
+            subtitle: "Cartographie des plaines inondables à risque",
+            badge: "Info-Sols",
+            badgeColor: "#b45309",
+            url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/Zones_a_risque_inondation_WMS/MapServer/WMSServer",
+            layers: "0",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 0.65,
+            insertPosition: "below_pedologie",
+            attribution: "© Gouvernement du Québec (MRNF)",
+            description: "Périmètres des zones inondables répertoriées au Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
+          },
+          {
+            id: "ecoforestier_mrnf",
+            name: "Données écoforestières (MRNF)",
+            subtitle: "Peuplements et types écologiques",
+            badge: "Info-Sols",
+            badgeColor: "#047857",
+            url: "https://geoegl.msp.gouv.qc.ca/ws/mffpecofor.fcgi",
+            layers: "MRNF-DIF",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 0.70,
+            insertPosition: "below_pedologie",
+            attribution: "© Gouvernement du Québec (MRNF / MFFP)",
+            description: "Système d'information écoforestière du Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L7 10h3l-4 7h6v5h2v-5h6l-4-7h3z"/></svg>`
+          }
+        ];
+      }
+
+      init() {
+        this.defaultCatalog.forEach(c => this.register(c));
+        this.loadCustomLayersFromStorage();
+        this.renderAllInSidebar();
+        this.setupCustomAddEvents();
+      }
+
+      register(config) {
+        const fullConfig = {
+          format: "image/png",
+          transparent: true,
+          version: "1.3.0",
+          insertPosition: "below_pedologie",
+          defaultOpacity: 0.8,
+          currentOpacity: config.defaultOpacity !== undefined ? config.defaultOpacity : 0.8,
+          ...config
+        };
+        this.registry.set(fullConfig.id, fullConfig);
+      }
+
+      getTileUrl(config) {
+        const cleanUrl = config.url.split("?")[0];
+        const crsParam = config.version === "1.1.1" ? "SRS=EPSG:3857" : "CRS=EPSG:3857";
+        const transparent = config.transparent ? "TRUE" : "FALSE";
+        const styles = config.styles || "";
+        return `${cleanUrl}?SERVICE=WMS&VERSION=${config.version}&REQUEST=GetMap&${crsParam}&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&LAYERS=${config.layers}&STYLES=${styles}&FORMAT=${config.format}&TRANSPARENT=${transparent}`;
+      }
+
+      ensureMapLayer(id) {
+        const cfg = this.registry.get(id);
+        if (!cfg) return false;
+        const sourceId = `wms-source-${id}`;
+        const layerId = `wms-layer-${id}`;
+
+        if (!this.map.getSource(sourceId)) {
+          this.map.addSource(sourceId, {
+            type: "raster",
+            tiles: [this.getTileUrl(cfg)],
+            tileSize: 256,
+            attribution: cfg.attribution || "WMS"
+          });
+        }
+
+        if (!this.map.getLayer(layerId)) {
+          let beforeLayer;
+          if (cfg.insertPosition === "above_pedologie") {
+            if (this.map.getLayer("parcelles-line-bg")) {
+              beforeLayer = "parcelles-line-bg";
+            } else if (this.map.getLayer("pedologie-line")) {
+              beforeLayer = "pedologie-line";
+            }
+          } else {
+            if (this.map.getLayer("pedologie-hit-layer")) {
+              beforeLayer = "pedologie-hit-layer";
+            } else if (this.map.getLayer("pedologie-fill")) {
+              beforeLayer = "pedologie-fill";
+            }
+          }
+
+          this.map.addLayer({
+            id: layerId,
+            type: "raster",
+            source: sourceId,
+            layout: { visibility: "none" },
+            paint: { "raster-opacity": cfg.currentOpacity }
+          }, beforeLayer);
+
+          if (typeof bringParcellesToFront === "function") {
+            bringParcellesToFront();
+          }
+        }
+        return true;
+      }
+
+      toggle(id, visible) {
+        const cfg = this.registry.get(id);
+        if (!cfg) return;
+
+        const layerId = `wms-layer-${id}`;
+        if (visible) {
+          this.ensureMapLayer(id);
+          this.map.setLayoutProperty(layerId, "visibility", "visible");
+          this.activeLayerIds.add(id);
+        } else {
+          if (this.map.getLayer(layerId)) {
+            this.map.setLayoutProperty(layerId, "visibility", "none");
+          }
+          this.activeLayerIds.delete(id);
+        }
+
+        const itemEl = document.getElementById(`wms-item-${id}`);
+        if (itemEl) {
+          if (visible) itemEl.classList.add("active");
+          else itemEl.classList.remove("active");
+          const chk = itemEl.querySelector('input[type="checkbox"]');
+          if (chk) chk.checked = visible;
+        }
+
+        if (typeof updateUrl === "function") updateUrl();
+      }
+
+      setOpacity(id, opacity) {
+        const cfg = this.registry.get(id);
+        if (!cfg) return;
+        cfg.currentOpacity = opacity;
+        const layerId = `wms-layer-${id}`;
+        if (this.map.getLayer(layerId)) {
+          this.map.setPaintProperty(layerId, "raster-opacity", opacity);
+        }
+        const valBadge = document.getElementById(`wms-opacity-val-${id}`);
+        if (valBadge) valBadge.textContent = `${Math.round(opacity * 100)}%`;
+        if (typeof updateUrl === "function") updateUrl();
+      }
+
+      renderAllInSidebar() {
+        const container = document.getElementById("wms-layers-list");
+        if (!container) return;
+        container.innerHTML = "";
+        this.registry.forEach((cfg) => {
+          this.renderLayerItem(cfg, container);
+        });
+      }
+
+      renderLayerItem(cfg, container) {
+        const item = document.createElement("div");
+        item.id = `wms-item-${cfg.id}`;
+        item.className = "wms-layer-item";
+        
+        const badgeColor = cfg.badgeColor || "#0284c7";
+        const opVal = Math.round(cfg.currentOpacity * 100);
+
+        item.innerHTML = `
+          <div class="wms-item-header">
+            <div class="wms-item-info">
+              <div class="wms-item-icon">
+                ${cfg.icon || '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>'}
+              </div>
+              <div class="wms-item-titles" title="${cfg.description || cfg.name}">
+                <div class="wms-item-title">
+                  <span>${cfg.name}</span>
+                  ${cfg.badge ? `<span class="wms-badge-src" style="background:${badgeColor}18; color:${badgeColor}; border:1px solid ${badgeColor}40;">${cfg.badge}</span>` : ''}
+                </div>
+                <div class="wms-item-subtitle">${cfg.subtitle || cfg.layers}</div>
+              </div>
+            </div>
+            <label class="switch-label" title="Activer/Désactiver cette couche">
+              <input type="checkbox" id="toggle-wms-${cfg.id}">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+          <div class="wms-item-controls">
+            <div class="tool-label-row">
+              <span class="tool-sublabel">Opacité</span>
+              <span id="wms-opacity-val-${cfg.id}" class="val-badge">${opVal}%</span>
+            </div>
+            <input type="range" id="slider-wms-${cfg.id}" min="0" max="100" value="${opVal}" class="slider">
+          </div>
+        `;
+
+        container.appendChild(item);
+
+        const chk = item.querySelector(`#toggle-wms-${cfg.id}`);
+        if (chk) {
+          chk.addEventListener("change", (e) => {
+            this.toggle(cfg.id, e.target.checked);
+          });
+        }
+
+        const slider = item.querySelector(`#slider-wms-${cfg.id}`);
+        if (slider) {
+          slider.addEventListener("input", (e) => {
+            this.setOpacity(cfg.id, parseInt(e.target.value, 10) / 100);
+          });
+        }
+      }
+
+      setupCustomAddEvents() {
+        const btnToggle = document.getElementById("btn-toggle-add-wms");
+        const box = document.getElementById("wms-custom-add-box");
+        const btnConfirm = document.getElementById("btn-confirm-add-wms");
+        const btnCancel = document.getElementById("btn-cancel-add-wms");
+        const nameInp = document.getElementById("custom-wms-name");
+        const urlInp = document.getElementById("custom-wms-url");
+        const layersInp = document.getElementById("custom-wms-layers");
+        const errEl = document.getElementById("custom-wms-error");
+
+        if (btnToggle && box) {
+          btnToggle.addEventListener("click", () => {
+            box.style.display = box.style.display === "none" ? "block" : "none";
+          });
+        }
+
+        if (btnCancel && box) {
+          btnCancel.addEventListener("click", () => {
+            box.style.display = "none";
+            if (errEl) errEl.style.display = "none";
+          });
+        }
+
+        if (btnConfirm) {
+          btnConfirm.addEventListener("click", () => {
+            const name = (nameInp.value || "").trim();
+            const url = (urlInp.value || "").trim();
+            const layers = (layersInp.value || "").trim();
+
+            if (!name || !url || !layers) {
+              if (errEl) {
+                errEl.textContent = "Veuillez remplir le nom, l'URL WMS et la couche.";
+                errEl.style.display = "block";
+              }
+              return;
+            }
+
+            const id = "custom_" + Date.now().toString(36);
+            const newCfg = {
+              id,
+              name,
+              subtitle: "Flux WMS personnalisé",
+              badge: "Perso",
+              badgeColor: "#64748b",
+              url,
+              layers,
+              format: "image/png",
+              transparent: true,
+              version: "1.3.0",
+              defaultOpacity: 0.8,
+              insertPosition: "below_pedologie",
+              attribution: name
+            };
+
+            this.register(newCfg);
+            this.saveCustomLayerToStorage(newCfg);
+
+            const container = document.getElementById("wms-layers-list");
+            if (container) this.renderLayerItem(newCfg, container);
+
+            this.toggle(id, true);
+
+            nameInp.value = "";
+            urlInp.value = "";
+            layersInp.value = "";
+            if (errEl) errEl.style.display = "none";
+            if (box) box.style.display = "none";
+          });
+        }
+      }
+
+      saveCustomLayerToStorage(cfg) {
+        try {
+          const list = JSON.parse(localStorage.getItem(this.storageKey) || "[]");
+          list.push(cfg);
+          localStorage.setItem(this.storageKey, JSON.stringify(list));
+        } catch(e) {}
+      }
+
+      loadCustomLayersFromStorage() {
+        try {
+          const list = JSON.parse(localStorage.getItem(this.storageKey) || "[]");
+          list.forEach(c => this.register(c));
+        } catch(e) {}
+      }
+
+      getActiveLayerIds() {
+        return Array.from(this.activeLayerIds);
+      }
+
+      restoreFromState(wmsIds) {
+        if (!Array.isArray(wmsIds)) return;
+        wmsIds.forEach(id => {
+          if (this.registry.has(id)) {
+            this.toggle(id, true);
+          }
+        });
+      }
+    }
+
     let topoManager = null;
     let contourManager = null;
     let profileManager = null;
     let ndviManager = null;
     let soilAiAssistant = null;
+    let wmsManager = null;
 
     map.on("load", () => {
       // 1. Google Hybrid Raster Source
@@ -4896,6 +5421,10 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
 
       // Instantiate Soil AI Assistant
       soilAiAssistant = new SoilAiAssistant(map);
+
+      // Instantiate WMS Layer Manager (Info-Sols & Québec services)
+      wmsManager = new WmsLayerManager(map);
+      wmsManager.init();
 
       // Map click handler for transect line drawing & NDVI mode
       map.on("click", (e) => {
@@ -5950,6 +6479,14 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           params.set("topo_op", topoOpacitySlider.value);
         }
 
+        // Active WMS layers
+        if (wmsManager) {
+          const activeWms = wmsManager.getActiveLayerIds();
+          if (activeWms.length > 0) {
+            params.set("wms", activeWms.join(","));
+          }
+        }
+
         const queryString = params.toString();
         const newUrl = window.location.pathname + (queryString ? "?" + queryString : "");
         window.history.replaceState(null, "", newUrl);
@@ -6039,6 +6576,11 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         if (ndviManager) {
           ndviManager.setMode(true);
         }
+      }
+
+      // 7. WMS layers
+      if (state.wms && state.wms.length > 0 && wmsManager) {
+        wmsManager.restoreFromState(state.wms);
       }
 
       // Ensure parcelles stay on top of other layers
