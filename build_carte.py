@@ -2388,10 +2388,27 @@ html_template = """<!DOCTYPE html>
 
         <div class="tool-label-row">
           <span class="tool-sublabel">Étirement viewport</span>
-          <div class="segmented-control" style="width: 140px;">
+          <div class="segmented-control" style="width: 180px;">
             <button id="btn-stretch-pct" class="seg-btn active" type="button" title="Percentile 5-95%">5-95%</button>
-            <button id="btn-stretch-minmax" class="seg-btn" type="button" title="Min-Max total">Min/Max</button>
+            <button id="btn-stretch-minmax" class="seg-btn" type="button" title="Min-Max automatique">Auto</button>
+            <button id="btn-stretch-manual" class="seg-btn" type="button" title="Plage altimétrique manuelle">Manuel</button>
           </div>
+        </div>
+
+        <div id="topo-manual-box" style="display: none; margin-top: 8px; padding: 7px 9px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+          <div style="font-size: 10.5px; font-weight: 600; color: #475569; margin-bottom: 5px;">Plage altimétrique personnalisée (m)</div>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <div style="flex: 1;">
+              <span style="font-size: 9.5px; color: #64748b; font-weight: 600;">Min (m)</span>
+              <input type="number" id="topo-manual-min" step="0.5" class="soil-ai-text-input" style="font-size: 11px; padding: 4px 6px; width: 100%; font-family: var(--font-mono, monospace);" placeholder="Min" />
+            </div>
+            <div style="flex: 1;">
+              <span style="font-size: 9.5px; color: #64748b; font-weight: 600;">Max (m)</span>
+              <input type="number" id="topo-manual-max" step="0.5" class="soil-ai-text-input" style="font-size: 11px; padding: 4px 6px; width: 100%; font-family: var(--font-mono, monospace);" placeholder="Max" />
+            </div>
+            <button id="btn-apply-topo-manual" type="button" class="profile-dock-btn" style="margin-top: 14px; padding: 4px 9px; font-size: 11px; font-weight: 600; background: #0f172a; color: #fff; border-color: #0f172a;" title="Appliquer la plage altimétrique">Appliquer</button>
+          </div>
+          <div id="topo-manual-error" style="font-size: 10px; color: #b91c1c; margin-top: 3px; display: none;"></div>
         </div>
       </div>
 
@@ -2458,9 +2475,9 @@ html_template = """<!DOCTYPE html>
         <label class="profile-precision-label">
           <span>Précision :</span>
           <select id="profile-precision" class="tool-select">
+            <option value="decimal2" selected>2 décimales (0.01 m)</option>
+            <option value="decimal1">1 décimale (0.1 m)</option>
             <option value="unit">0 décimale (1 m)</option>
-            <option value="decimal1" selected>1 décimale (0.1 m)</option>
-            <option value="decimal2">2 décimales (0.01 m)</option>
           </select>
         </label>
         <button id="btn-dock-clear" class="profile-dock-btn" type="button" title="Effacer la coupe">Effacer</button>
@@ -2937,7 +2954,11 @@ html_template = """<!DOCTYPE html>
         this.map = mapInstance;
         this.enabled = false;
         this.opacity = 0.70;
-        this.stretchMethod = 'percentile'; // 'percentile' or 'minmax'
+        this.stretchMethod = 'percentile'; // 'percentile', 'minmax', or 'manual'
+        this.manualMin = null;
+        this.manualMax = null;
+        this.lastAutoMin = null;
+        this.lastAutoMax = null;
         this.activeCogUrl = '';
         this.cogPromise = null;
         this.canvas = document.createElement('canvas');
@@ -2950,6 +2971,17 @@ html_template = """<!DOCTYPE html>
       setStretchMethod(method) {
         this.stretchMethod = method;
         this.scheduleUpdate();
+      }
+
+      setManualRange(min, max) {
+        if (Number.isFinite(min) && Number.isFinite(max) && max > min) {
+          this.manualMin = min;
+          this.manualMax = max;
+          this.stretchMethod = 'manual';
+          this.scheduleUpdate();
+          return true;
+        }
+        return false;
       }
 
       setOpacity(val) {
@@ -3030,9 +3062,22 @@ html_template = """<!DOCTYPE html>
             return;
           }
 
-          const [minAlt, maxAlt] = calculateViewportStretchRange(region.data, this.stretchMethod);
+          const [autoMin, autoMax] = calculateViewportStretchRange(region.data, this.stretchMethod === 'minmax' ? 'minmax' : 'percentile');
+          this.lastAutoMin = autoMin;
+          this.lastAutoMax = autoMax;
+
+          let minAlt, maxAlt;
+          if (this.stretchMethod === 'manual' && Number.isFinite(this.manualMin) && Number.isFinite(this.manualMax) && this.manualMax > this.manualMin) {
+            minAlt = this.manualMin;
+            maxAlt = this.manualMax;
+          } else {
+            minAlt = autoMin;
+            maxAlt = autoMax;
+          }
+
           if (badge) {
-            badge.textContent = `Alt: ${Math.round(minAlt)} m (mauve) → ${Math.round(maxAlt)} m (rouge)`;
+            const prefix = this.stretchMethod === 'manual' ? 'Alt fixé : ' : 'Alt : ';
+            badge.textContent = `${prefix}${minAlt.toFixed(2)} m (mauve) → ${maxAlt.toFixed(2)} m (rouge)`;
           }
 
           const span = Math.max(1, maxAlt - minAlt);
@@ -3270,7 +3315,7 @@ html_template = """<!DOCTYPE html>
         const region = await readCogRegion(
           cog,
           bbox,
-          256,
+          512,
           -32767,
           false,
           this.abortController.signal,
@@ -3295,9 +3340,12 @@ html_template = """<!DOCTYPE html>
           throw new Error("La distance de la coupe est trop faible.");
         }
 
-        const samplesCount = 128;
+        const samplesCount = 256;
         const profile = [];
         let segIdx = 1;
+
+        const spanX = region.sourceBBox[2] - region.sourceBBox[0];
+        const spanY = region.sourceBBox[3] - region.sourceBBox[1];
 
         for (let s = 0; s < samplesCount; s++) {
           const curDist = (totalDist * s) / (samplesCount - 1);
@@ -3311,17 +3359,42 @@ html_template = """<!DOCTYPE html>
           const ptLat = this.line[segIdx - 1][1] + (this.line[segIdx][1] - this.line[segIdx - 1][1]) * r;
 
           const [projX, projY] = proj4('EPSG:4326', EPSG_3979_DEF, [ptLng, ptLat]);
-          const px = Math.round(((projX - region.sourceBBox[0]) / (region.sourceBBox[2] - region.sourceBBox[0])) * (region.width - 1));
-          const py = Math.round(((region.sourceBBox[3] - projY) / (region.sourceBBox[3] - region.sourceBBox[1])) * (region.height - 1));
+          if (spanX > 0 && spanY > 0) {
+            const gx = ((projX - region.sourceBBox[0]) / spanX) * (region.width - 1);
+            const gy = ((region.sourceBBox[3] - projY) / spanY) * (region.height - 1);
 
-          if (px >= 0 && px < region.width && py >= 0 && py < region.height) {
-            const val = region.data[py * region.width + px];
-            if (Number.isFinite(val) && val > -1000 && val < 9000) {
-              profile.push({
-                distance: curDist,
-                elevation: val,
-                coord: [ptLng, ptLat]
-              });
+            if (gx >= 0 && gx <= region.width - 1 && gy >= 0 && gy <= region.height - 1) {
+              const x0 = Math.floor(gx);
+              const x1 = Math.min(region.width - 1, x0 + 1);
+              const y0 = Math.floor(gy);
+              const y1 = Math.min(region.height - 1, y0 + 1);
+              const wx = gx - x0;
+              const wy = gy - y0;
+
+              const v00 = region.data[y0 * region.width + x0];
+              const v10 = region.data[y0 * region.width + x1];
+              const v01 = region.data[y1 * region.width + x0];
+              const v11 = region.data[y1 * region.width + x1];
+
+              const vals = [v00, v10, v01, v11];
+              let val;
+              if (vals.every(v => Number.isFinite(v) && v > -1000 && v < 9000)) {
+                // Bilinear continuous elevation interpolation (no stairs)
+                val = (1 - wx) * (1 - wy) * v00 + wx * (1 - wy) * v10 + (1 - wx) * wy * v01 + wx * wy * v11;
+              } else {
+                const validVals = vals.filter(v => Number.isFinite(v) && v > -1000 && v < 9000);
+                if (validVals.length > 0) {
+                  val = validVals.reduce((a, b) => a + b, 0) / validVals.length;
+                }
+              }
+
+              if (val !== undefined && Number.isFinite(val) && val > -1000 && val < 9000) {
+                profile.push({
+                  distance: curDist,
+                  elevation: val,
+                  coord: [ptLng, ptLat]
+                });
+              }
             }
           }
         }
@@ -3363,9 +3436,10 @@ html_template = """<!DOCTYPE html>
         const slopePct = slope * 100;
 
         const fmt = (val) => {
+          if (!Number.isFinite(val)) return "—";
           if (precisionType === "unit") return val.toFixed(0);
-          if (precisionType === "decimal2") return val.toFixed(2);
-          return val.toFixed(1);
+          if (precisionType === "decimal1") return val.toFixed(1);
+          return val.toFixed(2); // Always 2 decimals by default
         };
 
         const distFmt = (d) => {
@@ -3421,6 +3495,7 @@ html_template = """<!DOCTYPE html>
             <line class="raster-profile-axis" x1="${axisLeft}" y1="${axisBottom}" x2="${axisLeft + plotW}" y2="${axisBottom}"/>
             <line class="raster-profile-axis" x1="${axisLeft}" y1="${pad.top}" x2="${axisLeft}" y2="${axisBottom}"/>
             <text class="raster-profile-axis-label" x="${axisLeft - 6}" y="${pad.top + 4}" text-anchor="end">${fmt(maxElev)} m</text>
+            <text class="raster-profile-axis-label" x="${axisLeft - 6}" y="${(pad.top + plotH * 0.5 + 3).toFixed(1)}" text-anchor="end">${fmt(minElev + span * 0.5)} m</text>
             <text class="raster-profile-axis-label" x="${axisLeft - 6}" y="${axisBottom}" text-anchor="end">${fmt(minElev)} m</text>
             <text class="raster-profile-axis-label" x="${axisLeft}" y="${height - 6}" text-anchor="start">0 m</text>
             <text class="raster-profile-axis-label" x="${axisLeft + plotW}" y="${height - 6}" text-anchor="end">${distFmt(totalDist)}</text>
@@ -6958,17 +7033,71 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
       if (topoManager) topoManager.setOpacity(pct / 100);
     });
 
+    const btnStretchManual = document.getElementById("btn-stretch-manual");
+    const topoManualBox = document.getElementById("topo-manual-box");
+    const topoManualMin = document.getElementById("topo-manual-min");
+    const topoManualMax = document.getElementById("topo-manual-max");
+    const btnApplyTopoManual = document.getElementById("btn-apply-topo-manual");
+    const topoManualError = document.getElementById("topo-manual-error");
+
     btnStretchPct.addEventListener("click", () => {
       btnStretchPct.classList.add("active");
       btnStretchMinMax.classList.remove("active");
+      if (btnStretchManual) btnStretchManual.classList.remove("active");
+      if (topoManualBox) topoManualBox.style.display = "none";
       if (topoManager) topoManager.setStretchMethod("percentile");
     });
 
     btnStretchMinMax.addEventListener("click", () => {
       btnStretchMinMax.classList.add("active");
       btnStretchPct.classList.remove("active");
+      if (btnStretchManual) btnStretchManual.classList.remove("active");
+      if (topoManualBox) topoManualBox.style.display = "none";
       if (topoManager) topoManager.setStretchMethod("minmax");
     });
+
+    function applyManualTopoRange() {
+      if (!topoManualMin || !topoManualMax || !topoManager) return;
+      const mn = parseFloat(topoManualMin.value);
+      const mx = parseFloat(topoManualMax.value);
+      if (isNaN(mn) || isNaN(mx) || mx <= mn) {
+        if (topoManualError) {
+          topoManualError.textContent = "Le max doit être strictement supérieur au min.";
+          topoManualError.style.display = "block";
+        }
+        return;
+      }
+      if (topoManualError) topoManualError.style.display = "none";
+      topoManager.setManualRange(mn, mx);
+    }
+
+    if (btnStretchManual) {
+      btnStretchManual.addEventListener("click", () => {
+        btnStretchManual.classList.add("active");
+        btnStretchPct.classList.remove("active");
+        btnStretchMinMax.classList.remove("active");
+        if (topoManualBox) {
+          topoManualBox.style.display = "block";
+          if ((!topoManualMin.value || !topoManualMax.value) && topoManager) {
+            const curMin = Number.isFinite(topoManager.manualMin) ? topoManager.manualMin : (topoManager.lastAutoMin || 0);
+            const curMax = Number.isFinite(topoManager.manualMax) ? topoManager.manualMax : (topoManager.lastAutoMax || 100);
+            topoManualMin.value = curMin.toFixed(2);
+            topoManualMax.value = curMax.toFixed(2);
+          }
+        }
+        applyManualTopoRange();
+      });
+    }
+
+    if (btnApplyTopoManual) {
+      btnApplyTopoManual.addEventListener("click", applyManualTopoRange);
+    }
+    if (topoManualMin) {
+      topoManualMin.addEventListener("keydown", (e) => { if (e.key === "Enter") applyManualTopoRange(); });
+    }
+    if (topoManualMax) {
+      topoManualMax.addEventListener("keydown", (e) => { if (e.key === "Enter") applyManualTopoRange(); });
+    }
 
     // Dynamic Contours Controls
     const toggleContours = document.getElementById("toggle-contours");
@@ -7089,7 +7218,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           btnQuickCalc.disabled = true;
           btnQuickCalc.textContent = "Calcul...";
         }
-        const prec = profilePrecision ? profilePrecision.value : "decimal1";
+        const prec = profilePrecision ? profilePrecision.value : "decimal2";
         await profileManager.calculateProfile(prec);
       } catch (err) {
         console.error("Profile calculation error:", err);
@@ -7264,7 +7393,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
       if (profileManager && profileManager.profile.length >= 2) {
         const dock = document.getElementById("elevation-profile-dock");
         if (dock && dock.classList.contains("open")) {
-          const prec = profilePrecision ? profilePrecision.value : "decimal1";
+          const prec = profilePrecision ? profilePrecision.value : "decimal2";
           profileManager.renderChart(prec);
         }
       }
