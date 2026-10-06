@@ -2263,31 +2263,31 @@
         </div>
       </div>
 
-      <!-- 5. Couches WMS (Info-Sols & Québec) -->
+      <!-- 5. Couches géomatiques et WMS (Québec) -->
       <div class="tool-card" id="card-wms">
         <div class="tool-card-header">
           <div class="tool-card-title">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            <span>Couches WMS (Info-Sols &amp; QC)</span>
+            <span>Données géomatiques &amp; WMS</span>
           </div>
-          <button id="btn-toggle-add-wms" class="profile-dock-btn" type="button" style="padding: 2px 7px; font-size: 10.5px;" title="Ajouter un flux WMS externe personnalisé">+ Ajouter</button>
+          <button id="btn-toggle-add-wms" class="profile-dock-btn" type="button" style="padding: 2px 7px; font-size: 10.5px;" title="Ajouter un flux WMS ou ArcGIS REST personnalisé">+ Ajouter</button>
         </div>
 
         <div class="tool-sublabel" style="margin-bottom: 2px;">
-          Flux cartographiques officiels du Québec
+          Hydrographie, cadastre et imagerie du Québec
         </div>
 
         <div id="wms-layers-list" class="wms-layers-list">
           <!-- Alimenté dynamiquement par WmsLayerManager -->
         </div>
 
-        <!-- Formulaire d'ajout de flux WMS personnalisé -->
+        <!-- Formulaire d'ajout de flux personnalisé -->
         <div id="wms-custom-add-box" class="wms-add-panel" style="display: none;">
-          <div style="font-size: 11px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Nouveau flux WMS externe</div>
+          <div style="font-size: 11px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Nouveau flux cartographique (WMS / REST)</div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
             <input type="text" id="custom-wms-name" class="soil-ai-text-input" placeholder="Nom de la couche" style="font-size: 11px; padding: 4px 8px;" />
-            <input type="url" id="custom-wms-url" class="soil-ai-text-input" placeholder="URL WMS (https://.../WMSServer)" style="font-size: 11px; padding: 4px 8px;" />
-            <input type="text" id="custom-wms-layers" class="soil-ai-text-input" placeholder="Identifiants (ex: 9,10 ou nom_couche)" style="font-size: 11px; padding: 4px 8px;" />
+            <input type="url" id="custom-wms-url" class="soil-ai-text-input" placeholder="URL (ex: WMS /WMSServer ou ArcGIS /MapServer)" style="font-size: 11px; padding: 4px 8px;" />
+            <input type="text" id="custom-wms-layers" class="soil-ai-text-input" placeholder="Couches (ex: 0 ou 9,10 ou nom)" style="font-size: 11px; padding: 4px 8px;" />
             <div style="display: flex; gap: 6px; margin-top: 2px;">
               <button id="btn-confirm-add-wms" type="button" class="profile-dock-btn" style="background: #0f172a; color: #fff; border-color: #0f172a; flex: 1; padding: 5px 0; font-weight: 600;">Ajouter à la carte</button>
               <button id="btn-cancel-add-wms" type="button" class="profile-dock-btn" style="padding: 5px 8px;">Annuler</button>
@@ -4809,18 +4809,17 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         this.storageKey = "pedo_custom_wms_layers";
 
         // Preconfigured catalog:
-        // 1. eau.qlr (Hydrographie linéaire: cours d'eau permanents & intermittents)
-        // 2. Info-Sols: Plans d'eau (Surfaces GRHQ)
-        // 3. Info-Sols: Zone agricole CPTAQ
-        // 4. Info-Sols: Zones à risque d'inondation
-        // 5. Info-Sols: Carte écoforestière MRNF
+        // 1. eau.qlr (Hydrographie linéaire: cours d'eau permanents & intermittents - MRNF)
+        // 2. Cadastre du Québec (Lots rénovés - ArcGIS REST)
+        // 3. Photographies aériennes (Orthomosaïque continue MRNF)
+        // 4. Zone agricole CPTAQ (Zonage LPTAA)
+        // 5. Hydrographie — Plans d'eau (Surfaces GRHQ - MRNF)
+        // 6. Zones à risque d'inondation (MRNF)
         this.defaultCatalog = [
           {
             id: "eau_grhq",
             name: "Hydrographie — Réseau (GRHQ)",
-            subtitle: "Cours d'eau permanents & intermittents (MRNF)",
-            badge: "eau.qlr",
-            badgeColor: "#0284c7",
+            subtitle: "Cours d'eau permanents & intermittents",
             url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/GRHQ_simple_WMS/MapServer/WMSServer",
             layers: "9,10,11,12,13,14,15,16",
             format: "image/png",
@@ -4833,11 +4832,54 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 6c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/><path d="M2 12c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/><path d="M2 18c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/></svg>`
           },
           {
+            id: "cadastre_quebec",
+            name: "Cadastre du Québec (Lots rénovés)",
+            subtitle: "Limites des lots et numéros cadastraux (zoom 14+)",
+            type: "arcgis_rest",
+            url: "https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer",
+            layers: "0",
+            format: "png32",
+            defaultOpacity: 0.90,
+            minZoom: 13,
+            insertPosition: "above_pedologie",
+            attribution: "© Gouvernement du Québec (MRNF / MELCCFP - Cadastre)",
+            description: "Lots du cadastre rénové du Québec issus du registre public foncier (MRNF).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`
+          },
+          {
+            id: "orthophotos_quebec",
+            name: "Photographies aériennes (Orthomosaïque QC)",
+            subtitle: "Imagerie continue haute résolution (MRNF)",
+            url: "https://servicesmatriciels.mern.gouv.qc.ca/erdas-iws/ogc/wms/Imagerie_Continue",
+            layers: "Imagerie_GQ",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF - Imagerie continue)",
+            description: "Mosaïque d'orthophotographies aériennes officielles continue couvrant le Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "cptaq_zone_agricole",
+            name: "Zone agricole provinciale (CPTAQ)",
+            subtitle: "Territoire protégé au cadastre (LPTAA)",
+            url: "https://carto.cptaq.gouv.qc.ca/cgi-bin/v2/cptaq",
+            layers: "zone_agricole",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 0.55,
+            insertPosition: "below_pedologie",
+            attribution: "© CPTAQ",
+            description: "Zonage agricole officiel de la Commission de protection du territoire agricole du Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>`
+          },
+          {
             id: "eau_grhq_surfaces",
             name: "Hydrographie — Plans d'eau (GRHQ)",
             subtitle: "Lacs, réservoirs & fleuve St-Laurent",
-            badge: "MRNF",
-            badgeColor: "#0369a1",
             url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/GRHQ_simple_WMS/MapServer/WMSServer",
             layers: "1,2,3,4,5,6,7",
             format: "image/png",
@@ -4850,28 +4892,9 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`
           },
           {
-            id: "cptaq_zone_agricole",
-            name: "Zone agricole provinciale (CPTAQ)",
-            subtitle: "Territoire protégé au cadastre (LPTAA)",
-            badge: "Info-Sols",
-            badgeColor: "#15803d",
-            url: "https://carto.cptaq.gouv.qc.ca/cgi-bin/v2/cptaq",
-            layers: "zone_agricole",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 0.55,
-            insertPosition: "below_pedologie",
-            attribution: "© CPTAQ",
-            description: "Zonage agricole officiel de la Commission de protection du territoire agricole du Québec (couche Info-Sols).",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>`
-          },
-          {
             id: "inondation_mrnf",
             name: "Zones inondables (MRNF)",
             subtitle: "Cartographie des plaines inondables à risque",
-            badge: "Info-Sols",
-            badgeColor: "#b45309",
             url: "https://servicescarto.mrnf.gouv.qc.ca/pes/services/Territoire/Zones_a_risque_inondation_WMS/MapServer/WMSServer",
             layers: "0",
             format: "image/png",
@@ -4882,23 +4905,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             attribution: "© Gouvernement du Québec (MRNF)",
             description: "Périmètres des zones inondables répertoriées au Québec.",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
-          },
-          {
-            id: "ecoforestier_mrnf",
-            name: "Données écoforestières (MRNF)",
-            subtitle: "Peuplements et types écologiques",
-            badge: "Info-Sols",
-            badgeColor: "#047857",
-            url: "https://geoegl.msp.gouv.qc.ca/ws/mffpecofor.fcgi",
-            layers: "MRNF-DIF",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 0.70,
-            insertPosition: "below_pedologie",
-            attribution: "© Gouvernement du Québec (MRNF / MFFP)",
-            description: "Système d'information écoforestière du Québec.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L7 10h3l-4 7h6v5h2v-5h6l-4-7h3z"/></svg>`
           }
         ];
       }
@@ -4924,11 +4930,18 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
       }
 
       getTileUrl(config) {
+        if (config.type === "arcgis_rest") {
+          const cleanUrl = config.url.split("?")[0].replace(/\/export\/?$/, "");
+          const layersParam = config.layers !== undefined && config.layers !== "" ? `&layers=show:${config.layers}` : "";
+          const fmt = config.format || "png32";
+          return `${cleanUrl}/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=${fmt}&transparent=true&f=image${layersParam}`;
+        }
         const cleanUrl = config.url.split("?")[0];
         const crsParam = config.version === "1.1.1" ? "SRS=EPSG:3857" : "CRS=EPSG:3857";
         const transparent = config.transparent ? "TRUE" : "FALSE";
         const styles = config.styles || "";
-        return `${cleanUrl}?SERVICE=WMS&VERSION=${config.version}&REQUEST=GetMap&${crsParam}&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&LAYERS=${config.layers}&STYLES=${styles}&FORMAT=${config.format}&TRANSPARENT=${transparent}`;
+        const fmt = config.format || "image/png";
+        return `${cleanUrl}?SERVICE=WMS&VERSION=${config.version || '1.3.0'}&REQUEST=GetMap&${crsParam}&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&LAYERS=${config.layers}&STYLES=${styles}&FORMAT=${fmt}&TRANSPARENT=${transparent}`;
       }
 
       ensureMapLayer(id) {
@@ -4954,6 +4967,12 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             } else if (this.map.getLayer("pedologie-line")) {
               beforeLayer = "pedologie-line";
             }
+          } else if (cfg.insertPosition === "bottom") {
+            if (this.map.getLayer("pedologie-hit-layer")) {
+              beforeLayer = "pedologie-hit-layer";
+            } else if (this.map.getLayer("pedologie-fill")) {
+              beforeLayer = "pedologie-fill";
+            }
           } else {
             if (this.map.getLayer("pedologie-hit-layer")) {
               beforeLayer = "pedologie-hit-layer";
@@ -4962,13 +4981,17 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             }
           }
 
-          this.map.addLayer({
+          const layerDef = {
             id: layerId,
             type: "raster",
             source: sourceId,
             layout: { visibility: "none" },
             paint: { "raster-opacity": cfg.currentOpacity }
-          }, beforeLayer);
+          };
+          if (cfg.minZoom) layerDef.minzoom = cfg.minZoom;
+          if (cfg.maxZoom) layerDef.maxzoom = cfg.maxZoom;
+
+          this.map.addLayer(layerDef, beforeLayer);
 
           if (typeof bringParcellesToFront === "function") {
             bringParcellesToFront();
@@ -5031,7 +5054,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         item.id = `wms-item-${cfg.id}`;
         item.className = "wms-layer-item";
         
-        const badgeColor = cfg.badgeColor || "#0284c7";
         const opVal = Math.round(cfg.currentOpacity * 100);
 
         item.innerHTML = `
@@ -5043,7 +5065,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               <div class="wms-item-titles" title="${cfg.description || cfg.name}">
                 <div class="wms-item-title">
                   <span>${cfg.name}</span>
-                  ${cfg.badge ? `<span class="wms-badge-src" style="background:${badgeColor}18; color:${badgeColor}; border:1px solid ${badgeColor}40;">${cfg.badge}</span>` : ''}
                 </div>
                 <div class="wms-item-subtitle">${cfg.subtitle || cfg.layers}</div>
               </div>
