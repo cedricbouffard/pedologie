@@ -2274,14 +2274,14 @@
         </div>
       </div>
 
-      <!-- 2. Sols pédologiques -->
+      <!-- 2. Carte pédologique -->
       <div class="tool-card">
         <div class="tool-card-header">
           <div class="tool-card-title">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-            <span>Sols pédologiques</span>
+            <span>Carte pédologique</span>
           </div>
-          <label class="switch-label" title="Afficher/Masquer les sols">
+          <label class="switch-label" title="Afficher/Masquer la carte pédologique">
             <input type="checkbox" id="toggle-pedo" />
             <span class="switch-slider"></span>
           </label>
@@ -2316,7 +2316,35 @@
         <input type="range" id="parcelles-opacity" min="0" max="100" value="95" class="slider" />
       </div>
 
-      <!-- 3. Topographie MNE (HRDEM 1m) -->
+      <!-- 3. Courbes de niveau dynamiques (au-dessus de la topographie) -->
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12c3-4 6-4 9 0s6 4 9 0"></path><path d="M3 6c3-4 6-4 9 0s6 4 9 0"></path><path d="M3 18c3-4 6-4 9 0s6 4 9 0"></path></svg>
+            <span>Courbes de niveau</span>
+          </div>
+          <label class="switch-label" title="Afficher/Masquer les courbes de niveau (dès zoom 11)">
+            <input type="checkbox" id="toggle-contours" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="tool-label-row">
+          <span class="tool-sublabel">Intervalle</span>
+        </div>
+        <div class="pills-group">
+          <button class="pill-btn" data-interval="0.1">10 cm</button>
+          <button class="pill-btn" data-interval="0.25">25 cm</button>
+          <button class="pill-btn" data-interval="0.5">50 cm</button>
+          <button class="pill-btn active" data-interval="1">1 m</button>
+        </div>
+
+        <div id="contour-status" class="contour-status-badge">
+          Désactivé
+        </div>
+      </div>
+
+      <!-- 4. Topographie MNE (HRDEM 1m) -->
       <div class="tool-card">
         <div class="tool-card-header">
           <div class="tool-card-title">
@@ -2351,34 +2379,6 @@
             <button id="btn-stretch-pct" class="seg-btn active" type="button" title="Percentile 5-95%">5-95%</button>
             <button id="btn-stretch-minmax" class="seg-btn" type="button" title="Min-Max total">Min/Max</button>
           </div>
-        </div>
-      </div>
-
-      <!-- 4. Courbes de niveau dynamiques -->
-      <div class="tool-card">
-        <div class="tool-card-header">
-          <div class="tool-card-title">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12c3-4 6-4 9 0s6 4 9 0"></path><path d="M3 6c3-4 6-4 9 0s6 4 9 0"></path><path d="M3 18c3-4 6-4 9 0s6 4 9 0"></path></svg>
-            <span>Courbes de niveau</span>
-          </div>
-          <label class="switch-label" title="Afficher/Masquer les courbes de niveau (dès zoom 11)">
-            <input type="checkbox" id="toggle-contours" />
-            <span class="switch-slider"></span>
-          </label>
-        </div>
-
-        <div class="tool-label-row">
-          <span class="tool-sublabel">Intervalle</span>
-        </div>
-        <div class="pills-group">
-          <button class="pill-btn" data-interval="0.1">10 cm</button>
-          <button class="pill-btn" data-interval="0.3">30 cm</button>
-          <button class="pill-btn active" data-interval="1">1 m</button>
-          <button class="pill-btn" data-interval="3">3 m</button>
-        </div>
-
-        <div id="contour-status" class="contour-status-badge">
-          Désactivé
         </div>
       </div>
 
@@ -3081,6 +3081,9 @@
               }
             }, 'pedologie-fill');
             this.sourceAdded = true;
+            if (typeof bringTopLayersToFront === 'function') {
+              bringTopLayersToFront();
+            }
           }
         } catch (err) {
           if (err.name === 'AbortError') return;
@@ -4937,19 +4940,19 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             id: "foncier",
             title: "Foncier & Aménagement",
             icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
-            defaultOpen: true
+            defaultOpen: false
           },
           {
             id: "eau",
             title: "Hydrographie & Milieux humides",
             icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
-            defaultOpen: true
+            defaultOpen: false
           },
           {
             id: "foret",
             title: "Foresterie & Environnement",
             icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L7 9h3l-4 7h6l-3 5h8l-3-5h6l-4-7h3L12 2z"/></svg>`,
-            defaultOpen: true
+            defaultOpen: false
           },
           {
             id: "imagerie",
@@ -4961,7 +4964,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             id: "custom",
             title: "Couches personnalisées",
             icon: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
-            defaultOpen: true
+            defaultOpen: false
           }
         ];
 
@@ -5646,8 +5649,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           const layersInCat = Array.from(this.registry.values()).filter(c => (c.category || "custom") === cat.id);
           if (cat.id === "custom" && layersInCat.length === 0) return; // Hide custom group if empty
 
-          const anyActive = layersInCat.some(c => this.activeLayerIds.has(c.id));
-          const isOpen = anyActive || cat.defaultOpen;
+          const isOpen = false;
 
           const groupEl = document.createElement("details");
           groupEl.className = "wms-group";
@@ -6090,8 +6092,17 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         }
       }
 
-      // Function to ensure parcels and cadastre always stay on top of all layers
+      // Function to ensure parcels, cadastre and contours stay properly layered
       function bringTopLayersToFront() {
+        // 0. Courbes de niveau au-dessus du relief topographique
+        if (map.getLayer("hrdem-topo-layer") && map.getLayer("gc-contour-minor")) {
+          const beforeId = map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined;
+          ["gc-contour-minor", "gc-contour-major", "gc-contour-labels"].forEach(id => {
+            if (map.getLayer(id)) {
+              map.moveLayer(id, beforeId);
+            }
+          });
+        }
         // 1. Parcels above soils, contours, and WMS
         ["parcelles-fill", "parcelles-line-bg", "parcelles-line-fg"].forEach(id => {
           if (map.getLayer(id)) {
@@ -6921,9 +6932,9 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         const interval = parseFloat(btn.dataset.interval);
         let majorEvery = 5;
         if (interval === 0.1) majorEvery = 10;
-        else if (interval === 0.3) majorEvery = 5;
+        else if (interval === 0.25) majorEvery = 4;
+        else if (interval === 0.5) majorEvery = 2;
         else if (interval === 1) majorEvery = 5;
-        else if (interval === 3) majorEvery = 5;
         if (contourManager) {
           contourManager.updateConfig({ interval, majorEvery, labelSize: 13 });
           contourManager.generateForView();
