@@ -4983,6 +4983,32 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             attribution: "© Gouvernement du Québec (MRNF)",
             description: "Périmètres des zones inondables répertoriées au Québec.",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
+          },
+          {
+            id: "milieux_humides",
+            name: "Milieux humides potentiels (MELCCFP)",
+            subtitle: "Cartographie provinciale (Tourbières, marais, marécages)",
+            url: "https://geo.environnement.gouv.qc.ca/donnees/services/Biodiversite/MH_potentiels/MapServer/WMSServer",
+            layers: "Milieux_humides_potentiels11904",
+            format: "image/png",
+            transparent: true,
+            version: "1.3.0",
+            defaultOpacity: 0.70,
+            insertPosition: "below_pedologie",
+            attribution: "© Gouvernement du Québec (MELCCFP)",
+            description: "Milieux humides potentiels du Québec issus de la cartographie provinciale officielle (MELCCFP - Biodiversité).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a10 10 0 0 0-7.54 16.56C5.54 17.65 7.18 17 9 17c1.47 0 2.82.43 3.96 1.16A7.95 7.95 0 0 1 17 17c1.82 0 3.46.65 4.54 1.56A10 10 0 0 0 12 2z"/><path d="M7 10v4"/><path d="M12 7v7"/><path d="M17 9v5"/><path d="M3 20c1.2-1 2.8-1.5 4.5-1.5s3.3.5 4.5 1.5c1.2-1 2.8-1.5 4.5-1.5s3.3.5 4.5 1.5"/></svg>`
+          },
+          {
+            id: "plans_drainage",
+            name: "Plans de drainage agricole (Info-Sols)",
+            subtitle: "Périmètres drainés & plans numérisés (JPG)",
+            type: "drainage_pmtiles",
+            url: "pmtiles://https://storage.googleapis.com/geoqc/drainage/plans_drainage.pmtiles",
+            defaultOpacity: 0.85,
+            attribution: "© Info-Sols / MAPAQ / Producteurs de grains du Québec",
+            description: "Périmètres des travaux de drainage agricole souterrain et accès direct aux plans d'ingénierie numérisés haute résolution (JPG).",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`
           }
         ];
       }
@@ -5168,12 +5194,77 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           });
       }
 
+      ensureDrainageLayers(cfg) {
+        if (!this.map.getSource("drainage-source")) {
+          this.map.addSource("drainage-source", {
+            type: "vector",
+            url: cfg.url || "pmtiles://https://storage.googleapis.com/geoqc/drainage/plans_drainage.pmtiles"
+          });
+        }
+
+        let beforeLayer;
+        if (this.map.getLayer("parcelles-line-bg")) {
+          beforeLayer = "parcelles-line-bg";
+        } else if (this.map.getLayer("pedologie-line")) {
+          beforeLayer = "pedologie-line";
+        }
+
+        if (!this.map.getLayer("drainage-fill")) {
+          this.map.addLayer({
+            id: "drainage-fill",
+            type: "fill",
+            source: "drainage-source",
+            "source-layer": "plans_drainage",
+            layout: { visibility: "none" },
+            paint: {
+              "fill-color": "#0284c7",
+              "fill-opacity": (cfg.currentOpacity !== undefined ? cfg.currentOpacity : 0.85) * 0.22
+            }
+          }, beforeLayer);
+        }
+
+        if (!this.map.getLayer("drainage-line")) {
+          this.map.addLayer({
+            id: "drainage-line",
+            type: "line",
+            source: "drainage-source",
+            "source-layer": "plans_drainage",
+            layout: {
+              visibility: "none",
+              "line-join": "round",
+              "line-cap": "round"
+            },
+            paint: {
+              "line-color": "#0369a1",
+              "line-width": [
+                "interpolate", ["linear"], ["zoom"],
+                9, 1.0,
+                12, 1.6,
+                15, 2.4
+              ],
+              "line-dasharray": [3, 2],
+              "line-opacity": (cfg.currentOpacity !== undefined ? cfg.currentOpacity : 0.85) * 0.95
+            }
+          }, beforeLayer);
+        }
+
+        if (typeof bringTopLayersToFront === "function") {
+          bringTopLayersToFront();
+        } else if (typeof bringParcellesToFront === "function") {
+          bringParcellesToFront();
+        }
+        return true;
+      }
+
       ensureMapLayer(id) {
         const cfg = this.registry.get(id);
         if (!cfg) return false;
 
         if (cfg.type === "cadastre_geojson") {
           return this.ensureCadastreLayers(cfg);
+        }
+        if (cfg.type === "drainage_pmtiles") {
+          return this.ensureDrainageLayers(cfg);
         }
 
         const sourceId = `wms-source-${id}`;
@@ -5267,6 +5358,24 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               this.cadastreAbortController.abort();
             }
           }
+        } else if (cfg.type === "drainage_pmtiles") {
+          this.ensureDrainageLayers(cfg);
+          const vis = visible ? "visible" : "none";
+          ["drainage-fill", "drainage-line"].forEach(l => {
+            if (this.map.getLayer(l)) {
+              this.map.setLayoutProperty(l, "visibility", vis);
+            }
+          });
+          if (visible) {
+            this.activeLayerIds.add(id);
+            if (typeof bringTopLayersToFront === "function") {
+              bringTopLayersToFront();
+            } else if (typeof bringParcellesToFront === "function") {
+              bringParcellesToFront();
+            }
+          } else {
+            this.activeLayerIds.delete(id);
+          }
         } else {
           const layerId = `wms-layer-${id}`;
           if (visible) {
@@ -5303,6 +5412,13 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           }
           if (this.map.getLayer("cadastre-labels")) {
             this.map.setPaintProperty("cadastre-labels", "text-opacity", opacity);
+          }
+        } else if (cfg.type === "drainage_pmtiles") {
+          if (this.map.getLayer("drainage-fill")) {
+            this.map.setPaintProperty("drainage-fill", "fill-opacity", opacity * 0.22);
+          }
+          if (this.map.getLayer("drainage-line")) {
+            this.map.setPaintProperty("drainage-line", "line-opacity", opacity * 0.95);
           }
         } else {
           const layerId = `wms-layer-${id}`;
@@ -5828,10 +5944,19 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           cadastreProps = cadastreHits[0].properties;
         }
 
-        if (!pedoProps && !parcelProps && !cadastreProps) return;
+        // 4. Query drainage (plans de drainage agricole)
+        let drainageProps = null;
+        const drainageHits = map.queryRenderedFeatures(e.point, {
+          layers: ["drainage-fill"].filter(l => map.getLayer(l))
+        });
+        if (drainageHits && drainageHits.length > 0) {
+          drainageProps = drainageHits[0].properties;
+        }
 
-        // If only cadastre was clicked (neither pedology polygon nor crop parcel)
-        if (!pedoProps && !parcelProps && cadastreProps) {
+        if (!pedoProps && !parcelProps && !cadastreProps && !drainageProps) return;
+
+        // If only cadastre was clicked (neither pedology, parcel, nor drainage)
+        if (!pedoProps && !parcelProps && !drainageProps && cadastreProps) {
           const lotNum = cadastreProps.NO_LOT || "Inconnu";
           const lotHtml = `
             <div class="pedo-popup" style="padding: 10px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
@@ -5847,8 +5972,36 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           return;
         }
 
-        let activeTab = defaultTab || (pedoProps ? "sols" : "cultures");
-        if (!pedoProps && parcelProps) activeTab = "cultures";
+        // If only drainage plan was clicked (with optional cadastre info)
+        if (!pedoProps && !parcelProps && drainageProps) {
+          const lotNum = drainageProps.no_lot || (cadastreProps ? cadastreProps.NO_LOT : "") || "Inconnu";
+          const nomFichier = drainageProps.nom || "Plan_drainage.jpg";
+          const planUrl = drainageProps.url || "";
+          const drainageHtml = `
+            <div class="pedo-popup" style="padding: 12px 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-width: 250px;">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <span style="font-size: 10px; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">Plan de drainage</span>
+                <span style="font-size: 11px; color: #64748b; margin-left: auto;">Info-Sols</span>
+              </div>
+              <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Lot nº ${lotNum}</div>
+              <div style="font-size: 11.5px; color: #475569; margin-bottom: 10px;">Fichier : <code style="font-size: 11px; background: #f1f5f9; padding: 2px 4px; border-radius: 3px; color: #0f172a;">${nomFichier}</code></div>
+              ${planUrl ? `
+                <a href="${planUrl}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 6px; background: #0284c7; color: #ffffff; text-decoration: none; font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: 5px; box-sizing: border-box; transition: background 0.15s ease;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  <span>Consulter le plan numérisé (JPG)</span>
+                </a>
+              ` : ''}
+            </div>
+          `;
+          new maplibregl.Popup({ maxWidth: "300px", className: "pedo-custom-popup", closeButton: true })
+            .setLngLat(e.lngLat)
+            .setHTML(drainageHtml)
+            .addTo(map);
+          return;
+        }
+
+        let activeTab = defaultTab || (pedoProps ? "sols" : (parcelProps ? "cultures" : "drainage"));
+        if (!pedoProps && parcelProps) activeTab = defaultTab || "cultures";
         if (!parcelProps && pedoProps && activeTab === "cultures") activeTab = "sols";
 
         // Tab 1: Sols HTML
@@ -6016,6 +6169,47 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           </div>
         `;
 
+        // Tab 4: Drainage HTML
+        let drainageTabHtml = "";
+        if (drainageProps) {
+          const dp = drainageProps;
+          const lotVal = dp.no_lot || (cadastreProps ? cadastreProps.NO_LOT : "") || "Inconnu";
+          const nomFichier = dp.nom || "Plan_drainage.jpg";
+          const planUrl = dp.url || "";
+
+          drainageTabHtml = `
+            <div class="parcel-info-badge" style="padding: 10px 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-left: 3.5px solid #0284c7; border-radius: 6px; font-size: 0.8rem; margin-bottom: 10px;">
+              <div style="font-weight: 700; color: #0369a1; display: flex; justify-content: space-between; align-items: center;">
+                <span>Plan de drainage souterrain</span>
+                <span style="font-weight: 700; color: #0284c7;">Lot nº ${lotVal}</span>
+              </div>
+              <div style="color: #334155; margin-top: 5px; font-size: 11.5px;">Fichier : <code style="font-size: 10.5px; background: #e0f2fe; padding: 2px 5px; border-radius: 3px; color: #0369a1;">${nomFichier}</code></div>
+              <div style="color: #64748b; margin-top: 3px; font-size: 11px;">Source : Cartothèque Info-Sols / MAPAQ</div>
+            </div>
+
+            <p style="margin: 0 0 12px 0; color: #475569; font-size: 11.5px; line-height: 1.45;">
+              Ce polygone correspond à un aménagement de drains agricoles souterrains numérisé à haute résolution.
+            </p>
+
+            ${planUrl ? `
+              <a href="${planUrl}" target="_blank" rel="noopener noreferrer" class="pedo-study-link" style="background: #0284c7; color: #ffffff; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; box-sizing: border-box; transition: background 0.15s ease;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>Consulter le plan numérisé (JPG)</span>
+              </a>
+            ` : '<div style="color: #94a3b8; font-size: 11px;">Lien du document non disponible.</div>'}
+          `;
+        } else {
+          drainageTabHtml = `
+            <div style="color: #64748b; font-size: 12px; padding: 16px 4px; text-align: center;">
+              Aucun périmètre de plan de drainage agricole répertorié sous ce point.
+            </div>
+          `;
+        }
+
         const popupHtml = `
           <div class="pedo-popup">
             <div class="popup-tabs-header">
@@ -6032,6 +6226,12 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
                 <span>NDVI</span>
               </button>
+              ${drainageProps ? `
+              <button type="button" class="popup-tab-btn ${activeTab === 'drainage' ? 'active' : ''}" data-tab="drainage">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                <span>Drainage</span>
+                <span class="popup-tab-dot" title="Plan de drainage disponible" style="background: #0284c7;"></span>
+              </button>` : ''}
             </div>
             <div class="popup-tab-pane ${activeTab === 'sols' ? 'active' : ''}" data-tab="sols">
               ${solsTabHtml}
@@ -6042,6 +6242,10 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             <div class="popup-tab-pane ${activeTab === 'ndvi' ? 'active' : ''}" data-tab="ndvi">
               ${ndviTabHtml}
             </div>
+            ${drainageProps ? `
+            <div class="popup-tab-pane ${activeTab === 'drainage' ? 'active' : ''}" data-tab="drainage">
+              ${drainageTabHtml}
+            </div>` : ''}
           </div>
         `;
 
@@ -6102,8 +6306,8 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
 
       // Click on cadastre-fill
       map.on("click", "cadastre-fill", (e) => {
-        const otherFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill", "parcelles-fill"].filter(l => map.getLayer(l)) });
-        if (otherFeatures && otherFeatures.length > 0) return; // Handled by pedologie or parcelles
+        const otherFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill", "parcelles-fill", "drainage-fill"].filter(l => map.getLayer(l)) });
+        if (otherFeatures && otherFeatures.length > 0) return; // Handled by pedologie, parcelles or drainage
         openTabbedFeaturePopup(e, "cultures");
       });
 
@@ -6113,6 +6317,23 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "pointer";
       });
       map.on("mouseleave", "cadastre-fill", () => {
+        if (profileManager && profileManager.isDrawing) return;
+        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "";
+      });
+
+      // Click on drainage-fill
+      map.on("click", "drainage-fill", (e) => {
+        const otherFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill", "parcelles-fill"].filter(l => map.getLayer(l)) });
+        if (otherFeatures && otherFeatures.length > 0) return; // Handled by pedologie or parcelles
+        openTabbedFeaturePopup(e, "drainage");
+      });
+
+      // Hover on drainage-fill
+      map.on("mouseenter", "drainage-fill", () => {
+        if (profileManager && profileManager.isDrawing) return;
+        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "pointer";
+      });
+      map.on("mouseleave", "drainage-fill", () => {
         if (profileManager && profileManager.isDrawing) return;
         map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "";
       });
