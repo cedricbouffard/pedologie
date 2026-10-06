@@ -5056,23 +5056,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         // 10. Zones inondables (MRNF)
         this.defaultCatalog = [
           {
-            id: "carte_hydro_mapaq",
-            category: "eau",
-            name: "Carte numérisée des cours d'eau (MAPAQ)",
-            subtitle: "Réseau hydrographique numérisé Info-Sols (zoom 10+)",
-            url: "https://www.info-sols.ca/api/data/local?map=hydrographie",
-            layers: "carte_hydro",
-            format: "image/png",
-            transparent: false,
-            version: "1.3.0",
-            minZoom: 9.5,
-            defaultOpacity: 1.0,
-            insertPosition: "above_pedologie",
-            attribution: "© Gouvernement du Québec (MAPAQ / Info-Sols)",
-            description: "Carte officielle numérisée des cours d'eau du MAPAQ (Info-Sols), incluant les cours d'eau agricoles, branches et fossés d'égouttement.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 6c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/><path d="M2 12c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/><path d="M2 18c.6 0 1.2-.2 1.7-.6 1.1-.8 2.3-.8 3.4 0 1.1.8 2.3.8 3.4 0 1.1-.8 2.3-.8 3.4 0 .5.4 1.1.6 1.7.6"/></svg>`
-          },
-          {
             id: "eau_grhq",
             category: "eau",
             name: "Hydrographie — Réseau (GRHQ)",
@@ -5275,102 +5258,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             insertPosition: "bottom",
             attribution: "© Gouvernement du Québec (MRNF / CMQ)",
             description: "Orthomosaïque 2021 ultra-haute résolution (12 cm RVB) de la Communauté métropolitaine de Québec.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "photos_2009_monteregie_est",
-            category: "imagerie",
-            name: "Photos aériennes 2009 (Montérégie-Est)",
-            subtitle: "Décennal écoforestier (Info-Sols)",
-            url: "https://www.info-sols.ca/api/data/local?map=monteregie_est",
-            layers: "orthos_2009_me",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Gouvernement du Québec / Info-Sols",
-            description: "Couverture d'orthophotos du décennal écoforestier 2009 couvrant la Montérégie-Est (Info-Sols).",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "photos_2009_monteregie_ouest",
-            category: "imagerie",
-            name: "Photos aériennes 2009 (Montérégie-Ouest)",
-            subtitle: "Décennal écoforestier (Info-Sols)",
-            url: "https://www.info-sols.ca/api/data/local?map=monteregie_ouest",
-            layers: "orthos_2009_mo",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Gouvernement du Québec / Info-Sols",
-            description: "Couverture d'orthophotos du décennal écoforestier 2009 couvrant la Montérégie-Ouest (Info-Sols).",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "photos_2007_estrie",
-            category: "imagerie",
-            name: "Photos aériennes 2007 (Estrie)",
-            subtitle: "Campagne 2007 (Info-Sols)",
-            url: "https://www.info-sols.ca/api/data/local?map=estrie",
-            layers: "orthos_2007_e",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Gouvernement du Québec / Info-Sols",
-            description: "Photographies aériennes numérisées 2007 de l'Estrie (Info-Sols).",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "photos_2000_infosols",
-            category: "imagerie",
-            name: "Photos aériennes 2000 (Info-Sols)",
-            subtitle: "Campagne historique 2000 (Info-Sols)",
-            url: "https://www.info-sols.ca/api/data/local?map=photo_aerienne",
-            layers: "orthos_2000",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Info-Sols / Gouvernement du Québec",
-            description: "Campagne de photographies aériennes numérisées de l'an 2000 issue du portail Info-Sols.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "photos_1979_infosols",
-            category: "imagerie",
-            name: "Photos aériennes 1979 (Info-Sols)",
-            subtitle: "Photographies aériennes historiques 1979",
-            url: "https://www.info-sols.ca/api/data/local?map=photo_aerienne",
-            layers: "orthos_1979",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Info-Sols / Gouvernement du Québec",
-            description: "Photographies aériennes historiques de 1979 du Québec issues du portail Info-Sols.",
-            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
-          },
-          {
-            id: "photos_1964_monteregie",
-            category: "imagerie",
-            name: "Photos aériennes 1964 (Montérégie-Est)",
-            subtitle: "Photographies aériennes historiques (Info-Sols)",
-            url: "https://www.info-sols.ca/api/data/local?map=monteregie_est",
-            layers: "orthos_1964_me",
-            format: "image/png",
-            transparent: true,
-            version: "1.3.0",
-            defaultOpacity: 1.0,
-            insertPosition: "bottom",
-            attribution: "© Gouvernement du Québec (MAPAQ / Info-Sols)",
-            description: "Mosaïque de photographies aériennes historiques de 1964 couvrant la région de la Montérégie-Est (Info-Sols / MAPAQ).",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
           },
           {
@@ -6393,13 +6280,11 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             }
           });
         }
-        // 0.5 Hydrographie numérisée (MAPAQ et GRHQ) au-dessus de tous les rasters et de la pédologie
+        // 0.5 Hydrographie officielle (GRHQ) au-dessus de tous les rasters et de la pédologie
         const hydroBeforeId = map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined;
-        ["wms-layer-carte_hydro_mapaq", "wms-layer-eau_grhq"].forEach(id => {
-          if (map.getLayer(id)) {
-            map.moveLayer(id, hydroBeforeId);
-          }
-        });
+        if (map.getLayer("wms-layer-eau_grhq")) {
+          map.moveLayer("wms-layer-eau_grhq", hydroBeforeId);
+        }
         // 1. Parcels above soils, contours, and WMS
         ["parcelles-fill", "parcelles-line-bg", "parcelles-line-fg"].forEach(id => {
           if (map.getLayer(id)) {
