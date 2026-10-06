@@ -4807,14 +4807,22 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         this.registry = new Map();
         this.activeLayerIds = new Set();
         this.storageKey = "pedo_custom_wms_layers";
+        this.isCadastreActive = false;
+        this.cadastreAbortController = null;
+        this._cadastreDebounceTimer = null;
+        this._cadastreMoveListener = null;
 
         // Preconfigured catalog:
-        // 1. eau.qlr (Hydrographie linéaire: cours d'eau permanents & intermittents - MRNF)
-        // 2. Cadastre du Québec (Lots rénovés - ArcGIS REST)
+        // 1. Hydrographie — Réseau (cours d'eau permanents & intermittents - MRNF eau.qlr)
+        // 2. Cadastre du Québec (Lots rénovés - GeoJSON vectoriel au-dessus de tout, 1 numéro/lot)
         // 3. Photographies aériennes (Orthomosaïque continue MRNF)
-        // 4. Zone agricole CPTAQ (Zonage LPTAA)
-        // 5. Hydrographie — Plans d'eau (Surfaces GRHQ - MRNF)
-        // 6. Zones à risque d'inondation (MRNF)
+        // 4. Orthomosaïque Montérégie (MRNF / Info-Sols 20 cm)
+        // 5. Orthomosaïque Estrie (MRNF / Info-Sols 20 cm)
+        // 6. Orthomosaïque Centre-du-Québec (MRNF / Info-Sols 20 cm)
+        // 7. Orthomosaïque Chaudière-Appalaches (MRNF 15 cm)
+        // 8. Zone agricole CPTAQ (Zonage LPTAA)
+        // 9. Hydrographie — Plans d'eau (Surfaces GRHQ - MRNF)
+        // 10. Zones inondables (MRNF)
         this.defaultCatalog = [
           {
             id: "eau_grhq",
@@ -4834,16 +4842,13 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           {
             id: "cadastre_quebec",
             name: "Cadastre du Québec (Lots rénovés)",
-            subtitle: "Limites des lots et numéros cadastraux (zoom 14+)",
-            type: "arcgis_rest",
-            url: "https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer",
-            layers: "0",
-            format: "png32",
+            subtitle: "Limites foncières & numéro de lot unique (zoom 14+)",
+            type: "cadastre_geojson",
+            url: "https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer/0/query",
             defaultOpacity: 0.90,
-            minZoom: 13,
-            insertPosition: "above_pedologie",
+            minZoom: 13.5,
             attribution: "© Gouvernement du Québec (MRNF / MELCCFP - Cadastre)",
-            description: "Lots du cadastre rénové du Québec issus du registre public foncier (MRNF).",
+            description: "Lots rénovés du cadastre du Québec issus du registre public foncier (MRNF). Rendu vectoriel avec un seul numéro par polygone, affiché au-dessus de tout.",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`
           },
           {
@@ -4859,6 +4864,66 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             insertPosition: "bottom",
             attribution: "© Gouvernement du Québec (MRNF - Imagerie continue)",
             description: "Mosaïque d'orthophotographies aériennes officielles continue couvrant le Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_monteregie",
+            name: "Orthomosaïque Montérégie (MRNF - 20 cm)",
+            subtitle: "Campagne haute résolution (Info-Sols)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2020_2020_Partenariat_Monteregie_20cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Montérégie)",
+            description: "Orthophotographies aériennes haute résolution (20 cm RVB) de la Montérégie.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_estrie",
+            name: "Orthomosaïque Estrie (MRNF - 20 cm)",
+            subtitle: "Campagne 2023 haute résolution (Info-Sols)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2023_2023_Partenariat_Estrie_20cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Estrie)",
+            description: "Orthophotographies aériennes 2023 haute résolution (20 cm RVB) de l'Estrie.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_centre_qc",
+            name: "Orthomosaïque Centre-du-Québec (MRNF - 20 cm)",
+            subtitle: "Campagne 2020 haute résolution (Info-Sols)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2020_2020_Partenariat_Centre-du-Quebec_20cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF - Info-Sols Centre-du-Québec)",
+            description: "Orthophotographies aériennes 2020 haute résolution (20 cm RVB) du Centre-du-Québec.",
+            icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+          },
+          {
+            id: "ortho_chaudiere",
+            name: "Orthomosaïque Chaudière-Appalaches (MRNF - 15 cm)",
+            subtitle: "Campagne 2020 très haute résolution (MRNF)",
+            url: "https://imagesgeo-atlas.mrnf.gouv.qc.ca/IDS_IMAGERIE_WMS/service.svc/get",
+            layers: "Orthomosaique_2020_2020_Partenariat_Chaudiere-Appalaches_15cm_RVB",
+            format: "image/jpeg",
+            transparent: false,
+            version: "1.3.0",
+            defaultOpacity: 1.0,
+            insertPosition: "bottom",
+            attribution: "© Gouvernement du Québec (MRNF)",
+            description: "Orthophotographies aériennes 2020 à 15 cm/pixel de la région Chaudière-Appalaches.",
             icon: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
           },
           {
@@ -4944,9 +5009,160 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         return `${cleanUrl}?SERVICE=WMS&VERSION=${config.version || '1.3.0'}&REQUEST=GetMap&${crsParam}&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256&LAYERS=${config.layers}&STYLES=${styles}&FORMAT=${fmt}&TRANSPARENT=${transparent}`;
       }
 
+      ensureCadastreLayers(cfg) {
+        if (!this.map.getSource("cadastre-source")) {
+          this.map.addSource("cadastre-source", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] }
+          });
+        }
+
+        if (!this.map.getLayer("cadastre-fill")) {
+          this.map.addLayer({
+            id: "cadastre-fill",
+            type: "fill",
+            source: "cadastre-source",
+            minzoom: 13.5,
+            layout: { visibility: "none" },
+            paint: {
+              "fill-color": "#ffffff",
+              "fill-opacity": 0.001
+            }
+          });
+        }
+
+        if (!this.map.getLayer("cadastre-lines")) {
+          this.map.addLayer({
+            id: "cadastre-lines",
+            type: "line",
+            source: "cadastre-source",
+            minzoom: 13.5,
+            layout: {
+              visibility: "none",
+              "line-join": "round",
+              "line-cap": "round"
+            },
+            paint: {
+              "line-color": "#0f172a",
+              "line-width": [
+                "interpolate", ["linear"], ["zoom"],
+                13.5, 0.9,
+                15, 1.4,
+                17, 2.2
+              ],
+              "line-opacity": (cfg.currentOpacity !== undefined ? cfg.currentOpacity : 0.9) * 0.95
+            }
+          });
+        }
+
+        if (!this.map.getLayer("cadastre-labels")) {
+          this.map.addLayer({
+            id: "cadastre-labels",
+            type: "symbol",
+            source: "cadastre-source",
+            minzoom: 13.5,
+            layout: {
+              visibility: "none",
+              "symbol-placement": "point",
+              "text-field": ["to-string", ["coalesce", ["get", "NO_LOT"], ""]],
+              "text-font": ["Noto Sans Regular"],
+              "text-size": [
+                "interpolate", ["linear"], ["zoom"],
+                13.5, 9.5,
+                15, 11,
+                17, 13
+              ],
+              "text-anchor": "center",
+              "text-allow-overlap": false,
+              "text-ignore-placement": false,
+              "text-padding": 4
+            },
+            paint: {
+              "text-color": "#0f172a",
+              "text-halo-color": "#ffffff",
+              "text-halo-width": 2,
+              "text-halo-blur": 0.5,
+              "text-opacity": cfg.currentOpacity !== undefined ? cfg.currentOpacity : 0.9
+            }
+          });
+        }
+
+        if (typeof bringTopLayersToFront === "function") {
+          bringTopLayersToFront();
+        } else if (typeof bringParcellesToFront === "function") {
+          bringParcellesToFront();
+        }
+        return true;
+      }
+
+      updateCadastreViewport() {
+        if (!this.isCadastreActive) return;
+        if (this._cadastreDebounceTimer) {
+          clearTimeout(this._cadastreDebounceTimer);
+        }
+        this._cadastreDebounceTimer = setTimeout(() => {
+          this._fetchCadastreData();
+        }, 300);
+      }
+
+      _fetchCadastreData() {
+        if (!this.isCadastreActive) return;
+        const currentZoom = this.map.getZoom();
+        const src = this.map.getSource("cadastre-source");
+        if (!src) return;
+
+        if (currentZoom < 13.5) {
+          src.setData({ type: "FeatureCollection", features: [] });
+          return;
+        }
+
+        if (this.cadastreAbortController) {
+          this.cadastreAbortController.abort();
+        }
+        this.cadastreAbortController = new AbortController();
+
+        const bounds = this.map.getBounds();
+        const lngSpan = bounds.getEast() - bounds.getWest();
+        const latSpan = bounds.getNorth() - bounds.getSouth();
+        const buf = 0.12;
+        const w = (bounds.getWest() - lngSpan * buf).toFixed(5);
+        const s = (bounds.getSouth() - latSpan * buf).toFixed(5);
+        const e = (bounds.getEast() + lngSpan * buf).toFixed(5);
+        const n = (bounds.getNorth() + latSpan * buf).toFixed(5);
+
+        const url = `https://geo.environnement.gouv.qc.ca/donnees/rest/services/Reference/Cadastre_allege/MapServer/0/query?geometry=${w},${s},${e},${n}&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=NO_LOT,OBJECTID&f=geojson&returnGeometry=true`;
+
+        fetch(url, { signal: this.cadastreAbortController.signal })
+          .then(res => {
+            if (!res.ok) throw new Error("Status " + res.status);
+            return res.json();
+          })
+          .then(geojson => {
+            if (!this.isCadastreActive) return;
+            if (geojson && geojson.features && src.setData) {
+              src.setData(geojson);
+              if (typeof bringTopLayersToFront === "function") {
+                bringTopLayersToFront();
+              } else if (typeof bringParcellesToFront === "function") {
+                bringParcellesToFront();
+              }
+            }
+          })
+          .catch(err => {
+            if (err.name !== "AbortError") {
+              console.warn("Erreur chargement cadastre:", err);
+            }
+          });
+      }
+
       ensureMapLayer(id) {
         const cfg = this.registry.get(id);
         if (!cfg) return false;
+
+        if (cfg.type === "cadastre_geojson") {
+          return this.ensureCadastreLayers(cfg);
+        }
+
         const sourceId = `wms-source-${id}`;
         const layerId = `wms-layer-${id}`;
 
@@ -4993,7 +5209,9 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
 
           this.map.addLayer(layerDef, beforeLayer);
 
-          if (typeof bringParcellesToFront === "function") {
+          if (typeof bringTopLayersToFront === "function") {
+            bringTopLayersToFront();
+          } else if (typeof bringParcellesToFront === "function") {
             bringParcellesToFront();
           }
         }
@@ -5004,16 +5222,50 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         const cfg = this.registry.get(id);
         if (!cfg) return;
 
-        const layerId = `wms-layer-${id}`;
-        if (visible) {
-          this.ensureMapLayer(id);
-          this.map.setLayoutProperty(layerId, "visibility", "visible");
-          this.activeLayerIds.add(id);
-        } else {
-          if (this.map.getLayer(layerId)) {
-            this.map.setLayoutProperty(layerId, "visibility", "none");
+        if (cfg.type === "cadastre_geojson") {
+          this.ensureCadastreLayers(cfg);
+          const vis = visible ? "visible" : "none";
+          ["cadastre-fill", "cadastre-lines", "cadastre-labels"].forEach(l => {
+            if (this.map.getLayer(l)) {
+              this.map.setLayoutProperty(l, "visibility", vis);
+            }
+          });
+
+          this.isCadastreActive = visible;
+          if (visible) {
+            this.activeLayerIds.add(id);
+            if (!this._cadastreMoveListener) {
+              this._cadastreMoveListener = () => {
+                if (this.isCadastreActive) {
+                  this.updateCadastreViewport();
+                }
+              };
+              this.map.on("moveend", this._cadastreMoveListener);
+            }
+            this.updateCadastreViewport();
+            if (typeof bringTopLayersToFront === "function") {
+              bringTopLayersToFront();
+            } else if (typeof bringParcellesToFront === "function") {
+              bringParcellesToFront();
+            }
+          } else {
+            this.activeLayerIds.delete(id);
+            if (this.cadastreAbortController) {
+              this.cadastreAbortController.abort();
+            }
           }
-          this.activeLayerIds.delete(id);
+        } else {
+          const layerId = `wms-layer-${id}`;
+          if (visible) {
+            this.ensureMapLayer(id);
+            this.map.setLayoutProperty(layerId, "visibility", "visible");
+            this.activeLayerIds.add(id);
+          } else {
+            if (this.map.getLayer(layerId)) {
+              this.map.setLayoutProperty(layerId, "visibility", "none");
+            }
+            this.activeLayerIds.delete(id);
+          }
         }
 
         const itemEl = document.getElementById(`wms-item-${id}`);
@@ -5031,9 +5283,19 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         const cfg = this.registry.get(id);
         if (!cfg) return;
         cfg.currentOpacity = opacity;
-        const layerId = `wms-layer-${id}`;
-        if (this.map.getLayer(layerId)) {
-          this.map.setPaintProperty(layerId, "raster-opacity", opacity);
+
+        if (cfg.type === "cadastre_geojson") {
+          if (this.map.getLayer("cadastre-lines")) {
+            this.map.setPaintProperty("cadastre-lines", "line-opacity", opacity * 0.95);
+          }
+          if (this.map.getLayer("cadastre-labels")) {
+            this.map.setPaintProperty("cadastre-labels", "text-opacity", opacity);
+          }
+        } else {
+          const layerId = `wms-layer-${id}`;
+          if (this.map.getLayer(layerId)) {
+            this.map.setPaintProperty(layerId, "raster-opacity", opacity);
+          }
         }
         const valBadge = document.getElementById(`wms-opacity-val-${id}`);
         if (valBadge) valBadge.textContent = `${Math.round(opacity * 100)}%`;
@@ -5409,15 +5671,24 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         }
       }
 
-      // Function to ensure parcels always stay on top of all layers
-      function bringParcellesToFront() {
+      // Function to ensure parcels and cadastre always stay on top of all layers
+      function bringTopLayersToFront() {
+        // 1. Parcels above soils, contours, and WMS
         ["parcelles-fill", "parcelles-line-bg", "parcelles-line-fg"].forEach(id => {
           if (map.getLayer(id)) {
             map.moveLayer(id);
           }
         });
+        // 2. Cadastre at the ABSOLUTE TOP of everything
+        ["cadastre-fill", "cadastre-lines", "cadastre-labels"].forEach(id => {
+          if (map.getLayer(id)) {
+            map.moveLayer(id);
+          }
+        });
       }
-      bringParcellesToFront();
+      window.bringParcellesToFront = bringTopLayersToFront;
+      window.bringTopLayersToFront = bringTopLayersToFront;
+      bringTopLayersToFront();
 
       // Instantiate Elevation Profile Manager
       profileManager = new ProfileManager(map);
@@ -5535,7 +5806,33 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           parcelProps = parcelHits[0].properties;
         }
 
-        if (!pedoProps && !parcelProps) return;
+        // 3. Query cadastre (lots rénovés)
+        let cadastreProps = null;
+        const cadastreHits = map.queryRenderedFeatures(e.point, {
+          layers: ["cadastre-fill"].filter(l => map.getLayer(l))
+        });
+        if (cadastreHits && cadastreHits.length > 0) {
+          cadastreProps = cadastreHits[0].properties;
+        }
+
+        if (!pedoProps && !parcelProps && !cadastreProps) return;
+
+        // If only cadastre was clicked (neither pedology polygon nor crop parcel)
+        if (!pedoProps && !parcelProps && cadastreProps) {
+          const lotNum = cadastreProps.NO_LOT || "Inconnu";
+          const lotHtml = `
+            <div class="pedo-popup" style="padding: 10px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Cadastre du Québec</div>
+              <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 2px;">Lot nº ${lotNum}</div>
+              <div style="font-size: 11px; color: #64748b;">Registre foncier officiel du Québec (MRNF)</div>
+            </div>
+          `;
+          new maplibregl.Popup({ maxWidth: "280px", className: "pedo-custom-popup" })
+            .setLngLat(e.lngLat)
+            .setHTML(lotHtml)
+            .addTo(map);
+          return;
+        }
 
         let activeTab = defaultTab || (pedoProps ? "sols" : "cultures");
         if (!pedoProps && parcelProps) activeTab = "cultures";
@@ -5656,6 +5953,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
                 ${supStr ? `<span style="font-weight: 700; color: #1e293b;">${supStr}</span>` : ''}
               </div>
               ${crop ? `<div style="color: #334155; margin-top: 4px;">Culture 2026 : <strong>${crop}</strong>${group ? ` <span style="color:#64748b;">(${group})</span>` : ''}</div>` : ''}
+              ${cadastreProps && cadastreProps.NO_LOT ? `<div style="color: #475569; margin-top: 3px; font-size: 11px;">Lot cadastre rénové : <strong>nº ${cadastreProps.NO_LOT}</strong></div>` : ''}
             </div>
 
             <div class="popup-crop-history" style="margin-top: 4px;">
@@ -5787,6 +6085,23 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         const pedoFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill"].filter(l => map.getLayer(l)) });
         if (pedoFeatures && pedoFeatures.length > 0) return; // Handled by pedologie-fill click
         openTabbedFeaturePopup(e, "cultures");
+      });
+
+      // Click on cadastre-fill
+      map.on("click", "cadastre-fill", (e) => {
+        const otherFeatures = map.queryRenderedFeatures(e.point, { layers: ["pedologie-fill", "parcelles-fill"].filter(l => map.getLayer(l)) });
+        if (otherFeatures && otherFeatures.length > 0) return; // Handled by pedologie or parcelles
+        openTabbedFeaturePopup(e, "cultures");
+      });
+
+      // Hover on cadastre-fill
+      map.on("mouseenter", "cadastre-fill", () => {
+        if (profileManager && profileManager.isDrawing) return;
+        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "pointer";
+      });
+      map.on("mouseleave", "cadastre-fill", () => {
+        if (profileManager && profileManager.isDrawing) return;
+        map.getCanvas().style.cursor = (ndviManager && ndviManager.isActiveMode) ? "crosshair" : "";
       });
     });
 
