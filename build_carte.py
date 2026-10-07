@@ -6,9 +6,6 @@ with open('data/study_names.json', 'r', encoding='utf-8') as f:
 
 study_names_json = json.dumps(study_names, ensure_ascii=False)
 
-with open('build_carte.py', 'r', encoding='utf-8') as f:
-    content = f.read()
-
 # Fix the google url in content and the f-string
 # Let's write the exact html template directly
 html_template = """<!DOCTYPE html>
@@ -2957,6 +2954,57 @@ html_template = """<!DOCTYPE html>
       return null;
     }
 
+    function findBestTileForArea(minLng, minLat, maxLng, maxLat, clickLng, clickLat) {
+      if (typeof clickLng === "number" && typeof clickLat === "number") {
+        const t = findTileForCoords(clickLng, clickLat);
+        if (t) return t;
+      }
+      const midLng = (minLng + maxLng) / 2;
+      const midLat = (minLat + maxLat) / 2;
+      let t = findTileForCoords(midLng, midLat);
+      if (t) return t;
+      for (const [lng, lat] of [[minLng, minLat], [maxLng, maxLat], [minLng, maxLat], [maxLng, minLat]]) {
+        t = findTileForCoords(lng, lat);
+        if (t) return t;
+      }
+      return null;
+    }
+
+    function isPointInRing(pt, ring) {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0], yi = ring[i][1];
+        const xj = ring[j][0], yj = ring[j][1];
+        const intersect = ((yi > pt[1]) !== (yj > pt[1]))
+          && (pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+
+    function isPointInGeom(pt, geom) {
+      if (!geom || !geom.coordinates) return true;
+      if (geom.type === "Polygon") {
+        if (!geom.coordinates.length || !isPointInRing(pt, geom.coordinates[0])) return false;
+        for (let k = 1; k < geom.coordinates.length; k++) {
+          if (isPointInRing(pt, geom.coordinates[k])) return false;
+        }
+        return true;
+      } else if (geom.type === "MultiPolygon") {
+        for (const poly of geom.coordinates) {
+          if (poly.length && isPointInRing(pt, poly[0])) {
+            let inHole = false;
+            for (let k = 1; k < poly.length; k++) {
+              if (isPointInRing(pt, poly[k])) { inHole = true; break; }
+            }
+            if (!inHole) return true;
+          }
+        }
+        return false;
+      }
+      return true;
+    }
+
     // Viewport Raster Stretch Color Ramp: Mauve (lowest) -> Red (highest)
     const TOPO_COLORMAP = [
       { t: 0.00, r: 76,  g: 29,  b: 149 }, // mauve sombre (#4c1d95)
@@ -4294,41 +4342,6 @@ html_template = """<!DOCTYPE html>
         return null;
       };
 
-      const isPointInRing = (pt, ring) => {
-        let inside = false;
-        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-          const xi = ring[i][0], yi = ring[i][1];
-          const xj = ring[j][0], yj = ring[j][1];
-          const intersect = ((yi > pt[1]) !== (yj > pt[1]))
-            && (pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi);
-          if (intersect) inside = !inside;
-        }
-        return inside;
-      };
-
-      const isPointInGeom = (pt, geom) => {
-        if (!geom || !geom.coordinates) return true;
-        if (geom.type === "Polygon") {
-          if (!geom.coordinates.length || !isPointInRing(pt, geom.coordinates[0])) return false;
-          for (let k = 1; k < geom.coordinates.length; k++) {
-            if (isPointInRing(pt, geom.coordinates[k])) return false;
-          }
-          return true;
-        } else if (geom.type === "MultiPolygon") {
-          for (const poly of geom.coordinates) {
-            if (poly.length && isPointInRing(pt, poly[0])) {
-              let inHole = false;
-              for (let k = 1; k < poly.length; k++) {
-                if (isPointInRing(pt, poly[k])) { inHole = true; break; }
-              }
-              if (!inHole) return true;
-            }
-          }
-          return false;
-        }
-        return true;
-      };
-
       const deserialize = getDeserializeFn();
       if (!deserialize) {
         if (badgeEl) badgeEl.textContent = "FlatGeobuf non chargé";
@@ -4592,13 +4605,35 @@ html_template = """<!DOCTYPE html>
         }
       }
 
-      async analyzeParcel(geom, parcelProps = {}) {
-        if (!geom || !geom.coordinates) return null;
+      async getCog(url) {
+        if (!this.cogCache) this.cogCache = new Map();
+        if (this.cogCache.has(url)) return this.cogCache.get(url);
+        const p = fromUrl(url, {}, AbortSignal.timeout(30000));
+        this.cogCache.set(url, p);
+        return p;
+      }
+
+      async analyzeParcel(geom, parcelProps = {}, clickLngLat = null) {
+        let targetGeom = geom;
+        if ((!targetGeom || !targetGeom.coordinates) && clickLngLat) {
+          const d = 150 / 111320;
+          targetGeom = {
+            type: "Polygon",
+            coordinates: [[
+              [clickLngLat.lng - d, clickLngLat.lat - d],
+              [clickLngLat.lng + d, clickLngLat.lat - d],
+              [clickLngLat.lng + d, clickLngLat.lat + d],
+              [clickLngLat.lng - d, clickLngLat.lat + d],
+              [clickLngLat.lng - d, clickLngLat.lat - d]
+            ]]
+          };
+        }
+        if (!targetGeom || !targetGeom.coordinates) return null;
         this.setupLayers();
 
         const pid = parcelProps.ID_PER || parcelProps.id_per || parcelProps.NO_PARCELLE || "";
         this.currentParcelId = pid;
-        this.currentGeom = geom;
+        this.currentGeom = targetGeom;
 
         if (this.statusBadgeEl) {
           this.statusBadgeEl.textContent = "Calcul de l'écoulement...";
@@ -4621,18 +4656,30 @@ html_template = """<!DOCTYPE html>
             for (const c of coords) scanCoords(c);
           }
         };
-        scanCoords(geom.coordinates);
+        scanCoords(targetGeom.coordinates);
 
-        if (!isFinite(minLng) || !isFinite(maxLng)) return null;
+        if (!isFinite(minLng) || !isFinite(maxLng)) {
+          if (clickLngLat) {
+            const d = 0.0015;
+            minLng = clickLngLat.lng - d;
+            maxLng = clickLngLat.lng + d;
+            minLat = clickLngLat.lat - d;
+            maxLat = clickLngLat.lat + d;
+          } else {
+            return null;
+          }
+        }
 
         const padLng = (maxLng - minLng) * 0.04 || 0.0003;
         const padLat = (maxLat - minLat) * 0.04 || 0.0003;
         const bboxWgs84 = [minLng - padLng, minLat - padLat, maxLng + padLng, maxLat + padLat];
         this.currentBbox = bboxWgs84;
 
-        const midLng = (minLng + maxLng) / 2;
-        const midLat = (minLat + maxLat) / 2;
-        const tileUrl = findTileForCoords(midLng, midLat);
+        const tileUrl = findBestTileForArea(
+          minLng, minLat, maxLng, maxLat,
+          clickLngLat ? clickLngLat.lng : undefined,
+          clickLngLat ? clickLngLat.lat : undefined
+        );
         if (!tileUrl) {
           if (this.statusBadgeEl) {
             this.statusBadgeEl.textContent = "MNE 1m non disponible";
@@ -4642,7 +4689,7 @@ html_template = """<!DOCTYPE html>
         }
 
         try {
-          const cog = await fromUrl(tileUrl);
+          const cog = await this.getCog(tileUrl);
           const targetSize = 64; // Grille 64x64 pour une résolution fine ~2-5 m
           const region = await readCogRegion(
             cog,
@@ -4650,7 +4697,7 @@ html_template = """<!DOCTYPE html>
             targetSize,
             -32767,
             false,
-            AbortSignal.timeout(9000),
+            AbortSignal.timeout(15000),
             "bilinear"
           );
 
@@ -4683,7 +4730,7 @@ html_template = """<!DOCTYPE html>
               const lng = bboxWgs84[0] + x * cellW;
               const idx = y * W + x;
               wgsCoords[idx] = [lng, lat];
-              if (isPointInGeom([lng, lat], geom)) {
+              if (isPointInGeom([lng, lat], targetGeom)) {
                 insideMask[idx] = 1;
                 insideCount++;
               }
@@ -4691,11 +4738,8 @@ html_template = """<!DOCTYPE html>
           }
 
           if (insideCount < 3) {
-            if (this.statusBadgeEl) {
-              this.statusBadgeEl.textContent = "Parcelle trop étroite";
-              this.statusBadgeEl.className = "contour-status-badge";
-            }
-            return null;
+            insideMask.fill(1);
+            insideCount = W * H;
           }
 
           // Direction D8 et gradients
@@ -6774,6 +6818,17 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         url: "pmtiles://https://storage.googleapis.com/geoqc/BDPPAD/BDPPAD_2026.pmtiles"
       });
 
+      // Permanent invisible query layer for parcelles (queryable even when parcelles-fill is hidden)
+      map.addLayer({
+        id: "parcelles-hit-layer",
+        type: "fill",
+        source: "parcelles-source",
+        "source-layer": "BDPPAD_2026",
+        paint: {
+          "fill-opacity": 0
+        }
+      });
+
       // 7. Parcelles Fill Layer (transparent background)
       map.addLayer({
         id: "parcelles-fill",
@@ -7015,11 +7070,11 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           pedoGeom = pedoHits[0].geometry;
         }
 
-        // 2. Query parcelles
+        // 2. Query parcelles (from visible layer or hit layer)
         let parcelProps = null;
         let parcelGeom = null;
         const parcelHits = map.queryRenderedFeatures(e.point, {
-          layers: ["parcelles-fill"].filter(l => map.getLayer(l))
+          layers: ["parcelles-fill", "parcelles-hit-layer"].filter(l => map.getLayer(l))
         });
         if (parcelHits && parcelHits.length > 0) {
           parcelProps = parcelHits[0].properties;
@@ -7278,11 +7333,26 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
               <span>Identifier la série de sol (Diagnostic terrain)</span>
             </button>
+
+            <div class="popup-hydro-section" style="margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 11px; font-weight: 700; color: #0369a1; text-transform: uppercase; letter-spacing: 0.5px;">Ruissellement & cuvettes</span>
+                <span id="sols-hydro-badge" style="font-size: 10px; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Calcul automatique...</span>
+              </div>
+              <div id="sols-hydro-container"></div>
+            </div>
           `;
         } else {
           solsTabHtml = `
             <div style="color: #64748b; font-size: 12px; padding: 16px 4px; text-align: center;">
               Aucune donnée pédologique cartographiée sous ce point.
+            </div>
+            <div class="popup-hydro-section" style="margin-top: 8px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 11px; font-weight: 700; color: #0369a1; text-transform: uppercase; letter-spacing: 0.5px;">Ruissellement & cuvettes</span>
+                <span id="sols-hydro-badge" style="font-size: 10px; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Calcul automatique...</span>
+              </div>
+              <div id="sols-hydro-container"></div>
             </div>
           `;
         }
@@ -7334,7 +7404,14 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             <div style="color: #64748b; font-size: 11.5px; padding: 4px 0; line-height: 1.45;">
               Aucun contour de parcelle BDPPAD 2026 enregistré à cet endroit précis.
             </div>
-            <div class="popup-crop-history" style="margin-top: 4px;">
+            <div style="margin-top: 8px;">
+              <button type="button" id="btn-tab-hydro" class="btn-popup-hydro">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                <span>Calculer l'écoulement et les cuvettes</span>
+              </button>
+              <div id="tab-hydro-stats-container"></div>
+            </div>
+            <div class="popup-crop-history" style="margin-top: 8px;">
               <div class="crop-history-header">
                 <span class="crop-history-title">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -7532,75 +7609,87 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             });
           }
 
-          // Hydrologie trigger in popup
+          // Hydrologie trigger in popup and automatic loading
           const btnHydroInPopup = popupDom.querySelector("#btn-tab-hydro");
           const hydroStatsBox = popupDom.querySelector("#tab-hydro-stats-container");
-          if (btnHydroInPopup) {
-            btnHydroInPopup.addEventListener("click", async () => {
-              if (!parcelHydrologyManager || !parcelGeom) return;
+          const solsHydroContainer = popupDom.querySelector("#sols-hydro-container");
+          const solsHydroBadge = popupDom.querySelector("#sols-hydro-badge");
+
+          const targetGeom = parcelGeom || pedoGeom;
+
+          const runHydroCalc = async (isManual = false) => {
+            if (!parcelHydrologyManager) return;
+            if (btnHydroInPopup) {
               btnHydroInPopup.disabled = true;
               btnHydroInPopup.textContent = "Calcul de l'écoulement...";
-              const res = await parcelHydrologyManager.analyzeParcel(parcelGeom, parcelProps);
-              btnHydroInPopup.disabled = false;
+            }
+            const loadingHtml = `
+              <div style="padding: 7px 10px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; font-size: 11px; color: #0369a1; display: flex; align-items: center; gap: 7px; margin-top: 6px;">
+                <span style="display:inline-block; width:12px; height:12px; border:2px solid #0284c7; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></span>
+                <span>Calcul automatique du ruissellement et des cuvettes...</span>
+              </div>
+            `;
+            if (hydroStatsBox && (!hydroStatsBox.innerHTML || isManual)) {
+              hydroStatsBox.innerHTML = loadingHtml;
+            }
+            if (solsHydroContainer && (!solsHydroContainer.innerHTML || isManual)) {
+              solsHydroContainer.innerHTML = loadingHtml;
+            }
+
+            try {
+              const res = await parcelHydrologyManager.analyzeParcel(targetGeom, parcelProps || {}, e.lngLat);
+              if (btnHydroInPopup) btnHydroInPopup.disabled = false;
               if (res) {
-                btnHydroInPopup.textContent = "Recalculer le ruissellement";
-                if (hydroStatsBox) {
-                  hydroStatsBox.innerHTML = `
-                    <div class="parcel-hydro-stats">
-                      <div class="parcel-hydro-stat-row">
-                        <span>Pente moyenne :</span>
-                        <span class="parcel-hydro-stat-val">${res.avgSlopePct}%</span>
-                      </div>
-                      <div class="parcel-hydro-stat-row">
-                        <span>Dénivelé sur la parcelle :</span>
-                        <span class="parcel-hydro-stat-val">${res.denivele} m (${res.minElev} m &rarr; ${res.maxElev} m)</span>
-                      </div>
-                      <div class="parcel-hydro-stat-row">
-                        <span>Direction dominante :</span>
-                        <span class="parcel-hydro-stat-val">${res.dominantDir}</span>
-                      </div>
-                      <div class="parcel-hydro-stat-row">
-                        <span>Cuvettes / Dépressions locales :</span>
-                        <span class="parcel-hydro-stat-val">${res.sinkCount > 0 ? res.sinkCount + ' cuvette(s) repérée(s)' : 'Aucune stagnation détectée'}</span>
-                      </div>
+                if (btnHydroInPopup) btnHydroInPopup.textContent = "Recalculer le ruissellement";
+                const statsHtml = `
+                  <div class="parcel-hydro-stats">
+                    <div class="parcel-hydro-stat-row">
+                      <span>Pente moyenne :</span>
+                      <span class="parcel-hydro-stat-val">${res.avgSlopePct}%</span>
                     </div>
-                  `;
+                    <div class="parcel-hydro-stat-row">
+                      <span>Dénivelé sur la parcelle :</span>
+                      <span class="parcel-hydro-stat-val">${res.denivele} m (${res.minElev} m &rarr; ${res.maxElev} m)</span>
+                    </div>
+                    <div class="parcel-hydro-stat-row">
+                      <span>Direction dominante :</span>
+                      <span class="parcel-hydro-stat-val">${res.dominantDir}</span>
+                    </div>
+                    <div class="parcel-hydro-stat-row">
+                      <span>Cuvettes / Dépressions locales :</span>
+                      <span class="parcel-hydro-stat-val">${res.sinkCount > 0 ? res.sinkCount + ' cuvette(s) repérée(s)' : 'Aucune stagnation détectée'}</span>
+                    </div>
+                  </div>
+                `;
+                if (hydroStatsBox) hydroStatsBox.innerHTML = statsHtml;
+                if (solsHydroContainer) solsHydroContainer.innerHTML = statsHtml;
+                if (solsHydroBadge) {
+                  solsHydroBadge.textContent = `${res.avgSlopePct}% pente • ${res.dominantDir}`;
                 }
               } else {
-                btnHydroInPopup.textContent = "Écoulement non calculable (MNE indisponible)";
+                if (btnHydroInPopup) btnHydroInPopup.textContent = "Écoulement non calculable (hors couverture MNE 1m)";
+                const noDataHtml = `<div style="color: #64748b; font-size: 11px; padding: 4px 0;">MNE 1m non disponible pour ce secteur.</div>`;
+                if (hydroStatsBox) hydroStatsBox.innerHTML = noDataHtml;
+                if (solsHydroContainer) solsHydroContainer.innerHTML = noDataHtml;
+                if (solsHydroBadge) solsHydroBadge.textContent = "Non disponible";
               }
-            });
+            } catch (err) {
+              console.warn("Hydrology calculation execution note:", err);
+              if (btnHydroInPopup) {
+                btnHydroInPopup.disabled = false;
+                btnHydroInPopup.textContent = "Écoulement non calculable";
+              }
+              if (solsHydroBadge) solsHydroBadge.textContent = "Erreur";
+            }
+          };
+
+          if (btnHydroInPopup) {
+            btnHydroInPopup.addEventListener("click", () => runHydroCalc(true));
           }
 
-          // Si le calcul automatique d'hydrologie est activé et qu'on a cliqué sur une parcelle
-          if (parcelProps && parcelGeom && parcelHydrologyManager && parcelHydrologyManager.enabled) {
-            parcelHydrologyManager.analyzeParcel(parcelGeom, parcelProps).then(res => {
-              if (res && btnHydroInPopup) {
-                btnHydroInPopup.textContent = "Recalculer le ruissellement";
-                if (hydroStatsBox) {
-                  hydroStatsBox.innerHTML = `
-                    <div class="parcel-hydro-stats">
-                      <div class="parcel-hydro-stat-row">
-                        <span>Pente moyenne :</span>
-                        <span class="parcel-hydro-stat-val">${res.avgSlopePct}%</span>
-                      </div>
-                      <div class="parcel-hydro-stat-row">
-                        <span>Dénivelé sur la parcelle :</span>
-                        <span class="parcel-hydro-stat-val">${res.denivele} m (${res.minElev} m &rarr; ${res.maxElev} m)</span>
-                      </div>
-                      <div class="parcel-hydro-stat-row">
-                        <span>Direction dominante :</span>
-                        <span class="parcel-hydro-stat-val">${res.dominantDir}</span>
-                      </div>
-                      <div class="parcel-hydro-stat-row">
-                        <span>Cuvettes / Dépressions locales :</span>
-                        <span class="parcel-hydro-stat-val">${res.sinkCount > 0 ? res.sinkCount + ' cuvette(s) repérée(s)' : 'Aucune stagnation détectée'}</span>
-                      </div>
-                    </div>
-                  `;
-                }
-              }
-            }).catch(e => console.warn("Auto hydro analysis note:", e));
+          // Chargement automatique immédiat de l'écoulement et des cuvettes
+          if (parcelHydrologyManager && parcelHydrologyManager.enabled) {
+            runHydroCalc(false);
           }
 
           // Trigger crop history query
