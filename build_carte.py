@@ -2377,7 +2377,7 @@ html_template = """<!DOCTYPE html>
             <span>Écoulement &amp; dépressions</span>
           </div>
           <label class="switch-label" title="Afficher/Masquer les flèches d'écoulement et le raster des dépressions (zoom &gt;= 13)">
-            <input type="checkbox" id="toggle-hydro-parcelle" checked />
+            <input type="checkbox" id="toggle-hydro-parcelle" />
             <span class="switch-slider"></span>
           </label>
         </div>
@@ -2408,7 +2408,7 @@ html_template = """<!DOCTYPE html>
         </div>
 
         <div id="hydro-parcelle-status" class="contour-status-badge" style="margin: 0; font-size: 10px;">
-          Prêt (zoom &gt;= 13)
+          Désactivé
         </div>
       </div>
 
@@ -4486,7 +4486,7 @@ html_template = """<!DOCTYPE html>
     class ParcelHydrologyManager {
       constructor(mapInstance) {
         this.map = mapInstance;
-        this.enabled = true; // Actif par défaut
+        this.enabled = false; // Désactivé par défaut
         this.cuvettesOpacity = 0.82;
         this.statusBadgeEl = document.getElementById("hydro-parcelle-status");
         this.debounceTimer = null;
@@ -7173,7 +7173,9 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
 
       // Instantiate Parcel Hydrology Manager (Écoulement & Raster de cuvettes à la volée)
       parcelHydrologyManager = new ParcelHydrologyManager(map);
-      parcelHydrologyManager.scheduleViewportUpdate();
+      if (parcelHydrologyManager.enabled) {
+        parcelHydrologyManager.scheduleViewportUpdate();
+      }
 
       // Instantiate Sentinel-2 NDVI Manager
       ndviManager = new NdviManager(map);
@@ -8733,7 +8735,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           toggleHydroParcelle.checked = true;
           if (parcelHydrologyManager) parcelHydrologyManager.setEnabled(true);
         }
-      } else if (state.layers.length > 0 && !state.layers.includes("hydro")) {
+      } else {
         if (toggleHydroParcelle) {
           toggleHydroParcelle.checked = false;
           if (parcelHydrologyManager) parcelHydrologyManager.setEnabled(false);
