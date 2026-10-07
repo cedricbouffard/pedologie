@@ -2357,26 +2357,48 @@
           <span id="parcelles-opacity-val" class="val-badge">95%</span>
         </div>
         <input type="range" id="parcelles-opacity" min="0" max="100" value="95" class="slider" />
+      </div>
 
-        <div style="margin-top: 10px; padding-top: 9px; border-top: 1px dashed #e2e8f0;">
-          <div class="tool-label-row" style="margin-bottom: 5px;">
-            <span class="tool-sublabel" style="font-weight: 600; color: #0284c7;">Écoulement &amp; cuvettes (MNE 1m)</span>
-            <label class="switch-label" title="Calculer automatiquement le ruissellement à la volée et les cuvettes par remplissage MNE" style="transform: scale(0.85); transform-origin: right center;">
-              <input type="checkbox" id="toggle-hydro-parcelle" checked />
-              <span class="switch-slider"></span>
-            </label>
+      <!-- 2c. Écoulement & Dépressions (au-dessus des courbes de niveau) -->
+      <div class="tool-card">
+        <div class="tool-card-header">
+          <div class="tool-card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            <span>Écoulement &amp; dépressions</span>
           </div>
-          <div style="font-size: 10.5px; color: #64748b; line-height: 1.35; margin-bottom: 6px;">
-            Flèches d'écoulement à la volée et raster des cuvettes (remplissage MNE).
+          <label class="switch-label" title="Afficher/Masquer les flèches d'écoulement et le raster des dépressions (zoom &gt;= 13)">
+            <input type="checkbox" id="toggle-hydro-parcelle" checked />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <div style="font-size: 10.5px; color: #64748b; line-height: 1.35; margin-bottom: 7px;">
+          Flèches selon la pente et raster des dépressions (remplissage MNE 1m) calculés à la volée.
+        </div>
+
+        <!-- Légende des flèches par pente -->
+        <div style="margin-bottom: 6px;">
+          <div style="font-size: 10px; font-weight: 600; color: #475569; margin-bottom: 3px;">Pente du ruissellement :</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; color: #64748b; background: #f8fafc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">
+            <span style="display:inline-flex; align-items:center; gap:3px;"><span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#38bdf8;"></span> &lt; 2.5%</span>
+            <span style="display:inline-flex; align-items:center; gap:3px;"><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#0284c7;"></span> 2.5–5%</span>
+            <span style="display:inline-flex; align-items:center; gap:3px;"><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#1d4ed8;"></span> 5–10%</span>
+            <span style="display:inline-flex; align-items:center; gap:3px;"><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#6d28d9;"></span> &gt; 10%</span>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
-            <div id="hydro-parcelle-status" class="contour-status-badge" style="margin: 0; flex: 1; font-size: 10.5px;">
-              Prêt (zoom &gt;= 13 ou clic parcelle)
-            </div>
-            <button id="btn-clear-hydro-parcelle" type="button" class="pill-btn" style="display: none; padding: 2px 7px; font-size: 10.5px;" title="Réinitialiser l'affichage hydrologique">
-              Effacer
-            </button>
+        </div>
+
+        <!-- Légende des dépressions par profondeur -->
+        <div style="margin-bottom: 7px;">
+          <div style="font-size: 10px; font-weight: 600; color: #475569; margin-bottom: 3px;">Dépressions / cuvettes :</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; color: #64748b; background: #f8fafc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">
+            <span style="display:inline-flex; align-items:center; gap:3px;"><span style="display:inline-block; width:9px; height:7px; border-radius:2px; background:rgba(103,232,249,0.75);"></span> 8–18 cm</span>
+            <span style="display:inline-flex; align-items:center; gap:3px;"><span style="display:inline-block; width:9px; height:7px; border-radius:2px; background:rgba(2,132,199,0.85);"></span> 18–35 cm</span>
+            <span style="display:inline-flex; align-items:center; gap:3px;"><span style="display:inline-block; width:9px; height:7px; border-radius:2px; background:rgba(29,78,216,0.92);"></span> &gt; 35 cm</span>
           </div>
+        </div>
+
+        <div id="hydro-parcelle-status" class="contour-status-badge" style="margin: 0; font-size: 10px;">
+          Prêt (zoom &gt;= 13)
         </div>
       </div>
 
@@ -4426,21 +4448,13 @@
       }
     }
 
-    // Gestionnaire de l'hydrologie parcellaire (écoulement de l'eau et zones d'accumulation)
-    // Gestionnaire de l'hydrologie (écoulement à la volée & raster des cuvettes par remplissage D8/Priority-Flood)
+    // Gestionnaire de l'hydrologie (écoulement à la volée & raster des dépressions par remplissage D8/Priority-Flood)
     class ParcelHydrologyManager {
       constructor(mapInstance) {
         this.map = mapInstance;
         this.enabled = true; // Actif par défaut
-        this.mode = "viewport"; // 'viewport' (à la volée) ou 'parcel' (focalisé)
-        this.currentParcelId = null;
-        this.currentAnalysis = null;
-        this.currentGeom = null;
-        this.currentBbox = null;
-        this.arrowDensity = "medium";
         this.cuvettesOpacity = 0.82;
         this.statusBadgeEl = document.getElementById("hydro-parcelle-status");
-        this.btnHydroClear = document.getElementById("btn-clear-hydro-parcelle");
         this.debounceTimer = null;
         this.abortController = null;
         this.cogCache = new Map();
@@ -4458,31 +4472,28 @@
           const ctx = canvas.getContext("2d");
           ctx.translate(size / 2, size / 2);
           ctx.beginPath();
-          ctx.moveTo(0, -11);
-          ctx.lineTo(8, 2);
-          ctx.lineTo(3.5, 2);
-          ctx.lineTo(3.5, 11);
-          ctx.lineTo(-3.5, 11);
-          ctx.lineTo(-3.5, 2);
-          ctx.lineTo(-8, 2);
+          ctx.moveTo(0, -12);
+          ctx.lineTo(7.5, 2);
+          ctx.lineTo(3.2, 2);
+          ctx.lineTo(3.2, 11);
+          ctx.lineTo(-3.2, 11);
+          ctx.lineTo(-3.2, 2);
+          ctx.lineTo(-7.5, 2);
           ctx.closePath();
-          ctx.fillStyle = "#0284c7";
+          ctx.fillStyle = "#ffffff";
           ctx.fill();
-          ctx.lineWidth = 1.6;
-          ctx.strokeStyle = "#ffffff";
-          ctx.stroke();
 
           const imgData = ctx.getImageData(0, 0, size, size);
           this.map.addImage("hydro-flow-arrow", {
             width: size,
             height: size,
             data: imgData.data
-          });
+          }, { sdf: true });
         }
       }
 
       setupLayers() {
-        // 1. Source & Couche Raster pour les cuvettes d'accumulation (MNE Fill - MNE Original)
+        // 1. Source & Couche Raster pour les dépressions (MNE Fill - MNE Original)
         if (!this.map.getSource("hydro-cuvettes-source")) {
           const dummyCanvas = document.createElement("canvas");
           dummyCanvas.width = 1; dummyCanvas.height = 1;
@@ -4511,7 +4522,7 @@
           ? "parcelles-line-bg"
           : (this.map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined);
 
-        // Couche Raster des cuvettes (bleu/cyan pour les zones de stagnation)
+        // Couche Raster des dépressions / cuvettes (au-dessus des courbes de niveau)
         if (!this.map.getLayer("hydro-cuvettes-layer")) {
           this.map.addLayer({
             id: "hydro-cuvettes-layer",
@@ -4537,16 +4548,16 @@
               "line-color": "#0284c7",
               "line-width": [
                 "interpolate", ["linear"], ["zoom"],
-                12, 1.5,
-                15, 3.2,
-                18, 5
+                13, 1.6,
+                15, 2.8,
+                18, 4.5
               ],
-              "line-opacity": 0.9
+              "line-opacity": 0.85
             }
           }, beforeLayer);
         }
 
-        // Flèches de direction d'écoulement
+        // Flèches de direction d'écoulement (taille et couleur selon la pente)
         if (!this.map.getLayer("hydro-flow-arrows")) {
           this.map.addLayer({
             id: "hydro-flow-arrows",
@@ -4556,21 +4567,34 @@
               "visibility": this.enabled ? "visible" : "none",
               "icon-image": "hydro-flow-arrow",
               "icon-size": [
-                "interpolate", ["linear"], ["zoom"],
-                12, 0.45,
-                14, 0.65,
-                16, 0.9,
-                18, 1.15
+                "interpolate", ["linear"], ["get", "slopePct"],
+                0.8, 0.45,
+                2.5, 0.60,
+                5.0, 0.78,
+                10.0, 0.98,
+                18.0, 1.20
               ],
               "icon-rotate": ["get", "angle"],
               "icon-rotation-alignment": "map",
               "icon-allow-overlap": true,
               "icon-ignore-placement": true
+            },
+            paint: {
+              "icon-color": [
+                "interpolate", ["linear"], ["get", "slopePct"],
+                0.8, "#38bdf8",
+                2.5, "#0284c7",
+                5.0, "#1d4ed8",
+                10.0, "#4338ca",
+                18.0, "#6d28d9"
+              ],
+              "icon-halo-color": "#ffffff",
+              "icon-halo-width": 1.4,
+              "icon-opacity": 0.95
             }
           }, beforeLayer);
         }
 
-        // Suppression des anciens cercles s'ils existaient
         if (this.map.getLayer("hydro-accumulation-circles")) {
           this.map.removeLayer("hydro-accumulation-circles");
         }
@@ -4603,19 +4627,11 @@
       }
 
       clear() {
-        this.currentParcelId = null;
-        this.currentAnalysis = null;
-        this.currentGeom = null;
-        this.currentBbox = null;
-        this.mode = "viewport";
         this.clearData();
-        if (this.btnHydroClear) {
-          this.btnHydroClear.style.display = "none";
-        }
         if (this.enabled) {
           this.scheduleViewportUpdate();
         } else if (this.statusBadgeEl) {
-          this.statusBadgeEl.textContent = "Aucune analyse active";
+          this.statusBadgeEl.textContent = "Désactivé";
           this.statusBadgeEl.className = "contour-status-badge";
         }
       }
@@ -4647,7 +4663,7 @@
         return p;
       }
 
-      // Algorithme de remplissage de dépressions (Priority-Flood / Sink Fill)
+      // Algorithme de remplissage de dépressions (Priority-Flood / Barnes 2014)
       computeDepressionFill(elev, W, H) {
         const size = W * H;
         const filled = new Float32Array(elev);
@@ -4759,7 +4775,7 @@
           const z = elev[i];
           if (Number.isFinite(z) && z > -1000 && z < 9000) {
             const d = filled[i] - z;
-            if (d > 0.04) { // Seuil de 4 cm pour éliminer le micro-bruit
+            if (d >= 0.08) { // Seuil minimal de 8 cm pour éliminer les micro-ornières et le bruit Lidar
               diff[i] = d;
               if (d > maxDepth) maxDepth = d;
               countDepressions++;
@@ -4772,11 +4788,30 @@
           }
         }
 
+        // Filtre de bruit : éliminer les cellules isolées (1 seul pixel isolé sans voisin)
+        for (let y = 0; y < H; y++) {
+          for (let x = 0; x < W; x++) {
+            const idx = y * W + x;
+            if (diff[idx] <= 0 || diff[idx] >= 0.15) continue;
+            let neighbors = 0;
+            for (let d = 0; d < 8; d++) {
+              const nx = x + dx[d], ny = y + dy[d];
+              if (nx >= 0 && nx < W && ny >= 0 && ny < H) {
+                if (diff[ny * W + nx] > 0) neighbors++;
+              }
+            }
+            if (neighbors === 0) {
+              diff[idx] = 0;
+              countDepressions--;
+            }
+          }
+        }
+
         return { diff, maxDepth, countDepressions, sumDepth, filled };
       }
 
-      // Génération du raster des cuvettes (palette de rétention d'eau)
-      renderCuvettesCanvas(diff, W, H, insideMask = null) {
+      // Génération du raster des dépressions avec palette progressive selon la profondeur
+      renderCuvettesCanvas(diff, W, H) {
         this.canvasCuvettes.width = W;
         this.canvasCuvettes.height = H;
         const imgData = this.ctxCuvettes.createImageData(W, H);
@@ -4784,34 +4819,33 @@
 
         for (let i = 0; i < W * H; i++) {
           const pIdx = i * 4;
-          if (insideMask && !insideMask[i]) {
-            px[pIdx + 3] = 0;
-            continue;
-          }
           const depth = diff[i];
-          if (depth <= 0.04) {
+          if (depth < 0.08) {
             px[pIdx + 3] = 0;
             continue;
           }
 
-          if (depth < 0.12) {
-            const t = (depth - 0.04) / 0.08;
-            px[pIdx] = Math.round(56 + t * (2 - 56));
-            px[pIdx + 1] = Math.round(189 + t * (132 - 189));
-            px[pIdx + 2] = Math.round(248 + t * (199 - 248));
-            px[pIdx + 3] = Math.round(140 + t * 45);
-          } else if (depth < 0.30) {
-            const t = (depth - 0.12) / 0.18;
-            px[pIdx] = Math.round(2 + t * (3 - 2));
-            px[pIdx + 1] = Math.round(132 + t * (105 - 132));
-            px[pIdx + 2] = Math.round(199 + t * (161 - 199));
-            px[pIdx + 3] = Math.round(185 + t * 35);
+          if (depth < 0.18) {
+            // Faible stagnation (8 cm à 18 cm) : Cyan turquoise clair
+            const t = (depth - 0.08) / 0.10;
+            px[pIdx] = Math.round(103 + t * (2 - 103));
+            px[pIdx + 1] = Math.round(232 + t * (132 - 232));
+            px[pIdx + 2] = Math.round(249 + t * (199 - 249));
+            px[pIdx + 3] = Math.round(140 + t * 45); // ~55-72% opacité
+          } else if (depth < 0.35) {
+            // Dépression moyenne (18 cm à 35 cm) : Bleu océan vif
+            const t = (depth - 0.18) / 0.17;
+            px[pIdx] = Math.round(2 + t * (29 - 2));
+            px[pIdx + 1] = Math.round(132 + t * (78 - 132));
+            px[pIdx + 2] = Math.round(199 + t * (216 - 199));
+            px[pIdx + 3] = Math.round(185 + t * 35); // ~72-86% opacité
           } else {
-            const t = Math.min(1, (depth - 0.30) / 0.50);
-            px[pIdx] = Math.round(3 + t * (12 - 3));
-            px[pIdx + 1] = Math.round(105 + t * (74 - 105));
-            px[pIdx + 2] = Math.round(161 + t * (110 - 161));
-            px[pIdx + 3] = Math.round(220 + t * 35);
+            // Dépression profonde (> 35 cm) : Bleu roi profond à bleu nuit
+            const t = Math.min(1, (depth - 0.35) / 0.45);
+            px[pIdx] = Math.round(29 + t * (15 - 29));
+            px[pIdx + 1] = Math.round(78 + t * (23 - 78));
+            px[pIdx + 2] = Math.round(216 + t * (66 - 216));
+            px[pIdx + 3] = Math.round(220 + t * 30); // ~86-98% opacité
           }
         }
 
@@ -4830,7 +4864,7 @@
       async updateViewport() {
         if (!this.enabled || !this.map) return;
         const zoom = this.map.getZoom();
-        if (zoom < 12.5) {
+        if (zoom < 12.8) {
           if (this.statusBadgeEl) {
             this.statusBadgeEl.textContent = "Zoomer (>= 13) pour l'écoulement";
             this.statusBadgeEl.className = "contour-status-badge";
@@ -4880,14 +4914,14 @@
 
           if (!region || !region.data || region.data.length === 0) return;
 
-          this.processHydrology(region, bboxWgs84, null);
+          this.processHydrology(region, bboxWgs84);
         } catch (err) {
           if (err.name === "AbortError") return;
           console.warn("Hydrology viewport update note:", err);
         }
       }
 
-      processHydrology(region, bboxWgs84, targetGeom = null) {
+      processHydrology(region, bboxWgs84) {
         const W = region.width;
         const H = region.height;
         const elev = region.data;
@@ -4896,33 +4930,21 @@
         const dyMetric = (sBbox[3] - sBbox[1]) / (H - 1);
         const cellAreaMetric = Math.abs(dxMetric * dyMetric);
 
-        const insideMask = new Uint8Array(W * H);
         const wgsCoords = new Array(W * H);
         const cellW = (bboxWgs84[2] - bboxWgs84[0]) / (W - 1);
         const cellH = (bboxWgs84[3] - bboxWgs84[1]) / (H - 1);
 
-        let insideCount = 0;
         for (let y = 0; y < H; y++) {
           const lat = bboxWgs84[3] - y * cellH;
           for (let x = 0; x < W; x++) {
             const lng = bboxWgs84[0] + x * cellW;
-            const idx = y * W + x;
-            wgsCoords[idx] = [lng, lat];
-            if (!targetGeom || isPointInGeom([lng, lat], targetGeom)) {
-              insideMask[idx] = 1;
-              insideCount++;
-            }
+            wgsCoords[y * W + x] = [lng, lat];
           }
         }
 
-        if (targetGeom && insideCount < 3) {
-          insideMask.fill(1);
-          insideCount = W * H;
-        }
-
-        // 1. Remplissage des dépressions & Raster des cuvettes
+        // 1. Remplissage des dépressions & Raster des cuvettes (seuil 8 cm, moins de bruit)
         const { diff, maxDepth, countDepressions, sumDepth } = this.computeDepressionFill(elev, W, H);
-        const cuvettesDataUrl = this.renderCuvettesCanvas(diff, W, H, targetGeom ? insideMask : null);
+        const cuvettesDataUrl = this.renderCuvettesCanvas(diff, W, H);
 
         const actualBbox = region.bboxWgs84 || bboxWgs84;
         const coords = region.cornersWgs84 || [
@@ -4959,21 +4981,11 @@
         const flowAngle = new Float32Array(W * H).fill(0);
         const flowSlope = new Float32Array(W * H).fill(0);
 
-        let sumSlope = 0;
-        let countSlope = 0;
-        let minElev = Infinity, maxElev = -Infinity;
-        const azimuths = [];
-
         for (let y = 1; y < H - 1; y++) {
           for (let x = 1; x < W - 1; x++) {
             const idx = y * W + x;
-            if (!insideMask[idx]) continue;
-
             const z = elev[idx];
             if (!Number.isFinite(z) || z <= -1000 || z >= 9000) continue;
-
-            if (z < minElev) minElev = z;
-            if (z > maxElev) maxElev = z;
 
             let maxDropSlope = 0;
             let bestTarget = -1;
@@ -4994,21 +5006,18 @@
               }
             }
 
-            if (bestTarget !== -1 && maxDropSlope > 0.0005) {
+            if (bestTarget !== -1 && maxDropSlope >= 0.008) {
               flowTarget[idx] = bestTarget;
               flowAngle[idx] = bestAngle;
               flowSlope[idx] = maxDropSlope;
-              sumSlope += maxDropSlope;
-              countSlope++;
-              azimuths.push(bestAngle);
             }
           }
         }
 
-        // Flow accumulation (D8)
+        // Flow accumulation (D8) pour identifier les thalwegs
         const cells = [];
         for (let i = 0; i < W * H; i++) {
-          if (insideMask[i] && Number.isFinite(elev[i]) && elev[i] > -1000) {
+          if (Number.isFinite(elev[i]) && elev[i] > -1000) {
             cells.push(i);
           }
         }
@@ -5017,41 +5026,21 @@
         const accumulation = new Int32Array(W * H).fill(1);
         for (const c of cells) {
           const tgt = flowTarget[c];
-          if (tgt !== -1 && insideMask[tgt]) {
+          if (tgt !== -1) {
             accumulation[tgt] += accumulation[c];
           }
         }
 
-        let dominantDirName = "Variable";
-        if (azimuths.length > 0) {
-          let sinSum = 0, cosSum = 0;
-          for (const az of azimuths) {
-            const rad = (az * Math.PI) / 180;
-            sinSum += Math.sin(rad);
-            cosSum += Math.cos(rad);
-          }
-          let meanAz = (Math.atan2(sinSum, cosSum) * 180) / Math.PI;
-          if (meanAz < 0) meanAz += 360;
-
-          if (meanAz >= 337.5 || meanAz < 22.5) dominantDirName = "Vers le Nord (N)";
-          else if (meanAz < 67.5) dominantDirName = "Vers le Nord-Est (NE)";
-          else if (meanAz < 112.5) dominantDirName = "Vers l'Est (E)";
-          else if (meanAz < 157.5) dominantDirName = "Vers le Sud-Est (SE)";
-          else if (meanAz < 202.5) dominantDirName = "Vers le Sud (S)";
-          else if (meanAz < 247.5) dominantDirName = "Vers le Sud-Ouest (SO)";
-          else if (meanAz < 292.5) dominantDirName = "Vers l'Ouest (O)";
-          else dominantDirName = "Vers le Nord-Ouest (NO)";
-        }
-
-        // 3. Flèches de direction d'écoulement (à la volée)
+        // 3. Flèches de direction d'écoulement (espacées pour une lecture épurée : step = 8)
         const arrowFeatures = [];
-        const step = targetGeom ? (this.arrowDensity === "high" ? 2 : 3) : (this.arrowDensity === "high" ? 3 : 4);
+        const step = 8;
 
-        for (let y = 1; y < H - 1; y += step) {
-          for (let x = 1; x < W - 1; x += step) {
+        for (let y = 2; y < H - 2; y += step) {
+          for (let x = 2; x < W - 2; x += step) {
             const idx = y * W + x;
-            if (!insideMask[idx] || flowTarget[idx] === -1) continue;
-            if (flowSlope[idx] < 0.001) continue;
+            if (flowTarget[idx] === -1 || flowSlope[idx] < 0.008) continue;
+
+            const slopePct = Math.round(flowSlope[idx] * 1000) / 10;
 
             arrowFeatures.push({
               type: "Feature",
@@ -5061,23 +5050,23 @@
               },
               properties: {
                 angle: flowAngle[idx],
-                slopePct: Math.round(flowSlope[idx] * 1000) / 10,
+                slopePct: slopePct,
                 elevation: Math.round(elev[idx] * 10) / 10
               }
             });
           }
         }
 
-        // 4. Thalwegs (axes d'écoulement concentré)
-        const accumThreshold = Math.max(6, Math.round(insideCount * 0.035));
+        // 4. Thalwegs (axes d'écoulement concentré épurés)
+        const accumThreshold = Math.max(14, Math.round(W * H * 0.0035));
         const lineFeatures = [];
 
         for (let y = 1; y < H - 1; y++) {
           for (let x = 1; x < W - 1; x++) {
             const idx = y * W + x;
-            if (!insideMask[idx] || accumulation[idx] < accumThreshold) continue;
+            if (accumulation[idx] < accumThreshold) continue;
             const tgt = flowTarget[idx];
-            if (tgt !== -1 && insideMask[tgt]) {
+            if (tgt !== -1) {
               lineFeatures.push({
                 type: "Feature",
                 geometry: {
@@ -5101,138 +5090,12 @@
           features: lineFeatures
         });
 
-        const avgSlopePct = countSlope > 0 ? (sumSlope / countSlope) * 100 : 0;
-        const denivele = maxElev > minElev ? maxElev - minElev : 0;
         const cuvetteAreaM2 = Math.round(countDepressions * cellAreaMetric);
-        const cuvetteVolumeM3 = Math.round(sumDepth * cellAreaMetric);
-
-        this.currentAnalysis = {
-          arrowCount: arrowFeatures.length,
-          streamCount: lineFeatures.length,
-          cuvetteCount: countDepressions,
-          cuvetteAreaM2: cuvetteAreaM2,
-          maxCuvetteDepth: Math.round(maxDepth * 100) / 100,
-          cuvetteVolumeM3: cuvetteVolumeM3,
-          avgSlopePct: avgSlopePct.toFixed(1),
-          denivele: denivele.toFixed(2),
-          minElev: minElev.toFixed(2),
-          maxElev: maxElev.toFixed(2),
-          dominantDir: dominantDirName
-        };
 
         if (this.statusBadgeEl) {
-          const cuvText = cuvetteAreaM2 > 0 ? `${cuvetteAreaM2} m² cuvettes` : `pente ${avgSlopePct.toFixed(1)}%`;
+          const cuvText = cuvetteAreaM2 > 0 ? `${cuvetteAreaM2} m² cuvettes` : `aucune stagnation`;
           this.statusBadgeEl.textContent = `${arrowFeatures.length} flèches • ${cuvText}`;
           this.statusBadgeEl.className = "contour-status-badge active";
-        }
-
-        return this.currentAnalysis;
-      }
-
-      async analyzeParcel(geom, parcelProps = {}, clickLngLat = null) {
-        this.mode = "parcel";
-        let targetGeom = geom;
-        if ((!targetGeom || !targetGeom.coordinates) && clickLngLat) {
-          const d = 150 / 111320;
-          targetGeom = {
-            type: "Polygon",
-            coordinates: [[
-              [clickLngLat.lng - d, clickLngLat.lat - d],
-              [clickLngLat.lng + d, clickLngLat.lat - d],
-              [clickLngLat.lng + d, clickLngLat.lat + d],
-              [clickLngLat.lng - d, clickLngLat.lat + d],
-              [clickLngLat.lng - d, clickLngLat.lat - d]
-            ]]
-          };
-        }
-        if (!targetGeom || !targetGeom.coordinates) return null;
-        this.setupLayers();
-
-        const pid = parcelProps.ID_PER || parcelProps.id_per || parcelProps.NO_PARCELLE || "";
-        this.currentParcelId = pid;
-        this.currentGeom = targetGeom;
-
-        if (this.statusBadgeEl) {
-          this.statusBadgeEl.textContent = "Calcul de l'écoulement...";
-          this.statusBadgeEl.className = "contour-status-badge active";
-        }
-        if (this.btnHydroClear) {
-          this.btnHydroClear.style.display = "inline-flex";
-        }
-
-        let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
-        const scanCoords = (coords) => {
-          if (!Array.isArray(coords)) return;
-          if (coords.length >= 2 && typeof coords[0] === "number" && typeof coords[1] === "number") {
-            if (coords[0] < minLng) minLng = coords[0];
-            if (coords[0] > maxLng) maxLng = coords[0];
-            if (coords[1] < minLat) minLat = coords[1];
-            if (coords[1] > maxLat) maxLat = coords[1];
-          } else {
-            for (const c of coords) scanCoords(c);
-          }
-        };
-        scanCoords(targetGeom.coordinates);
-
-        if (!isFinite(minLng) || !isFinite(maxLng)) {
-          if (clickLngLat) {
-            const d = 0.0015;
-            minLng = clickLngLat.lng - d;
-            maxLng = clickLngLat.lng + d;
-            minLat = clickLngLat.lat - d;
-            maxLat = clickLngLat.lat + d;
-          } else {
-            return null;
-          }
-        }
-
-        const padLng = (maxLng - minLng) * 0.04 || 0.0003;
-        const padLat = (maxLat - minLat) * 0.04 || 0.0003;
-        const bboxWgs84 = [minLng - padLng, minLat - padLat, maxLng + padLng, maxLat + padLat];
-        this.currentBbox = bboxWgs84;
-
-        const tileUrl = findBestTileForArea(
-          minLng, minLat, maxLng, maxLat,
-          clickLngLat ? clickLngLat.lng : undefined,
-          clickLngLat ? clickLngLat.lat : undefined
-        );
-        if (!tileUrl) {
-          if (this.statusBadgeEl) {
-            this.statusBadgeEl.textContent = "MNE 1m non disponible";
-            this.statusBadgeEl.className = "contour-status-badge";
-          }
-          return null;
-        }
-
-        try {
-          const cog = await this.getCog(tileUrl);
-          const targetSize = 96;
-          const region = await readCogRegion(
-            cog,
-            bboxWgs84,
-            targetSize,
-            -32767,
-            false,
-            AbortSignal.timeout(15000),
-            "bilinear"
-          );
-
-          if (!region || !region.data || region.data.length === 0) {
-            if (this.statusBadgeEl) {
-              this.statusBadgeEl.textContent = "Erreur lecture MNE";
-              this.statusBadgeEl.className = "contour-status-badge";
-            }
-            return null;
-          }
-
-          return this.processHydrology(region, bboxWgs84, targetGeom);
-        } catch (err) {
-          console.error("Hydrological parcel analysis error:", err);
-          if (this.statusBadgeEl) {
-            this.statusBadgeEl.textContent = "Erreur de calcul";
-            this.statusBadgeEl.className = "contour-status-badge";
-          }
-          return null;
         }
       }
     }
@@ -7173,21 +7036,28 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
 
       // Function to ensure parcels, cadastre, contours and hydrography stay properly layered
       function bringTopLayersToFront() {
-        // 0. Courbes de niveau au-dessus du relief topographique
-        if (map.getLayer("hrdem-topo-layer") && map.getLayer("gc-contour-minor")) {
-          const beforeId = map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined;
-          ["gc-contour-minor", "gc-contour-major", "gc-contour-labels"].forEach(id => {
-            if (map.getLayer(id)) {
-              map.moveLayer(id, beforeId);
-            }
-          });
-        }
+        // 0. Courbes de niveau placées SOUS les couches d'écoulement et de dépressions
+        const hydroFirstId = map.getLayer("hydro-cuvettes-layer")
+          ? "hydro-cuvettes-layer"
+          : (map.getLayer("hydro-flow-lines")
+            ? "hydro-flow-lines"
+            : (map.getLayer("hydro-flow-arrows")
+              ? "hydro-flow-arrows"
+              : (map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined)));
+
+        ["gc-contour-minor", "gc-contour-major", "gc-contour-labels"].forEach(id => {
+          if (map.getLayer(id)) {
+            map.moveLayer(id, hydroFirstId);
+          }
+        });
+
         // 0.5 Hydrographie officielle (GRHQ) au-dessus de tous les rasters et de la pédologie
         const hydroBeforeId = map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined;
         if (map.getLayer("wms-layer-eau_grhq")) {
           map.moveLayer("wms-layer-eau_grhq", hydroBeforeId);
         }
-        // 0.8 Hydrologie parcellaire (flèches, axes de drainage et cuvettes raster) sous le contour des parcelles
+
+        // 0.8 Écoulement & Dépressions AU-DESSUS des courbes de niveau et sous le contour des parcelles
         const hydroParcelBefore = map.getLayer("parcelles-line-bg") ? "parcelles-line-bg" : (map.getLayer("parcelles-fill") ? "parcelles-fill" : undefined);
         ["hydro-cuvettes-layer", "hydro-flow-lines", "hydro-flow-arrows"].forEach(id => {
           if (map.getLayer(id)) {
@@ -7279,7 +7149,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           }
         }
 
-        if (parcelHydrologyManager && parcelHydrologyManager.enabled && parcelHydrologyManager.mode === "viewport") {
+        if (parcelHydrologyManager && parcelHydrologyManager.enabled) {
           parcelHydrologyManager.scheduleViewportUpdate();
         }
       });
@@ -7589,26 +7459,11 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
               <span>Identifier la série de sol (Diagnostic terrain)</span>
             </button>
-
-            <div class="popup-hydro-section" style="margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <span style="font-size: 11px; font-weight: 700; color: #0369a1; text-transform: uppercase; letter-spacing: 0.5px;">Ruissellement & cuvettes</span>
-                <span id="sols-hydro-badge" style="font-size: 10px; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Calcul automatique...</span>
-              </div>
-              <div id="sols-hydro-container"></div>
-            </div>
           `;
         } else {
           solsTabHtml = `
             <div style="color: #64748b; font-size: 12px; padding: 16px 4px; text-align: center;">
               Aucune donnée pédologique cartographiée sous ce point.
-            </div>
-            <div class="popup-hydro-section" style="margin-top: 8px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <span style="font-size: 11px; font-weight: 700; color: #0369a1; text-transform: uppercase; letter-spacing: 0.5px;">Ruissellement & cuvettes</span>
-                <span id="sols-hydro-badge" style="font-size: 10px; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Calcul automatique...</span>
-              </div>
-              <div id="sols-hydro-container"></div>
             </div>
           `;
         }
@@ -7634,14 +7489,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
               ${cadastreProps && cadastreProps.NO_LOT ? `<div style="color: #475569; margin-top: 3px; font-size: 11px;">Lot cadastre rénové : <strong>nº ${cadastreProps.NO_LOT}</strong></div>` : ''}
             </div>
 
-            <div style="margin-top: 8px;">
-              <button type="button" id="btn-tab-hydro" class="btn-popup-hydro">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-                <span>Calculer l'écoulement et les cuvettes</span>
-              </button>
-              <div id="tab-hydro-stats-container"></div>
-            </div>
-
             <div class="popup-crop-history" style="margin-top: 8px;">
               <div class="crop-history-header">
                 <span class="crop-history-title">
@@ -7659,13 +7506,6 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           culturesTabHtml = `
             <div style="color: #64748b; font-size: 11.5px; padding: 4px 0; line-height: 1.45;">
               Aucun contour de parcelle BDPPAD 2026 enregistré à cet endroit précis.
-            </div>
-            <div style="margin-top: 8px;">
-              <button type="button" id="btn-tab-hydro" class="btn-popup-hydro">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-                <span>Calculer l'écoulement et les cuvettes</span>
-              </button>
-              <div id="tab-hydro-stats-container"></div>
             </div>
             <div class="popup-crop-history" style="margin-top: 8px;">
               <div class="crop-history-header">
@@ -7865,93 +7705,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
             });
           }
 
-          // Hydrologie trigger in popup and automatic loading
-          const btnHydroInPopup = popupDom.querySelector("#btn-tab-hydro");
-          const hydroStatsBox = popupDom.querySelector("#tab-hydro-stats-container");
-          const solsHydroContainer = popupDom.querySelector("#sols-hydro-container");
-          const solsHydroBadge = popupDom.querySelector("#sols-hydro-badge");
 
-          const targetGeom = parcelGeom || pedoGeom;
-
-          const runHydroCalc = async (isManual = false) => {
-            if (!parcelHydrologyManager) return;
-            if (btnHydroInPopup) {
-              btnHydroInPopup.disabled = true;
-              btnHydroInPopup.textContent = "Calcul de l'écoulement...";
-            }
-            const loadingHtml = `
-              <div style="padding: 7px 10px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; font-size: 11px; color: #0369a1; display: flex; align-items: center; gap: 7px; margin-top: 6px;">
-                <span style="display:inline-block; width:12px; height:12px; border:2px solid #0284c7; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;"></span>
-                <span>Calcul automatique du ruissellement et des cuvettes...</span>
-              </div>
-            `;
-            if (hydroStatsBox && (!hydroStatsBox.innerHTML || isManual)) {
-              hydroStatsBox.innerHTML = loadingHtml;
-            }
-            if (solsHydroContainer && (!solsHydroContainer.innerHTML || isManual)) {
-              solsHydroContainer.innerHTML = loadingHtml;
-            }
-
-            try {
-              const res = await parcelHydrologyManager.analyzeParcel(targetGeom, parcelProps || {}, e.lngLat);
-              if (btnHydroInPopup) btnHydroInPopup.disabled = false;
-              if (res) {
-                if (btnHydroInPopup) btnHydroInPopup.textContent = "Recalculer le ruissellement";
-                const statsHtml = `
-                  <div class="parcel-hydro-stats">
-                    <div class="parcel-hydro-stat-row">
-                      <span>Pente moyenne :</span>
-                      <span class="parcel-hydro-stat-val">${res.avgSlopePct}%</span>
-                    </div>
-                    <div class="parcel-hydro-stat-row">
-                      <span>Dénivelé sur la parcelle :</span>
-                      <span class="parcel-hydro-stat-val">${res.denivele} m (${res.minElev} m &rarr; ${res.maxElev} m)</span>
-                    </div>
-                    <div class="parcel-hydro-stat-row">
-                      <span>Direction dominante :</span>
-                      <span class="parcel-hydro-stat-val">${res.dominantDir}</span>
-                    </div>
-                    <div class="parcel-hydro-stat-row">
-                      <span>Cuvettes &amp; rétention (raster) :</span>
-                      <span class="parcel-hydro-stat-val">${res.cuvetteAreaM2 > 0 ? (res.cuvetteAreaM2 + ' m² • prof. max ' + Math.round(res.maxCuvetteDepth * 100) + ' cm') : 'Aucune stagnation détectée'}</span>
-                    </div>
-                    ${res.cuvetteVolumeM3 > 0 ? `
-                    <div class="parcel-hydro-stat-row">
-                      <span>Volume de rétention estimé :</span>
-                      <span class="parcel-hydro-stat-val">~${res.cuvetteVolumeM3} m³ d'eau</span>
-                    </div>` : ''}
-                  </div>
-                `;
-                if (hydroStatsBox) hydroStatsBox.innerHTML = statsHtml;
-                if (solsHydroContainer) solsHydroContainer.innerHTML = statsHtml;
-                if (solsHydroBadge) {
-                  solsHydroBadge.textContent = `${res.avgSlopePct}% pente • ${res.dominantDir}`;
-                }
-              } else {
-                if (btnHydroInPopup) btnHydroInPopup.textContent = "Écoulement non calculable (hors couverture MNE 1m)";
-                const noDataHtml = `<div style="color: #64748b; font-size: 11px; padding: 4px 0;">MNE 1m non disponible pour ce secteur.</div>`;
-                if (hydroStatsBox) hydroStatsBox.innerHTML = noDataHtml;
-                if (solsHydroContainer) solsHydroContainer.innerHTML = noDataHtml;
-                if (solsHydroBadge) solsHydroBadge.textContent = "Non disponible";
-              }
-            } catch (err) {
-              console.warn("Hydrology calculation execution note:", err);
-              if (btnHydroInPopup) {
-                btnHydroInPopup.disabled = false;
-                btnHydroInPopup.textContent = "Écoulement non calculable";
-              }
-              if (solsHydroBadge) solsHydroBadge.textContent = "Erreur";
-            }
-          };
-
-          if (btnHydroInPopup) {
-            btnHydroInPopup.addEventListener("click", () => runHydroCalc(true));
-          }
-
-          // Chargement automatique immédiat de l'écoulement et des cuvettes
-          if (parcelHydrologyManager && parcelHydrologyManager.enabled) {
-            runHydroCalc(false);
-          }
 
           // Trigger crop history query
           loadCropHistory(e.lngLat, popupDom);
@@ -8776,6 +8530,7 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
         if (toggleParcelles && toggleParcelles.checked) activeLayers.push("parcelles");
         if (toggleTopo && toggleTopo.checked) activeLayers.push("topo");
         if (toggleContours && toggleContours.checked) activeLayers.push("contours");
+        if (toggleHydroParcelle && toggleHydroParcelle.checked) activeLayers.push("hydro");
         if (ndviManager && ndviManager.isActiveMode) activeLayers.push("ndvi");
 
         if (activeLayers.length > 0) {
@@ -8882,6 +8637,19 @@ OPTIONS: [Choix 1 | Choix 2 | Choix 3]
           if (contourManager) {
             contourManager.generateForView();
           }
+        }
+      }
+
+      // 5b. Écoulement & Dépressions
+      if (state.layers.includes("hydro")) {
+        if (toggleHydroParcelle) {
+          toggleHydroParcelle.checked = true;
+          if (parcelHydrologyManager) parcelHydrologyManager.setEnabled(true);
+        }
+      } else if (state.layers.length > 0 && !state.layers.includes("hydro")) {
+        if (toggleHydroParcelle) {
+          toggleHydroParcelle.checked = false;
+          if (parcelHydrologyManager) parcelHydrologyManager.setEnabled(false);
         }
       }
 
