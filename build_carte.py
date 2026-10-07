@@ -4478,6 +4478,7 @@ html_template = """<!DOCTYPE html>
               <em>Historique pluriannuel (2003–2025) non accessible directement : requêtes HTTP Range partielles non autorisées par la politique CORS du stockage GCS distant (bdppad.fgb).</em>
             </div>
           `;
+        }
       }
     }
 
