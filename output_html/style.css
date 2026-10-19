@@ -2008,6 +2008,11 @@ figcaption {
   line-height: 1.55;
 }
 
+.inter-comte-table th:nth-child(3),
+.inter-comte-table td:nth-child(3) {
+  text-align: center;
+}
+
 .inter-comte-table tr:nth-child(even) td {
   background: var(--table-row-alt);
 }
